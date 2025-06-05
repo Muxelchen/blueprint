@@ -75,6 +75,31 @@ import { useAppStore } from './store/appStore'
 import { useDarkMode } from './hooks/useDarkMode'
 import './index.css';
 
+// Add a simple widget wrapper with error boundary
+const WidgetWrapper: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
+  const { isDarkMode } = useDarkMode()
+
+  return (
+    <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+      <h3 className={`text-lg font-semibold mb-4 ${
+        isDarkMode ? 'text-white' : 'text-gray-900'
+      }`}>{title}</h3>
+      <div className="w-full min-h-[240px] overflow-hidden">
+        <ErrorBoundary fallback={
+          <div className="flex items-center justify-center h-full bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="text-center">
+              <p className="text-red-800 font-medium">Widget Error</p>
+              <p className="text-red-600 text-sm">Failed to render {title}</p>
+            </div>
+          </div>
+        }>
+          {children}
+        </ErrorBoundary>
+      </div>
+    </div>
+  )
+}
+
 // Comprehensive Dashboard showcasing all components
 const ComponentShowcase: React.FC = () => {
   const [activeTab, setActiveTab] = useState('widgets')
@@ -175,14 +200,9 @@ const ComponentShowcase: React.FC = () => {
                 { title: 'Data Table', component: <DataTable /> },
                 { title: 'KPI Card', component: <KPICard data={mockKPIData[0]} /> }
               ].map(({ title, component }, idx) => (
-                <div key={idx} className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
-                  <h3 className={`text-lg font-semibold mb-4 ${
-                    isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}>{title}</h3>
-                  <div className="w-full min-h-[240px] overflow-hidden">
-                    {component}
-                  </div>
-                </div>
+                <WidgetWrapper key={idx} title={title}>
+                  {component}
+                </WidgetWrapper>
               ))}
             </div>
           </div>
