@@ -1,5 +1,9 @@
 // Common components - organized by category
 
+// Core System Components
+export { default as AdvancedThemeProvider, useTheme, ThemeSelector } from './AdvancedThemeProvider';
+export { default as ErrorBoundary } from './ErrorBoundary';
+
 // Buttons
 export * from './buttons';
 
@@ -21,3 +25,10 @@ export { default as IconButton } from './buttons/IconButton';
 export { default as InputField } from './inputs/InputField';
 export { default as Modal } from './overlays/Modal';
 export { default as ToastNotification } from './feedback/ToastNotification';
+
+// Re-export theme types for convenience
+export type { 
+  Theme, 
+  ThemeColors, 
+  ThemeContextValue 
+} from './AdvancedThemeProvider';
