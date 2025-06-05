@@ -1,4 +1,6 @@
-// Core types and interfaces
+// Core types and interfaces - organized by category
+
+// Base component interfaces
 export interface BaseComponent {
   id?: string;
   className?: string;
@@ -7,20 +9,20 @@ export interface BaseComponent {
   testId?: string;
 }
 
-export type ComponentSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type ComponentVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
-export type ComponentState = 'default' | 'hover' | 'active' | 'disabled' | 'loading';
-
-// Export WithChildren interface
 export interface WithChildren {
   children: React.ReactNode;
 }
 
-// Export all type modules
-export * from './widgets';
-export * from './layout';
-export * from './navigation';
-export * from './forms';
-export * from './notifications';
-export * from './maps';
-export * from './charts';
+// Component property types
+export type ComponentSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type ComponentVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+export type ComponentState = 'default' | 'hover' | 'active' | 'disabled' | 'loading';
+
+// Type modules - organized by component categories
+export * from './forms';        // Form-related types
+export * from './navigation';   // Navigation component types  
+export * from './layout';       // Layout component types
+export * from './widgets';      // Widget component types
+export * from './charts';       // Chart component types
+export * from './maps';         // Map component types
+export * from './notifications'; // Notification types

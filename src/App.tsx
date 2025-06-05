@@ -16,6 +16,9 @@ import {
 import toast from 'react-hot-toast'
 import { create } from 'zustand'
 import DonutChart from './components/widgets/DonutChart'
+import { DevErrorBoundary } from './components/common/feedback/DevErrorBoundary'
+import './index.css';
+import { TemplateShowcase } from './components';
 
 // Zustand store for global state management
 interface AppState {
@@ -394,7 +397,7 @@ const SettingsPage: React.FC = () => {
   )
 }
 
-// Main App Component
+// Main App Component with Error Boundary
 const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const location = useLocation()
@@ -408,99 +411,117 @@ const App: React.FC = () => {
   ]
 
   return (
-    <div className="h-screen bg-secondary-50 overflow-hidden">
-      {/* Mobile sidebar backdrop */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+    <DevErrorBoundary>
+      <div className="h-screen bg-secondary-50 overflow-hidden">
+        {/* Mobile sidebar backdrop */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
 
-      <div className="flex h-full">
-        {/* Sidebar */}
-        <div className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-0`}>
-          <div className="flex items-center justify-between h-16 px-6 border-b border-secondary-200">
-            <h1 className="text-xl font-bold text-secondary-900">Blueprint</h1>
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="md:hidden p-2 rounded-lg hover:bg-secondary-100"
-            >
-              <X className="w-5 h-5" />
-            </button>
+        <div className="flex h-full">
+          {/* Sidebar */}
+          <div className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-0`}>
+            <div className="flex items-center justify-between h-16 px-6 border-b border-secondary-200">
+              <h1 className="text-xl font-bold text-secondary-900">Blueprint</h1>
+              <button
+                onClick={() => setIsSidebarOpen(false)}
+                className="md:hidden p-2 rounded-lg hover:bg-secondary-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <nav className="mt-6 px-3">
+              <div className="space-y-1">
+                {navigation.map((item) => {
+                  const isActive = location.pathname === item.href
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        isActive
+                          ? 'bg-primary-100 text-primary-700'
+                          : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100'
+                      }`}
+                    >
+                      <item.icon className="mr-3 h-5 w-5" />
+                      {item.name}
+                      {item.name === 'Settings' && notifications > 0 && (
+                        <span className="ml-auto bg-error-500 text-white text-xs px-2 py-1 rounded-full">
+                          {notifications}
+                        </span>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
+            </nav>
           </div>
-          
-          <nav className="mt-6 px-3">
-            <div className="space-y-1">
-              {navigation.map((item) => {
-                const isActive = location.pathname === item.href
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={() => setIsSidebarOpen(false)}
-                    className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100'
-                    }`}
-                  >
-                    <item.icon className="mr-3 h-5 w-5" />
-                    {item.name}
-                    {item.name === 'Settings' && notifications > 0 && (
-                      <span className="ml-auto bg-error-500 text-white text-xs px-2 py-1 rounded-full">
+
+          {/* Main content area */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Top navigation */}
+            <header className="bg-white shadow-sm border-b border-secondary-200 h-16">
+              <div className="flex items-center justify-between h-full px-6">
+                <button
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="md:hidden p-2 rounded-lg hover:bg-secondary-100"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+                
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <Bell className="w-6 h-6 text-secondary-400" />
+                    {notifications > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-error-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                         {notifications}
                       </span>
                     )}
-                  </Link>
-                )
-              })}
-            </div>
-          </nav>
-        </div>
-
-        {/* Main content area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Top navigation */}
-          <header className="bg-white shadow-sm border-b border-secondary-200 h-16">
-            <div className="flex items-center justify-between h-full px-6">
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className="md:hidden p-2 rounded-lg hover:bg-secondary-100"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-              
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <Bell className="w-6 h-6 text-secondary-400" />
-                  {notifications > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-error-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                      {notifications}
-                    </span>
-                  )}
-                </div>
-                <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
                 </div>
               </div>
-            </div>
-          </header>
+            </header>
 
-          {/* Page content */}
-          <main className="flex-1 overflow-auto p-6">
-            <AnimatePresence mode="wait">
-              <Routes location={location} key={location.pathname}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/analytics" element={<AnalyticsPage />} />
-                <Route path="/map" element={<MapPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-              </Routes>
-            </AnimatePresence>
-          </main>
+            {/* Page content with error boundary for individual routes */}
+            <main className="flex-1 overflow-auto p-6">
+              <AnimatePresence mode="wait">
+                <Routes location={location} key={location.pathname}>
+                  <Route path="/" element={
+                    <DevErrorBoundary>
+                      <HomePage />
+                    </DevErrorBoundary>
+                  } />
+                  <Route path="/analytics" element={
+                    <DevErrorBoundary>
+                      <AnalyticsPage />
+                    </DevErrorBoundary>
+                  } />
+                  <Route path="/map" element={
+                    <DevErrorBoundary>
+                      <MapPage />
+                    </DevErrorBoundary>
+                  } />
+                  <Route path="/settings" element={
+                    <DevErrorBoundary>
+                      <SettingsPage />
+                    </DevErrorBoundary>
+                  } />
+                </Routes>
+              </AnimatePresence>
+            </main>
+          </div>
         </div>
       </div>
-    </div>
+    </DevErrorBoundary>
   )
 }
 

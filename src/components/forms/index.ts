@@ -1,6 +1,8 @@
-// Form components and utilities
-export { 
-  default as Form,
+// Forms components
+export { default as Form } from './Form';
+
+// Re-export form hooks and utilities
+export {
   FormField,
   FormActions,
   FormStatus,
@@ -8,13 +10,4 @@ export {
   useFormValidation,
   useFormState,
   useFormActions
-} from './Form';
-export type {
-  FormProps,
-  FormFieldProps,
-  FormState,
-  FormContextValue,
-  FormActions as FormActionsType,
-  ValidationRule,
-  FormFieldWrapperProps
 } from './Form';
