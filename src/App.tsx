@@ -63,39 +63,11 @@ const ComponentShowcase: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { isDarkMode } = useDarkMode()
   
-  const showcaseTabs = [
-    { 
-      id: 'widgets', 
-      label: 'Charts & Widgets', 
-      icon: <BarChart3 className="w-4 h-4" />,
-      content: <div>Widgets content</div>
-    },
-    { 
-      id: 'display', 
-      label: 'Display Components', 
-      icon: <Grid className="w-4 h-4" />,
-      content: <div>Display content</div>
-    },
-    { 
-      id: 'advanced', 
-      label: 'Advanced Layout', 
-      icon: <Settings className="w-4 h-4" />,
-      content: <div>Advanced content</div>
-    },
-    { 
-      id: 'feedback', 
-      label: 'Feedback & Loading', 
-      icon: <Activity className="w-4 h-4" />,
-      content: <div>Feedback content</div>
-    },
-    { 
-      id: 'templates', 
-      label: 'Templates', 
-      icon: <Table className="w-4 h-4" />,
-      content: <div>Templates content</div>
-    }
-  ]
-
+  const handleTabChange = (tabId: string) => {
+    console.log('App.tsx - Tab change handler called with:', tabId);
+    setActiveTab(tabId);
+  };
+  
   const mockKPIData = [
     {
       id: 'revenue',
@@ -106,6 +78,7 @@ const ComponentShowcase: React.FC = () => {
       unit: '',
       format: 'currency' as const,
       trend: 'up' as const,
+      change: 6363, // Added missing change property
       changePercent: 5.3,
       icon: DollarSign,
       color: '#10B981'
@@ -119,6 +92,7 @@ const ComponentShowcase: React.FC = () => {
       unit: '',
       format: 'number' as const,
       trend: 'up' as const,
+      change: 315, // Added missing change property
       changePercent: 8.6,
       icon: Users,
       color: '#3B82F6'
@@ -131,6 +105,7 @@ const ComponentShowcase: React.FC = () => {
       unit: '%',
       format: 'percentage' as const,
       trend: 'down' as const,
+      change: -0.26, // Added missing change property
       changePercent: -2.1,
       icon: TrendingUp,
       color: '#F59E0B'
@@ -144,78 +119,61 @@ const ComponentShowcase: React.FC = () => {
       unit: '%',
       format: 'percentage' as const,
       trend: 'up' as const,
+      change: 3, // Added missing change property
       changePercent: 5.3,
       icon: Target,
       color: '#8B5CF6'
     }
   ]
-
-  const mockTableData = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', department: 'Engineering', joinDate: '2024-01-15', salary: 95000, performance: 92, status: 'Active' as const },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', department: 'Marketing', joinDate: '2024-02-20', salary: 75000, performance: 88, status: 'Active' as const },
-    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor', department: 'Content', joinDate: '2024-03-10', salary: 65000, performance: 78, status: 'Inactive' as const },
-    { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'User', department: 'Sales', joinDate: '2024-04-05', salary: 80000, performance: 95, status: 'Pending' as const }
-  ]
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="space-y-8"
-    >
-      <div className="text-center">
-        <h1 className={`text-4xl font-bold mb-4 ${
-          isDarkMode ? 'text-white' : 'text-secondary-900'
-        }`}>
-          Blueprint Component Showcase
-        </h1>
-        <p className={`text-lg max-w-3xl mx-auto ${
-          isDarkMode ? 'text-gray-300' : 'text-secondary-600'
-        }`}>
-          Comprehensive demonstration of all Blueprint components working together.
-          This dashboard verifies that every component in your system is functional.
-        </p>
-      </div>
-
-      {/* Alert Banner */}
-      <AlertBanner
-        type="success"
-        title="System Status"
-        message="All Blueprint components are loaded and functional!"
-        dismissible={true}
-      />
-
-      {/* Tab Navigation */}
-      <TabNavigation
-        tabs={showcaseTabs}
-        defaultActiveTab={activeTab}
-        onTabChange={setActiveTab}
-        variant="underline"
-      />
-
-      {/* Widgets Showcase */}
-      {activeTab === 'widgets' && (
+  
+  const showcaseTabs = [
+    { 
+      id: 'widgets', 
+      label: 'Charts & Widgets', 
+      icon: <BarChart3 className="w-4 h-4" />,
+      content: (
         <div className="space-y-8">
-          {/* Test Section - Start with just one component */}
+          {/* Showcase all widget components */}
           <div>
             <h2 className={`text-2xl font-bold mb-6 ${
               isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>Chart Components Test</h2>
-            <div className="grid grid-cols-1 gap-6">
-              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
-                <h3 className={`text-lg font-semibold mb-4 ${
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>Line Chart</h3>
-                <LineChart />
-              </div>
+            }`}>Chart & Widget Components</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { title: 'Area Chart', component: <AreaChart /> },
+                { title: 'Bar Chart', component: <BarChart /> },
+                { title: 'Donut Chart', component: <DonutChart /> },
+                { title: 'Line Chart', component: <LineChart /> },
+                { title: 'Pie Chart', component: <PieChartWidget /> },
+                { title: 'Gauge Chart', component: <GaugeChart /> },
+                { title: 'Realtime Chart', component: <RealtimeChart /> },
+                { title: 'Heatmap', component: <Heatmap /> },
+                { title: 'Scatter Plot', component: <ScatterPlot /> },
+                { title: 'Treemap', component: <Treemap /> },
+                { title: 'Timeline', component: <Timeline /> },
+                { title: 'Calendar', component: <Calendar /> },
+                { title: 'Progress Bar', component: <ProgressBar /> },
+                { title: 'Weather Widget', component: <WeatherWidget /> },
+                { title: 'Data Table', component: <DataTable /> },
+                { title: 'KPI Card', component: <KPICard data={mockKPIData[0]} /> }
+              ].map(({ title, component }, idx) => (
+                <div key={idx} className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                  <h3 className={`text-lg font-semibold mb-4 ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  }`}>{title}</h3>
+                  {component}
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      )}
-
-      {/* Display Components */}
-      {activeTab === 'display' && (
+      )
+    },
+    { 
+      id: 'display', 
+      label: 'Display Components', 
+      icon: <Grid className="w-4 h-4" />,
+      content: (
         <div className="space-y-8">
           {/* Status Indicators */}
           <div>
@@ -306,69 +264,13 @@ const ComponentShowcase: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Feedback Components */}
-      {activeTab === 'feedback' && (
-        <div className="space-y-8">
-          {/* Loading States */}
-          <div>
-            <h2 className={`text-2xl font-bold mb-6 ${
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>Loading States</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
-                <h3 className={`text-lg font-semibold mb-4 ${
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>Loading Component</h3>
-                <div className="flex space-x-4">
-                  <Button 
-                    onClick={() => {
-                      setIsLoading(true)
-                      setTimeout(() => setIsLoading(false), 3000)
-                    }}
-                  >
-                    Trigger Loading
-                  </Button>
-                </div>
-                {isLoading && (
-                  <div className="mt-4">
-                    <LoadingState message="Loading data..." />
-                  </div>
-                )}
-              </div>
-              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
-                <h3 className={`text-lg font-semibold mb-4 ${
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>Skeleton Screen</h3>
-                <SkeletonScreen type="card" count={3} />
-              </div>
-            </div>
-          </div>
-
-          {/* Buttons */}
-          <div>
-            <h2 className={`text-2xl font-bold mb-6 ${
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>Button Components</h2>
-            <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Button variant="primary">Primary</Button>
-                <Button variant="secondary">Secondary</Button>
-                <Button variant="outline">Outline</Button>
-                <Button variant="ghost">Ghost</Button>
-                <Button variant="primary" size="sm">Small</Button>
-                <Button variant="secondary" size="lg">Large</Button>
-                <IconButton icon={<Bell />} tooltip="Notifications" />
-                <Button variant="primary" leftIcon={<User />}>With Icon</Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Advanced Layout Components */}
-      {activeTab === 'advanced' && (
+      )
+    },
+    { 
+      id: 'advanced', 
+      label: 'Advanced Layout', 
+      icon: <Settings className="w-4 h-4" />,
+      content: (
         <div className="space-y-8">
           {/* Advanced Layout Manager */}
           <div>
@@ -448,10 +350,75 @@ const ComponentShowcase: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
+      )
+    },
+    { 
+      id: 'feedback', 
+      label: 'Feedback & Loading', 
+      icon: <Activity className="w-4 h-4" />,
+      content: (
+        <div className="space-y-8">
+          {/* Loading States */}
+          <div>
+            <h2 className={`text-2xl font-bold mb-6 ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>Loading States</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}>Loading Component</h3>
+                <div className="flex space-x-4">
+                  <Button 
+                    onClick={() => {
+                      setIsLoading(true)
+                      setTimeout(() => setIsLoading(false), 3000)
+                    }}
+                  >
+                    Trigger Loading
+                  </Button>
+                </div>
+                {isLoading && (
+                  <div className="mt-4">
+                    <LoadingState message="Loading data..." />
+                  </div>
+                )}
+              </div>
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}>Skeleton Screen</h3>
+                <SkeletonScreen type="card" count={3} />
+              </div>
+            </div>
+          </div>
 
-      {/* Templates */}
-      {activeTab === 'templates' && (
+          {/* Buttons */}
+          <div>
+            <h2 className={`text-2xl font-bold mb-6 ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>Button Components</h2>
+            <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Button variant="primary">Primary</Button>
+                <Button variant="secondary">Secondary</Button>
+                <Button variant="outline">Outline</Button>
+                <Button variant="ghost">Ghost</Button>
+                <Button variant="primary" size="sm">Small</Button>
+                <Button variant="secondary" size="lg">Large</Button>
+                <IconButton icon={<Bell />} tooltip="Notifications" />
+                <Button variant="primary" leftIcon={<User />}>With Icon</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    { 
+      id: 'templates', 
+      label: 'Templates', 
+      icon: <Table className="w-4 h-4" />,
+      content: (
         <div className="space-y-8">
           <div>
             <h2 className={`text-2xl font-bold mb-6 ${
@@ -460,7 +427,46 @@ const ComponentShowcase: React.FC = () => {
             <TemplateShowcase />
           </div>
         </div>
-      )}
+      )
+    }
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="space-y-8"
+    >
+      <div className="text-center">
+        <h1 className={`text-4xl font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-secondary-900'
+        }`}>
+          Blueprint Component Showcase
+        </h1>
+        <p className={`text-lg max-w-3xl mx-auto ${
+          isDarkMode ? 'text-gray-300' : 'text-secondary-600'
+        }`}>
+          Comprehensive demonstration of all Blueprint components working together.
+          This dashboard verifies that every component in your system is functional.
+        </p>
+      </div>
+
+      {/* Alert Banner */}
+      <AlertBanner
+        type="success"
+        title="System Status"
+        message="All Blueprint components are loaded and functional!"
+        dismissible={true}
+      />
+
+      {/* Tab Navigation - This handles all content display */}
+      <TabNavigation
+        tabs={showcaseTabs}
+        defaultActiveTab="widgets"
+        onTabChange={handleTabChange}
+        variant="underline"
+      />
     </motion.div>
   )
 }
@@ -865,7 +871,7 @@ const App: React.FC = () => {
 
   return (
     <DevErrorBoundary>
-      <div className={`h-screen overflow-hidden transition-colors duration-300 ${
+      <div className={`min-h-screen transition-colors duration-300 ${
         isDarkMode ? 'bg-gray-900' : 'bg-secondary-50'
       }`}>
         {/* Mobile sidebar backdrop */}
@@ -876,7 +882,7 @@ const App: React.FC = () => {
           />
         )}
 
-        <div className="flex h-full">
+        <div className="flex min-h-screen">
           {/* Sidebar */}
           <div className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 shadow-xl transform transition-all duration-300 ease-in-out md:translate-x-0 md:static md:inset-0 ${
             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-secondary-200'
@@ -931,9 +937,9 @@ const App: React.FC = () => {
           </div>
 
           {/* Main content area */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col min-h-screen">
             {/* Top navigation */}
-            <header className={`shadow-sm border-b h-16 transition-colors duration-300 ${
+            <header className={`shadow-sm border-b h-16 flex-shrink-0 transition-colors duration-300 ${
               isDarkMode 
                 ? 'bg-gray-800 border-gray-700' 
                 : 'bg-white border-secondary-200'
@@ -967,7 +973,7 @@ const App: React.FC = () => {
             </header>
 
             {/* Page content with error boundary for individual routes */}
-            <main className="flex-1 overflow-auto p-6">
+            <main className="flex-1 p-6 overflow-y-auto">
               <AnimatePresence mode="wait">
                 <Routes location={location} key={location.pathname}>
                   <Route path="/" element={

@@ -78,15 +78,15 @@ export const exportChartAsPNG = async (
   try {
     const { default: html2canvas } = await import('html2canvas');
     const canvas = await html2canvas(element, {
-      backgroundColor: options.backgroundColor || '#ffffff',
+      background: options.backgroundColor || '#ffffff',
       scale: options.scale || 2,
       width: options.width,
       height: options.height,
       useCORS: true,
       allowTaint: false
-    });
+    } as any);
 
-    canvas.toBlob((blob) => {
+    canvas.toBlob((blob: Blob | null) => {
       if (blob) {
         saveAs(blob, `${options.filename || 'chart'}.png`);
       }

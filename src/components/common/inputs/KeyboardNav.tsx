@@ -262,7 +262,16 @@ const KeyboardNav: React.FC<KeyboardNavProps> = ({
   // Effects
   useEffect(() => {
     updateFocusableElements();
-  }, [updateFocusableElements, children]);
+    
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleMouseDown);
+    
+    return () => {
+      // Clean up event listeners to prevent memory leaks
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, [updateFocusableElements, handleKeyDown, handleMouseDown]);
 
   useEffect(() => {
     if (focusOnMount && focusableElements.length > 0) {

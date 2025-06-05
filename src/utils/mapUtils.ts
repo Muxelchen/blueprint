@@ -103,12 +103,10 @@ export const calculateCenter = (points: Coordinates[]): Coordinates => {
 };
 
 // Bounds calculation
-export const calculateBounds = (points: Coordinates[]): Bounds => {
+export const calculateBounds = (points: Coordinates[]): Bounds | null => {
   if (points.length === 0) {
-    return {
-      northeast: { latitude: 0, longitude: 0 },
-      southwest: { latitude: 0, longitude: 0 }
-    };
+    // Return null to indicate no bounds available
+    return null;
   }
   
   const latitudes = points.map(p => p.latitude);

@@ -279,26 +279,78 @@ export const Form: React.FC<FormProps> = ({
 
   // Set field value
   const setFieldValue = useCallback(async (name: string, value: any) => {
-    setState(prev => ({
-      ...prev,
-      fields: {
+    // First update the state with new value
+    setState(prev => {
+      // Create a copy of the updated fields with the new value
+      const updatedFields = {
         ...prev.fields,
         [name]: {
           ...prev.fields[name],
           value,
           dirty: true
         }
-      },
-      isDirty: true
-    }));
-
-    // Validate on change if enabled
-    if (validateOnChange) {
-      const allValues = { ...Object.fromEntries(Object.entries(state.fields).map(([k, v]) => [k, v.value])), [name]: value };
-      const error = await validateValue(name, value, allValues);
-      setFieldError(name, error);
-    }
-  }, [state.fields, validateOnChange, validateValue]);
+      };
+      
+      // Start with the current state
+      const newState = {
+        ...prev,
+        fields: updatedFields,
+        isDirty: true
+      };
+      
+      // Handle validation in the same state update if needed
+      if (validateOnChange) {
+        // Schedule validation to run after state update
+        setTimeout(async () => {
+          const allValues = Object.fromEntries(
+            Object.entries(updatedFields).map(([k, v]) => [k, v.value])
+          );
+          
+          const error = await validateValue(name, value, allValues);
+          
+          // Update state directly for the error
+          setState(currentState => {
+            // If there's an error, add it
+            if (error) {
+              return {
+                ...currentState,
+                fields: {
+                  ...currentState.fields,
+                  [name]: {
+                    ...currentState.fields[name],
+                    valid: false
+                  }
+                },
+                errors: {
+                  ...currentState.errors,
+                  [name]: error
+                }
+              };
+            } 
+            // If no error, remove any existing error
+            else if (currentState.errors[name]) {
+              const { [name]: removed, ...restErrors } = currentState.errors;
+              return {
+                ...currentState,
+                fields: {
+                  ...currentState.fields,
+                  [name]: {
+                    ...currentState.fields[name],
+                    valid: true
+                  }
+                },
+                errors: restErrors
+              };
+            }
+            
+            return currentState;
+          });
+        }, 0);
+      }
+      
+      return newState;
+    });
+  }, [validateOnChange, validateValue]);
 
   // Set field error
   const setFieldError = useCallback((name: string, error?: string) => {

@@ -67,6 +67,12 @@ const Stepper: React.FC<StepperProps> = ({
       setIsValidating(false);
       return isValid;
     } catch (error) {
+      // Always mark step as invalid if validation throws an exception
+      const newErrors = new Set(validationErrors);
+      newErrors.add(activeStep);
+      setValidationErrors(newErrors);
+      
+      console.error(`Error validating step ${activeStep}:`, error);
       setIsValidating(false);
       return false;
     }

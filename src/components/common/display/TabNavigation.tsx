@@ -31,137 +31,153 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
   onTabClose
 }) => {
   const [activeTab, setActiveTab] = useState(defaultActiveTab || tabs[0]?.id || '');
-  const [tabList, setTabList] = useState(tabs);
+  const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
   const handleTabClick = (tabId: string) => {
-    const tab = tabList.find(t => t.id === tabId);
+    const tab = tabs.find(t => t.id === tabId);
     if (tab && !tab.disabled) {
       setActiveTab(tabId);
       onTabChange?.(tabId);
     }
   };
 
-  const handleTabClose = (tabId: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    const newTabs = tabList.filter(tab => tab.id !== tabId);
-    setTabList(newTabs);
-    
-    if (activeTab === tabId && newTabs.length > 0) {
-      const newActiveTab = newTabs[0].id;
-      setActiveTab(newActiveTab);
-      onTabChange?.(newActiveTab);
+  // Clean style functions without complex hover logic
+  const getTabButtonStyles = (tabId: string) => {
+    const tab = tabs.find(t => t.id === tabId);
+    const isActive = activeTab === tabId;
+    const isHovered = hoveredTab === tabId;
+    const isDisabled = tab?.disabled;
+
+    // Base styles for all variants
+    const baseStyles = {
+      padding: '12px 16px',
+      border: 'none',
+      cursor: isDisabled ? 'not-allowed' : 'pointer',
+      fontSize: '14px',
+      fontWeight: '500' as const,
+      opacity: isDisabled ? 0.5 : 1,
+      transition: 'all 0.15s ease',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      position: 'relative' as const,
+      zIndex: 1,
+      outline: 'none',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      whiteSpace: 'nowrap' as const,
+      userSelect: 'none' as const,
+      textDecoration: 'none',
+      lineHeight: '1.5',
+      borderRadius: '6px'
+    };
+
+    // Different styles based on variant and state
+    if (variant === 'underline') {
+      return {
+        ...baseStyles,
+        backgroundColor: 'transparent',
+        color: isActive ? '#2563eb' : (isHovered && !isActive && !isDisabled ? '#374151' : '#64748b'),
+        borderBottom: isActive ? '3px solid #2563eb' : '3px solid transparent',
+        borderRadius: '0',
+        paddingBottom: '12px'
+      };
     }
-    
-    onTabClose?.(tabId);
-  };
 
-  const getTabButtonClasses = (tab: Tab) => {
-    const baseClasses = 'relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none';
-    const isActive = activeTab === tab.id;
-    const isDisabled = tab.disabled;
+    if (variant === 'pills') {
+      return {
+        ...baseStyles,
+        backgroundColor: isActive ? '#2563eb' : (isHovered && !isActive && !isDisabled ? '#e2e8f0' : '#f8fafc'),
+        color: isActive ? 'white' : '#475569',
+        borderRadius: '20px',
+        padding: '10px 18px',
+        boxShadow: isActive ? '0 2px 8px rgba(37, 99, 235, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.1)'
+      };
+    }
 
-    const variantClasses = {
-      default: `
-        border-b-2 rounded-t-md
-        ${isActive 
-          ? 'border-blue-500 text-blue-600 bg-blue-50' 
-          : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
-        }
-        ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-      `,
-      pills: `
-        rounded-full
-        ${isActive 
-          ? 'bg-blue-600 text-white shadow-md' 
-          : 'text-gray-600 hover:bg-gray-100'
-        }
-        ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-      `,
-      underline: `
-        border-b-2 pb-2
-        ${isActive 
-          ? 'border-blue-500 text-blue-600' 
-          : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
-        }
-        ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-      `,
-      cards: `
-        rounded-lg border
-        ${isActive 
-          ? 'bg-white border-blue-500 text-blue-600 shadow-md' 
-          : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300'
-        }
-        ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-      `
+    if (variant === 'cards') {
+      return {
+        ...baseStyles,
+        backgroundColor: isActive ? '#ffffff' : (isHovered && !isActive && !isDisabled ? '#ffffff' : '#f8fafc'),
+        color: isActive ? '#2563eb' : '#475569',
+        border: isActive ? '2px solid #2563eb' : '1px solid #e2e8f0',
+        borderRadius: '8px',
+        boxShadow: isActive ? '0 4px 12px rgba(37, 99, 235, 0.15)' : '0 1px 3px rgba(0, 0, 0, 0.1)'
+      };
+    }
+
+    // Default variant
+    return {
+      ...baseStyles,
+      backgroundColor: isActive ? '#eff6ff' : (isHovered && !isActive && !isDisabled ? '#f8fafc' : 'transparent'),
+      color: isActive ? '#2563eb' : (isHovered && !isActive && !isDisabled ? '#374151' : '#6b7280'),
+      borderBottom: isActive ? '2px solid #2563eb' : '2px solid transparent',
+      borderRadius: '6px 6px 0 0',
+      paddingBottom: '10px'
     };
-
-    return `${baseClasses} ${variantClasses[variant]}`;
   };
 
-  const getTabListClasses = () => {
-    const baseClasses = orientation === 'horizontal' ? 'flex' : 'flex flex-col space-y-1';
-    
-    const variantClasses = {
-      default: orientation === 'horizontal' ? 'border-b border-gray-200' : '',
-      pills: orientation === 'horizontal' ? 'space-x-2' : '',
-      underline: orientation === 'horizontal' ? 'space-x-8' : '',
-      cards: orientation === 'horizontal' ? 'space-x-2 p-2 bg-gray-100 rounded-lg' : 'space-y-2 p-2 bg-gray-100 rounded-lg'
-    };
-
-    return `${baseClasses} ${variantClasses[variant]}`;
-  };
-
-  const activeTabContent = tabList.find(tab => tab.id === activeTab)?.content;
+  const activeTabContent = tabs.find(tab => tab.id === activeTab)?.content;
 
   return (
-    <div className={`tab-navigation ${className}`}>
-      <div className={orientation === 'horizontal' ? 'flex flex-col' : 'flex'}>
-        {/* Tab List */}
-        <div className={`${getTabListClasses()} ${orientation === 'vertical' ? 'w-64 mr-6' : ''}`}>
-          {tabList.map((tab) => (
-            <button
-              key={tab.id}
-              className={getTabButtonClasses(tab)}
-              onClick={() => handleTabClick(tab.id)}
-              disabled={tab.disabled}
-              aria-selected={activeTab === tab.id}
-              role="tab"
-            >
-              {tab.icon && (
-                <span className="w-4 h-4">{tab.icon}</span>
-              )}
-              
-              <span>{tab.label}</span>
-              
-              {tab.badge && (
-                <span className="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">
-                  {tab.badge}
-                </span>
-              )}
-              
-              {tab.closable && (
-                <button
-                  className="ml-2 p-0.5 hover:bg-gray-200 rounded-full transition-colors"
-                  onClick={(e) => handleTabClose(tab.id, e)}
-                  aria-label={`Close ${tab.label} tab`}
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </button>
-          ))}
-        </div>
+    <div style={{ width: '100%', position: 'relative' }}>
+      {/* Tab List */}
+      <div style={{
+        display: 'flex',
+        gap: variant === 'underline' ? '32px' : '8px',
+        marginBottom: '20px',
+        borderBottom: variant === 'underline' || variant === 'default' ? '1px solid #e5e7eb' : 'none',
+        paddingBottom: '0px'
+      }}>
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => handleTabClick(tab.id)}
+            onMouseEnter={() => setHoveredTab(tab.id)}
+            onMouseLeave={() => setHoveredTab(null)}
+            disabled={tab.disabled}
+            style={getTabButtonStyles(tab.id)}
+          >
+            {tab.icon && (
+              <span style={{ 
+                width: '16px', 
+                height: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {tab.icon}
+              </span>
+            )}
+            <span>{tab.label}</span>
+            {tab.badge && (
+              <span style={{
+                backgroundColor: '#ef4444',
+                color: 'white',
+                fontSize: '11px',
+                fontWeight: '600',
+                padding: '2px 6px',
+                borderRadius: '10px',
+                marginLeft: '4px',
+                minWidth: '18px',
+                height: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {tab.badge}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
 
-        {/* Tab Content */}
-        <div className={`tab-content ${orientation === 'vertical' ? 'flex-1' : 'mt-4'}`}>
-          {activeTabContent && (
-            <div className="fade-in">
-              {activeTabContent}
-            </div>
-          )}
-        </div>
+      {/* Tab Content */}
+      <div style={{ width: '100%', minHeight: '200px' }}>
+        {activeTabContent && (
+          <div key={activeTab}>
+            {activeTabContent}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -72,8 +72,9 @@ const TreemapComponent: React.FC<TreemapProps> = ({
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const total = data.children ? data.children.reduce((sum: number, child: TreemapData) => sum + child.size, 0) : data.size;
-      const percentage = ((total / data.size) * 100).toFixed(1);
+      const allData = mockData.flatMap(category => category.children || []);
+      const totalSize = allData.reduce((sum, item) => sum + item.size, 0);
+      const percentage = ((data.size / totalSize) * 100).toFixed(1);
       
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
@@ -101,12 +102,12 @@ const TreemapComponent: React.FC<TreemapProps> = ({
   };
 
   const CustomContent = ({ x, y, width, height, payload }: any) => {
-    if (width < 10 || height < 10) return null;
+    if (width < 10 || height < 10 || !payload) return null;
     
     const isSelected = selectedNode === payload.name;
     const isHovered = hoveredNode === payload.name;
     const colorIndex = mockData.findIndex(item => item.name === payload.name);
-    const color = colors[colorIndex % colors.length];
+    const color = payload.color || colors[colorIndex % colors.length];
     
     // Calculate font size based on area
     let fontSize = Math.min(width / 8, height / 3, 16);
@@ -137,7 +138,7 @@ const TreemapComponent: React.FC<TreemapProps> = ({
           onMouseLeave={() => setHoveredNode(null)}
         />
         
-        {showText && (
+        {showText && payload.name && (
           <text
             x={x + width / 2}
             y={y + height / 2}
@@ -151,9 +152,9 @@ const TreemapComponent: React.FC<TreemapProps> = ({
             <tspan x={x + width / 2} dy="0">
               {payload.name.length > 10 ? payload.name.substring(0, 10) + '...' : payload.name}
             </tspan>
-            {showValue && (
+            {showValue && payload.size && (
               <tspan x={x + width / 2} dy={fontSize + 2} fontSize={fontSize * 0.8}>
-                {payload.value}
+                {payload.size.toLocaleString()}
               </tspan>
             )}
           </text>
@@ -216,7 +217,8 @@ const TreemapComponent: React.FC<TreemapProps> = ({
         <div className="grid grid-cols-2 gap-4">
           {mockData.map((category) => {
             const total = category.children ? category.children.reduce((sum: number, child: TreemapData) => sum + child.size, 0) : category.size;
-            const percentage = ((total / category.size) * 100).toFixed(1);
+            const allDataTotal = mockData.flatMap(cat => cat.children || []).reduce((sum, item) => sum + item.size, 0);
+            const percentage = ((total / allDataTotal) * 100).toFixed(1);
             const isSelected = selectedNode === category.name;
             
             return (
@@ -242,7 +244,7 @@ const TreemapComponent: React.FC<TreemapProps> = ({
                     className="h-2 rounded-full transition-all duration-500"
                     style={{ 
                       width: `${percentage}%`,
-                      backgroundColor: data.find(d => d.name === category.name)?.color || '#3B82F6'
+                      backgroundColor: category.color || '#3B82F6'
                     }}
                   ></div>
                 </div>
@@ -256,18 +258,42 @@ const TreemapComponent: React.FC<TreemapProps> = ({
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
         <div className="grid grid-cols-3 gap-4 text-center text-sm">
           <div>
-            <p className="font-bold text-lg">{mockData.reduce((sum, item) => sum + item.size, 0).toLocaleString()}</p>
+            <p className="font-bold text-lg">
+              {mockData.flatMap(cat => cat.children || []).reduce((sum, item) => sum + item.size, 0).toLocaleString()}
+            </p>
             <p className="text-gray-600">Total Size</p>
           </div>
           <div>
-            <p className="font-bold text-lg">{mockData[0].name}</p>
-            <p className="text-gray-600">Largest Dept</p>
-            <p className="text-xs text-gray-500">({mockData[0].size.toLocaleString()})</p>
+            {(() => {
+              const categoryTotals = mockData.map(cat => ({
+                name: cat.name,
+                total: cat.children ? cat.children.reduce((sum, child) => sum + child.size, 0) : cat.size
+              }));
+              const largest = categoryTotals.reduce((max, cat) => cat.total > max.total ? cat : max);
+              return (
+                <>
+                  <p className="font-bold text-lg">{largest.name}</p>
+                  <p className="text-gray-600">Largest Dept</p>
+                  <p className="text-xs text-gray-500">({largest.total.toLocaleString()})</p>
+                </>
+              );
+            })()}
           </div>
           <div>
-            <p className="font-bold text-lg">{mockData[mockData.length - 1].name}</p>
-            <p className="text-gray-600">Smallest Dept</p>
-            <p className="text-xs text-gray-500">({mockData[mockData.length - 1].size.toLocaleString()})</p>
+            {(() => {
+              const categoryTotals = mockData.map(cat => ({
+                name: cat.name,
+                total: cat.children ? cat.children.reduce((sum, child) => sum + child.size, 0) : cat.size
+              }));
+              const smallest = categoryTotals.reduce((min, cat) => cat.total < min.total ? cat : min);
+              return (
+                <>
+                  <p className="font-bold text-lg">{smallest.name}</p>
+                  <p className="text-gray-600">Smallest Dept</p>
+                  <p className="text-xs text-gray-500">({smallest.total.toLocaleString()})</p>
+                </>
+              );
+            })()}
           </div>
         </div>
       </div>

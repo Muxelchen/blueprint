@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Minus, Target, DollarSign, Users, Activity, Award } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { TrendingUp, TrendingDown, Activity, DollarSign, Users, Target, Award, Minus } from 'lucide-react';
 
 interface KPIData {
   id: string;
   title: string;
   value: number;
   previousValue: number;
+  change: number;
   target?: number;
   unit: string;
   format: 'number' | 'currency' | 'percentage';
@@ -22,6 +23,7 @@ const mockKPIs: KPIData[] = [
     title: 'Monthly Revenue',
     value: 124500,
     previousValue: 118200,
+    change: 6300,
     target: 130000,
     unit: '',
     format: 'currency',
@@ -36,6 +38,7 @@ const mockKPIs: KPIData[] = [
     title: 'Active Users',
     value: 8945,
     previousValue: 8234,
+    change: 711,
     target: 10000,
     unit: '',
     format: 'number',
@@ -50,6 +53,7 @@ const mockKPIs: KPIData[] = [
     title: 'Conversion Rate',
     value: 3.24,
     previousValue: 2.98,
+    change: 0.26,
     unit: '%',
     format: 'percentage',
     trend: 'up',
@@ -63,6 +67,7 @@ const mockKPIs: KPIData[] = [
     title: 'Performance Score',
     value: 94.2,
     previousValue: 91.8,
+    change: 2.4,
     target: 95,
     unit: '%',
     format: 'percentage',
@@ -77,6 +82,7 @@ const mockKPIs: KPIData[] = [
     title: 'User Engagement',
     value: 76.8,
     previousValue: 78.2,
+    change: -1.4,
     unit: '%',
     format: 'percentage',
     trend: 'down',
@@ -108,18 +114,8 @@ const KPICard: React.FC<KPICardProps> = ({
   // If no specific KPI data provided, use the first mock KPI
   const kpi = data || mockKPIs[0];
 
-  useEffect(() => {
-    if (animate) {
-      const timer = setTimeout(() => {
-        setAnimatedValue(kpi.value);
-      }, 100);
-      return () => clearTimeout(timer);
-    } else {
-      setAnimatedValue(kpi.value);
-    }
-  }, [kpi.value, animate]);
-
-  const formatValue = (value: number, format: string, unit: string) => {
+  // Move formatValue function BEFORE it's used in useMemo
+  const formatValue = useCallback((value: number, format: string, unit: string) => {
     switch (format) {
       case 'currency':
         return new Intl.NumberFormat('en-US', {
@@ -136,7 +132,41 @@ const KPICard: React.FC<KPICardProps> = ({
           ? `${(value / 1000).toFixed(1)}k${unit}`
           : `${value.toLocaleString()}${unit}`;
     }
-  };
+  }, []);
+
+  // Memoize expensive calculations - NOW formatValue is available
+  const targetProgress = useMemo(() => {
+    if (!kpi.target) return 0;
+    return Math.min((kpi.value / kpi.target) * 100, 100);
+  }, [kpi.value, kpi.target]);
+
+  const formattedValue = useMemo(() => {
+    return formatValue(animatedValue, kpi.format, kpi.unit);
+  }, [formatValue, animatedValue, kpi.format, kpi.unit]);
+
+  const formattedPreviousValue = useMemo(() => {
+    return formatValue(kpi.previousValue, kpi.format, kpi.unit);
+  }, [formatValue, kpi.previousValue, kpi.format, kpi.unit]);
+
+  // Use useCallback for event handlers to prevent unnecessary re-renders
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+  }, []);
+
+  useEffect(() => {
+    if (animate) {
+      const timer = setTimeout(() => {
+        setAnimatedValue(kpi.value);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setAnimatedValue(kpi.value);
+    }
+  }, [kpi.value, animate]);
 
   const getTrendIcon = () => {
     switch (kpi.trend) {
@@ -158,11 +188,6 @@ const KPICard: React.FC<KPICardProps> = ({
       default:
         return 'text-gray-600 bg-gray-100';
     }
-  };
-
-  const getTargetProgress = () => {
-    if (!kpi.target) return 0;
-    return Math.min((kpi.value / kpi.target) * 100, 100);
   };
 
   const sizeClasses = {
@@ -190,21 +215,18 @@ const KPICard: React.FC<KPICardProps> = ({
   };
 
   const Icon = kpi.icon;
-  const targetProgress = getTargetProgress();
 
   return (
     <div 
-      className={`bg-white rounded-lg shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl cursor-pointer ${sizeClasses[size]} ${
-        isHovered ? 'scale-105' : ''
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className={`bg-white rounded-lg shadow-lg border border-gray-200 performance-hover cursor-pointer ${sizeClasses[size]} gpu-accelerated`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div 
-            className={`${iconSizes[size]} rounded-lg flex items-center justify-center text-white transition-all duration-300`}
+            className={`${iconSizes[size]} rounded-lg flex items-center justify-center text-white transition-colors duration-200`}
             style={{ backgroundColor: kpi.color }}
           >
             <Icon className={`${size === 'small' ? 'w-4 h-4' : size === 'medium' ? 'w-5 h-5' : 'w-6 h-6'}`} />
@@ -218,7 +240,7 @@ const KPICard: React.FC<KPICardProps> = ({
         </div>
         
         {showTrend && (
-          <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium ${getTrendColor()}`}>
+          <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 hover-bounce ${getTrendColor()}`}>
             {getTrendIcon()}
             <span className="ml-1">
               {kpi.changePercent > 0 ? '+' : ''}{kpi.changePercent.toFixed(1)}%
@@ -230,20 +252,19 @@ const KPICard: React.FC<KPICardProps> = ({
       {/* Main Value */}
       <div className="mb-4">
         <div 
-          className={`font-bold text-gray-900 transition-all duration-1000 ${valueSizes[size]}`}
+          className={`font-bold text-gray-900 transition-colors duration-300 ${valueSizes[size]}`}
           style={{ 
-            color: animate && animatedValue !== kpi.value ? kpi.color : undefined,
-            transform: animate && animatedValue !== kpi.value ? 'scale(1.1)' : 'scale(1)'
+            color: isHovered ? kpi.color : undefined
           }}
         >
-          {animate ? formatValue(animatedValue, kpi.format, kpi.unit) : formatValue(kpi.value, kpi.format, kpi.unit)}
+          {formattedValue}
         </div>
         
         {showTrend && (
-          <div className="flex items-center space-x-2 mt-2">
+          <div className="flex items-center space-x-2 mt-2 opacity-70 transition-opacity duration-200">
             <span className="text-sm text-gray-600">vs last period:</span>
             <span className="text-sm font-medium text-gray-900">
-              {formatValue(kpi.previousValue, kpi.format, kpi.unit)}
+              {formattedPreviousValue}
             </span>
           </div>
         )}
@@ -260,7 +281,7 @@ const KPICard: React.FC<KPICardProps> = ({
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
-              className="h-2 rounded-full transition-all duration-1000 ease-out"
+              className="h-full rounded-full transition-all duration-500 ease-out"
               style={{ 
                 width: `${targetProgress}%`,
                 backgroundColor: kpi.color
@@ -274,20 +295,18 @@ const KPICard: React.FC<KPICardProps> = ({
         </div>
       )}
 
-      {/* Mini Trend Chart */}
+      {/* Simplified Mini Trend Chart - Better Performance */}
       <div className="mt-4">
         <div className="flex items-end space-x-1 h-8">
           {Array.from({ length: 7 }, (_, i) => {
-            const variance = (Math.random() - 0.5) * 0.2;
-            const height = Math.max(10, (kpi.value + kpi.value * variance) / kpi.value * 32);
+            const height = Math.max(10, 20 + Math.random() * 12);
             return (
               <div
                 key={i}
-                className="flex-1 rounded-t transition-all duration-500"
+                className="flex-1 rounded-t transition-colors duration-200 hover:opacity-80 cursor-pointer"
                 style={{ 
                   height: `${height}px`,
-                  backgroundColor: i === 6 ? kpi.color : `${kpi.color}66`,
-                  animationDelay: `${i * 100}ms`
+                  backgroundColor: i === 6 ? kpi.color : `${kpi.color}66`
                 }}
               ></div>
             );
@@ -296,23 +315,32 @@ const KPICard: React.FC<KPICardProps> = ({
         <div className="text-xs text-gray-500 text-center mt-2">7-day trend</div>
       </div>
 
-      {/* Insight Badge */}
+      {/* Performance Insights - Only show on hover with animation */}
       {isHovered && (
-        <div className="mt-4 p-2 bg-gray-50 rounded-lg text-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Change:</span>
-            <span className={`font-medium ${kpi.trend === 'up' ? 'text-green-600' : kpi.trend === 'down' ? 'text-red-600' : 'text-gray-600'}`}>
-              {kpi.value - kpi.previousValue > 0 ? '+' : ''}{(kpi.value - kpi.previousValue).toFixed(kpi.format === 'percentage' ? 1 : 0)} {kpi.unit}
-            </span>
-          </div>
-          {kpi.target && (
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-gray-600">To target:</span>
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 animate-fade-in">
+          <div className="text-xs text-blue-800 font-medium mb-2">Performance Insights</div>
+          <div className="space-y-1 text-xs text-blue-700">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Change:</span>
               <span className="font-medium text-gray-900">
-                {kpi.target - kpi.value > 0 ? '+' : ''}{(kpi.target - kpi.value).toFixed(kpi.format === 'percentage' ? 1 : 0)} {kpi.unit}
+                {kpi.change > 0 ? '+' : ''}{kpi.change.toFixed(kpi.format === 'percentage' ? 1 : 0)} {kpi.unit}
               </span>
             </div>
-          )}
+            {kpi.target && (
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">To target:</span>
+                <span className="font-medium text-gray-900">
+                  {kpi.target - kpi.value > 0 ? '+' : ''}{(kpi.target - kpi.value).toFixed(kpi.format === 'percentage' ? 1 : 0)} {kpi.unit}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center justify-between border-t border-blue-200 pt-1">
+              <span className="text-gray-600">Performance:</span>
+              <span className={`font-medium ${targetProgress >= 90 ? 'text-green-600' : targetProgress >= 70 ? 'text-yellow-600' : 'text-red-600'}`}>
+                {targetProgress >= 90 ? 'Excellent' : targetProgress >= 70 ? 'Good' : 'Needs Improvement'}
+              </span>
+            </div>
+          </div>
         </div>
       )}
     </div>

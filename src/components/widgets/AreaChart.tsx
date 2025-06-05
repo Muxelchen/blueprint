@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 interface AreaData {
   month: string;
@@ -37,6 +38,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   showDots = true,
   stackedMode = false
 }) => {
+  const { isDarkMode } = useDarkMode();
   const [activeArea, setActiveArea] = useState<string | null>(null);
   const [hiddenAreas, setHiddenAreas] = useState<Set<string>>(new Set());
   const [zoomDomain, setZoomDomain] = useState<any>(null);
@@ -53,8 +55,14 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length > 0) {
       return (
-        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold mb-3 text-gray-800">{`Month: ${label}`}</p>
+        <div className={`p-4 border rounded-lg shadow-lg ${
+          isDarkMode 
+            ? 'bg-gray-800 border-gray-600 text-white' 
+            : 'bg-white border-gray-200 text-gray-800'
+        }`}>
+          <p className={`font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+            {`Month: ${label}`}
+          </p>
           <div className="space-y-2">
             {payload
               .filter((item: any) => !hiddenAreas.has(item.dataKey))
@@ -73,8 +81,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
                 </div>
               ))}
           </div>
-          <div className="mt-3 pt-2 border-t border-gray-100">
-            <div className="flex justify-between text-xs text-gray-600">
+          <div className={`mt-3 pt-2 border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
+            <div className={`flex justify-between text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               <span>Total Interactions:</span>
               <span className="font-semibold">
                 {payload.filter((item: any) => !hiddenAreas.has(item.dataKey))
@@ -126,17 +134,27 @@ const AreaChart: React.FC<AreaChartProps> = ({
               onMouseLeave={() => setActiveArea(null)}
               className={`flex items-center px-3 py-2 rounded-lg border transition-all ${
                 isHidden 
-                  ? 'bg-gray-100 border-gray-300 opacity-50' 
+                  ? isDarkMode 
+                    ? 'bg-gray-700 border-gray-600 opacity-50' 
+                    : 'bg-gray-100 border-gray-300 opacity-50'
                   : isActive
-                    ? 'bg-blue-50 border-blue-300 shadow-md'
-                    : 'bg-white border-gray-200 hover:bg-gray-50'
+                    ? isDarkMode 
+                      ? 'bg-blue-900 border-blue-700 shadow-md' 
+                      : 'bg-blue-50 border-blue-300 shadow-md'
+                    : isDarkMode
+                      ? 'bg-gray-800 border-gray-600 hover:bg-gray-700'
+                      : 'bg-white border-gray-200 hover:bg-gray-50'
               }`}
             >
               <div 
                 className={`w-3 h-3 rounded-full mr-2 ${isHidden ? 'opacity-30' : ''}`}
                 style={{ backgroundColor: area.color }}
               ></div>
-              <span className={`text-sm ${isHidden ? 'line-through text-gray-400' : 'font-medium'}`}>
+              <span className={`text-sm ${
+                isHidden 
+                  ? isDarkMode ? 'line-through text-gray-500' : 'line-through text-gray-400'
+                  : 'font-medium'
+              }`}>
                 {area.name}
               </span>
             </button>
@@ -162,9 +180,13 @@ const AreaChart: React.FC<AreaChartProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className={`p-6 rounded-lg shadow-lg ${
+      isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+    }`}>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+          {title}
+        </h3>
       </div>
 
       {/* Controls */}
@@ -176,7 +198,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
             className={`px-3 py-1 text-xs rounded-lg border transition-colors ${
               localStackedMode 
                 ? 'bg-blue-100 text-blue-700 border-blue-300' 
-                : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                : isDarkMode
+                  ? 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
             }`}
           >
             {localStackedMode ? 'Stacked' : 'Overlayed'}
@@ -186,7 +210,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
             className={`px-3 py-1 text-xs rounded-lg border transition-colors ${
               localShowDots 
                 ? 'bg-green-100 text-green-700 border-green-300' 
-                : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                : isDarkMode
+                  ? 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
             }`}
           >
             {localShowDots ? 'Dots On' : 'Dots Off'}
@@ -211,18 +237,21 @@ const AreaChart: React.FC<AreaChartProps> = ({
               ))}
             </defs>
             
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke={isDarkMode ? '#374151' : '#f0f0f0'} 
+            />
             <XAxis 
               dataKey="month" 
-              stroke="#666"
+              stroke={isDarkMode ? '#9CA3AF' : '#666'}
               fontSize={12}
-              tick={{ fill: '#666' }}
+              tick={{ fill: isDarkMode ? '#9CA3AF' : '#666' }}
             />
             <YAxis 
-              stroke="#666"
+              stroke={isDarkMode ? '#9CA3AF' : '#666'}
               fontSize={12}
               tickFormatter={formatYAxisTick}
-              tick={{ fill: '#666' }}
+              tick={{ fill: isDarkMode ? '#9CA3AF' : '#666' }}
             />
             <Tooltip content={<CustomTooltip />} />
 
@@ -275,13 +304,17 @@ const AreaChart: React.FC<AreaChartProps> = ({
           const growth = ((values[values.length - 1] - values[0]) / values[0] * 100);
           
           return (
-            <div key={area.dataKey} className="bg-gray-50 p-4 rounded-lg">
+            <div key={area.dataKey} className={`p-4 rounded-lg ${
+              isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+            }`}>
               <div className="flex items-center mb-2">
                 <div 
                   className="w-3 h-3 rounded-full mr-2"
                   style={{ backgroundColor: area.color }}
                 ></div>
-                <h4 className="text-sm font-medium text-gray-700">{area.name}</h4>
+                <h4 className={`text-sm font-medium ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>{area.name}</h4>
               </div>
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
@@ -305,7 +338,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
       </div>
 
       {/* Controls hint */}
-      <div className="mt-4 text-xs text-gray-500 text-center">
+      <div className={`mt-4 text-xs text-center ${
+        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+      }`}>
         Click legend items to toggle areas • Use mode buttons to change visualization • Hover for details
       </div>
     </div>

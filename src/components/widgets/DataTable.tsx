@@ -1,69 +1,114 @@
-import React, { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback, useMemo } from 'react';
+import { ChevronUp, ChevronDown, Search, Filter, ChevronLeft, ChevronRight, Download, RefreshCw } from 'lucide-react';
 
+// Type definitions
 interface TableData {
   id: number;
   name: string;
   email: string;
   department: string;
   status: 'Active' | 'Inactive' | 'Pending';
-  joinDate: string;
   salary: number;
   performance: number;
-}
-
-const mockData: TableData[] = [
-  { id: 1, name: 'John Doe', email: 'john@company.com', department: 'Engineering', status: 'Active', joinDate: '2023-01-15', salary: 85000, performance: 92 },
-  { id: 2, name: 'Jane Smith', email: 'jane@company.com', department: 'Marketing', status: 'Active', joinDate: '2023-03-22', salary: 72000, performance: 88 },
-  { id: 3, name: 'Mike Johnson', email: 'mike@company.com', department: 'Sales', status: 'Pending', joinDate: '2023-06-10', salary: 68000, performance: 85 },
-  { id: 4, name: 'Sarah Wilson', email: 'sarah@company.com', department: 'Engineering', status: 'Active', joinDate: '2022-11-08', salary: 92000, performance: 95 },
-  { id: 5, name: 'David Brown', email: 'david@company.com', department: 'Marketing', status: 'Inactive', joinDate: '2023-02-18', salary: 65000, performance: 78 },
-  { id: 6, name: 'Lisa Davis', email: 'lisa@company.com', department: 'HR', status: 'Active', joinDate: '2023-04-05', salary: 58000, performance: 91 },
-  { id: 7, name: 'Tom Anderson', email: 'tom@company.com', department: 'Sales', status: 'Active', joinDate: '2023-01-30', salary: 75000, performance: 89 },
-  { id: 8, name: 'Emily Garcia', email: 'emily@company.com', department: 'Engineering', status: 'Active', joinDate: '2022-09-12', salary: 88000, performance: 94 },
-  { id: 9, name: 'Chris Martinez', email: 'chris@company.com', department: 'Marketing', status: 'Pending', joinDate: '2023-07-01', salary: 70000, performance: 82 },
-  { id: 10, name: 'Amanda Taylor', email: 'amanda@company.com', department: 'HR', status: 'Active', joinDate: '2023-05-20', salary: 62000, performance: 87 },
-  { id: 11, name: 'Ryan Clark', email: 'ryan@company.com', department: 'Sales', status: 'Active', joinDate: '2023-03-15', salary: 73000, performance: 90 },
-  { id: 12, name: 'Michelle White', email: 'michelle@company.com', department: 'Engineering', status: 'Inactive', joinDate: '2022-12-01', salary: 90000, performance: 86 },
-];
-
-interface DataTableProps {
-  data?: TableData[];
-  title?: string;
-  pageSize?: number;
+  joinDate: string;
 }
 
 type SortField = keyof TableData;
 type SortDirection = 'asc' | 'desc';
 
-const DataTable: React.FC<DataTableProps> = ({ 
-  data = mockData, 
-  title = 'Employee Database',
+// Mock data
+const mockData: TableData[] = [
+  { id: 1, name: 'John Doe', email: 'john@example.com', department: 'Engineering', status: 'Active', salary: 85000, performance: 92, joinDate: '2022-01-15' },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', department: 'Marketing', status: 'Active', salary: 72000, performance: 88, joinDate: '2021-11-20' },
+  { id: 3, name: 'Bob Johnson', email: 'bob@example.com', department: 'Sales', status: 'Inactive', salary: 68000, performance: 75, joinDate: '2020-08-10' },
+  { id: 4, name: 'Alice Brown', email: 'alice@example.com', department: 'Engineering', status: 'Active', salary: 95000, performance: 95, joinDate: '2023-03-01' },
+  { id: 5, name: 'Charlie Wilson', email: 'charlie@example.com', department: 'HR', status: 'Pending', salary: 65000, performance: 82, joinDate: '2024-01-10' },
+  { id: 6, name: 'Diana Lee', email: 'diana@example.com', department: 'Marketing', status: 'Active', salary: 78000, performance: 89, joinDate: '2022-07-05' },
+  { id: 7, name: 'Edward Davis', email: 'edward@example.com', department: 'Sales', status: 'Active', salary: 71000, performance: 84, joinDate: '2021-05-15' },
+  { id: 8, name: 'Fiona Clark', email: 'fiona@example.com', department: 'Engineering', status: 'Active', salary: 89000, performance: 91, joinDate: '2022-12-01' },
+];
+
+interface SortButtonProps {
+  field: SortField;
+  currentField: SortField;
+  direction: SortDirection;
+  onSort: (field: SortField) => void;
+  children: React.ReactNode;
+}
+
+const SortButton: React.FC<SortButtonProps> = ({ field, currentField, direction, onSort, children }) => (
+  <button 
+    className="flex items-center space-x-1 hover:text-blue-600 transition-colors font-medium"
+    onClick={() => onSort(field)}
+  >
+    <span>{children}</span>
+    {currentField === field && (
+      direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
+    )}
+  </button>
+);
+
+const AvatarCell = ({ item }: { item: TableData }) => (
+  <div className="flex items-center space-x-3">
+    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+      {item.name.split(' ').map((n: string) => n[0]).join('')}
+    </div>
+    <div>
+      <div className="font-medium text-gray-900">{item.name}</div>
+      <div className="text-sm text-gray-500">{item.email}</div>
+    </div>
+  </div>
+);
+
+interface DataTableProps {
+  data?: TableData[];
+  title?: string;
+  searchable?: boolean;
+  filterable?: boolean;
+  exportable?: boolean;
+  pageSize?: number;
+}
+
+const DataTable: React.FC<DataTableProps> = ({
+  data = mockData,
+  title = 'Employee Data',
+  searchable = true,
+  filterable = true,
+  exportable = true,
   pageSize = 5
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [departmentFilter, setDepartmentFilter] = useState<string>('');
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterDepartment, setFilterDepartment] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
-  const departments = Array.from(new Set(data.map(item => item.department)));
-  const statuses = Array.from(new Set(data.map(item => item.status)));
+  // Filter options
+  const departments = useMemo(() => 
+    Array.from(new Set(data.map((item: TableData) => item.department))),
+    [data]
+  );
+  
+  const statuses = useMemo(() => 
+    Array.from(new Set(data.map((item: TableData) => item.status))),
+    [data]
+  );
 
+  // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
-    let filtered = data.filter(item => {
+    let filtered = data.filter((item: TableData) => {
       const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            item.department.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = filterStatus === 'all' || item.status === filterStatus;
-      const matchesDepartment = filterDepartment === 'all' || item.department === filterDepartment;
+      const matchesStatus = !statusFilter || item.status === statusFilter;
+      const matchesDepartment = !departmentFilter || item.department === departmentFilter;
       
       return matchesSearch && matchesStatus && matchesDepartment;
     });
 
-    filtered.sort((a, b) => {
+    filtered.sort((a: TableData, b: TableData) => {
       const aValue = a[sortField];
       const bValue = b[sortField];
       
@@ -81,217 +126,230 @@ const DataTable: React.FC<DataTableProps> = ({
     });
 
     return filtered;
-  }, [data, searchTerm, sortField, sortDirection, filterStatus, filterDepartment]);
+  }, [data, searchTerm, statusFilter, departmentFilter, sortField, sortDirection]);
 
+  // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginatedData = filteredAndSortedData.slice(startIndex, startIndex + pageSize);
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredAndSortedData.slice(startIndex, startIndex + pageSize);
+  }, [filteredAndSortedData, currentPage, pageSize]);
 
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  // Event handlers
+  const handleSort = useCallback((field: SortField) => {
+    if (field === sortField) {
+      setSortDirection((prev: SortDirection) => prev === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
       setSortDirection('asc');
     }
-  };
+  }, [sortField]);
 
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) return null;
-    return sortDirection === 'asc' ? 
-      <ChevronUp className="w-4 h-4 ml-1" /> : 
-      <ChevronDown className="w-4 h-4 ml-1" />;
-  };
-
-  const getStatusBadge = (status: string) => {
-    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
-    switch (status) {
-      case 'Active':
-        return `${baseClasses} bg-green-100 text-green-800`;
-      case 'Inactive':
-        return `${baseClasses} bg-red-100 text-red-800`;
-      case 'Pending':
-        return `${baseClasses} bg-yellow-100 text-yellow-800`;
-      default:
-        return `${baseClasses} bg-gray-100 text-gray-800`;
+  const handleSelectAll = useCallback(() => {
+    if (selectedRows.size === paginatedData.length) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(paginatedData.map((item: TableData) => item.id)));
     }
-  };
+  }, [selectedRows.size, paginatedData]);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
+  const handleRowSelect = useCallback((id: number) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedRows(newSelected);
+  }, [selectedRows]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  const exportToCSV = useCallback(() => {
+    const headers = ['Name', 'Email', 'Department', 'Status', 'Salary', 'Performance', 'Join Date'];
+    const csvData = [
+      headers,
+      ...filteredAndSortedData.map((item: TableData) => [
+        item.name, item.email, item.department, item.status, 
+        item.salary.toString(), item.performance.toString(), item.joinDate
+      ])
+    ];
+    
+    const csvContent = csvData.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'table-data.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }, [filteredAndSortedData]);
+
+  // Statistics
+  const statistics = useMemo(() => ({
+    total: filteredAndSortedData.length,
+    active: filteredAndSortedData.filter((d: TableData) => d.status === 'Active').length,
+    avgSalary: filteredAndSortedData.reduce((sum: number, d: TableData) => sum + d.salary, 0) / filteredAndSortedData.length || 0,
+    avgPerformance: Math.round(filteredAndSortedData.reduce((sum: number, d: TableData) => sum + d.performance, 0) / filteredAndSortedData.length) || 0,
+  }), [filteredAndSortedData]);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        <div className="text-sm text-gray-500">
-          {filteredAndSortedData.length} of {data.length} records
+    <div className="bg-white rounded-lg shadow-lg p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+        <div className="flex items-center space-x-2">
+          {exportable && (
+            <button 
+              onClick={exportToCSV}
+              className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+              title="Export to CSV"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+          )}
+          <button className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
+            <RefreshCw className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <div className="flex-1 min-w-64">
-          <div className="relative">
+      {/* Statistics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-blue-50 p-3 rounded-lg">
+          <p className="text-sm text-blue-600 font-medium">Total Records</p>
+          <p className="text-2xl font-bold text-blue-800">{statistics.total}</p>
+        </div>
+        <div className="bg-green-50 p-3 rounded-lg">
+          <p className="text-sm text-green-600 font-medium">Active</p>
+          <p className="text-2xl font-bold text-green-800">{statistics.active}</p>
+        </div>
+        <div className="bg-purple-50 p-3 rounded-lg">
+          <p className="text-sm text-purple-600 font-medium">Avg Salary</p>
+          <p className="text-2xl font-bold text-purple-800">${Math.round(statistics.avgSalary).toLocaleString()}</p>
+        </div>
+        <div className="bg-orange-50 p-3 rounded-lg">
+          <p className="text-sm text-orange-600 font-medium">Avg Performance</p>
+          <p className="text-2xl font-bold text-orange-800">{statistics.avgPerformance}%</p>
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        {/* Search */}
+        {searchable && (
+          <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search by name, email, or department..."
+              placeholder="Search employees..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Filter className="w-4 h-4 text-gray-400" />
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">All Statuses</option>
-            {statuses.map(status => (
-              <option key={status} value={status}>{status}</option>
-            ))}
-          </select>
-          
-          <select
-            value={filterDepartment}
-            onChange={(e) => setFilterDepartment(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">All Departments</option>
-            {departments.map(dept => (
-              <option key={dept} value={dept}>{dept}</option>
-            ))}
-          </select>
-        </div>
+        )}
+
+        {/* Filters */}
+        {filterable && (
+          <div className="flex gap-2">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Status</option>
+              {statuses.map((status) => (
+                <option key={status as string} value={status as string}>{status as string}</option>
+              ))}
+            </select>
+            
+            <select
+              value={departmentFilter}
+              onChange={(e) => setDepartmentFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Departments</option>
+              {departments.map((dept) => (
+                <option key={dept as string} value={dept as string}>{dept as string}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th 
-                onClick={() => handleSort('name')}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center">
-                  Name {getSortIcon('name')}
-                </div>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-200">
+              <th className="text-left py-3 px-4">
+                <input
+                  type="checkbox"
+                  checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
+                  onChange={handleSelectAll}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
               </th>
-              <th 
-                onClick={() => handleSort('email')}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center">
-                  Email {getSortIcon('email')}
-                </div>
+              <th className="text-left py-3 px-4">
+                <SortButton field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>
+                  Employee
+                </SortButton>
               </th>
-              <th 
-                onClick={() => handleSort('department')}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center">
-                  Department {getSortIcon('department')}
-                </div>
+              <th className="text-left py-3 px-4">
+                <SortButton field="department" currentField={sortField} direction={sortDirection} onSort={handleSort}>
+                  Department
+                </SortButton>
               </th>
-              <th 
-                onClick={() => handleSort('status')}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center">
-                  Status {getSortIcon('status')}
-                </div>
+              <th className="text-left py-3 px-4">
+                <SortButton field="status" currentField={sortField} direction={sortDirection} onSort={handleSort}>
+                  Status
+                </SortButton>
               </th>
-              <th 
-                onClick={() => handleSort('joinDate')}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center">
-                  Join Date {getSortIcon('joinDate')}
-                </div>
+              <th className="text-left py-3 px-4">
+                <SortButton field="salary" currentField={sortField} direction={sortDirection} onSort={handleSort}>
+                  Salary
+                </SortButton>
               </th>
-              <th 
-                onClick={() => handleSort('salary')}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center">
-                  Salary {getSortIcon('salary')}
-                </div>
-              </th>
-              <th 
-                onClick={() => handleSort('performance')}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center">
-                  Performance {getSortIcon('performance')}
-                </div>
+              <th className="text-left py-3 px-4">
+                <SortButton field="performance" currentField={sortField} direction={sortDirection} onSort={handleSort}>
+                  Performance
+                </SortButton>
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedData.map((item, index) => (
-              <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${
-                index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-              }`}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                      {item.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div className="ml-3">
-                      <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                      <div className="text-sm text-gray-500">ID: {item.id}</div>
-                    </div>
-                  </div>
+          <tbody>
+            {paginatedData.map((item: TableData, index: number) => (
+              <tr key={item.id} className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                <td className="py-3 px-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.has(item.id)}
+                    onChange={() => handleRowSelect(item.id)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{item.email}</div>
+                <td className="py-3 px-4">
+                  <AvatarCell item={item} />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{item.department}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={getStatusBadge(item.status)}>
+                <td className="py-3 px-4 text-gray-900">{item.department}</td>
+                <td className="py-3 px-4">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    item.status === 'Active' ? 'bg-green-100 text-green-800' :
+                    item.status === 'Inactive' ? 'bg-red-100 text-red-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
                     {item.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {formatDate(item.joinDate)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {formatCurrency(item.salary)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="py-3 px-4 text-gray-900">${item.salary.toLocaleString()}</td>
+                <td className="py-3 px-4">
                   <div className="flex items-center">
-                    <div className="text-sm text-gray-900 mr-2">{item.performance}%</div>
-                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
                       <div 
-                        className={`h-2 rounded-full transition-all duration-500 ${
-                          item.performance >= 90 ? 'bg-green-500' :
-                          item.performance >= 80 ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }`}
+                        className="bg-blue-600 h-2 rounded-full" 
                         style={{ width: `${item.performance}%` }}
                       ></div>
                     </div>
+                    <span className="text-sm text-gray-600">{item.performance}%</span>
                   </div>
                 </td>
               </tr>
@@ -303,27 +361,27 @@ const DataTable: React.FC<DataTableProps> = ({
       {/* Pagination */}
       <div className="flex items-center justify-between mt-6">
         <div className="text-sm text-gray-700">
-          Showing {startIndex + 1} to {Math.min(startIndex + pageSize, filteredAndSortedData.length)} of {filteredAndSortedData.length} results
+          Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, filteredAndSortedData.length)} of {filteredAndSortedData.length} results
         </div>
         
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           
-          <div className="flex space-x-1">
+          <div className="flex items-center space-x-1">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`px-3 py-2 rounded-lg transition-colors ${
-                  page === currentPage
-                    ? 'bg-blue-500 text-white'
-                    : 'border border-gray-300 hover:bg-gray-50'
+                className={`px-3 py-1 rounded-lg ${
+                  currentPage === page 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 {page}
@@ -332,41 +390,29 @@ const DataTable: React.FC<DataTableProps> = ({
           </div>
           
           <button
-            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Summary Statistics */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Summary Statistics</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div className="text-center">
-            <p className="font-bold text-lg">{filteredAndSortedData.filter(d => d.status === 'Active').length}</p>
-            <p className="text-gray-600">Active</p>
-          </div>
-          <div className="text-center">
-            <p className="font-bold text-lg">
-              {formatCurrency(filteredAndSortedData.reduce((sum, d) => sum + d.salary, 0) / filteredAndSortedData.length)}
-            </p>
-            <p className="text-gray-600">Avg Salary</p>
-          </div>
-          <div className="text-center">
-            <p className="font-bold text-lg">
-              {Math.round(filteredAndSortedData.reduce((sum, d) => sum + d.performance, 0) / filteredAndSortedData.length)}%
-            </p>
-            <p className="text-gray-600">Avg Performance</p>
-          </div>
-          <div className="text-center">
-            <p className="font-bold text-lg">{departments.length}</p>
-            <p className="text-gray-600">Departments</p>
-          </div>
+      {/* Selected items info */}
+      {selectedRows.size > 0 && (
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+          <p className="text-sm text-blue-800">
+            {selectedRows.size} item(s) selected
+            <button 
+              onClick={() => setSelectedRows(new Set())}
+              className="ml-2 text-blue-600 hover:text-blue-800 underline"
+            >
+              Clear selection
+            </button>
+          </p>
         </div>
-      </div>
+      )}
     </div>
   );
 };

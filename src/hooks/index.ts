@@ -1,9 +1,17 @@
 // Hook utilities - rapid development essentials
 export * from './useCommon';
 
-// Future hook exports (uncomment when created):
-// export * from './useAnalytics';
-// export * from './useAuth';
-// export * from './useDebounce';
-// export * from './useTheme';
-// export * from './useNotifications';
+// Analytics hooks
+export * from './useAnalytics';
+
+// Authentication hooks
+export * from './useAuth';
+
+// Performance optimization hooks
+export * from './useDebounce';
+
+// Theme management hooks
+export * from './useTheme';
+
+// Notification management hooks
+export * from './useNotifications';

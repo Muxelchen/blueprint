@@ -8,11 +8,16 @@ export interface KPIData {
   title: string;
   value: string | number;
   previousValue?: number;
-  change?: number;
+  change: number; // Made required to match mock data
   changeType?: 'increase' | 'decrease' | 'neutral';
   trend?: 'up' | 'down' | 'stable';
   icon?: string;
   color?: string;
+  target?: number;
+  unit?: string;
+  format?: 'number' | 'currency' | 'percentage';
+  changePercent?: number;
+  description?: string;
 }
 
 // User type for mock data

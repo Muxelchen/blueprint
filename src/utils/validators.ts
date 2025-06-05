@@ -128,7 +128,7 @@ export const password = (value: string, options: {
     errors.push('Password must contain at least one number');
   }
 
-  if (requireSpecialChars && !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)) {
+  if (requireSpecialChars && !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value)) {
     errors.push('Password must contain at least one special character');
   }
 
@@ -142,9 +142,10 @@ export const password = (value: string, options: {
 export const creditCard = (value: string): ValidationResult => {
   const cleaned = value.replace(/\D/g, '');
   
-  // Luhn algorithm
+  // Luhn algorithm - start with isEven = true since we process right to left
+  // and we want to double every second digit starting from the second-to-last
   let sum = 0;
-  let isEven = false;
+  let isEven = true;
   
   for (let i = cleaned.length - 1; i >= 0; i--) {
     let digit = parseInt(cleaned[i]);
@@ -205,7 +206,15 @@ export const dateRange = (
 export const age = (birthDate: Date | string, minAge: number, maxAge?: number): ValidationResult => {
   const birth = new Date(birthDate);
   const today = new Date();
-  const age = Math.floor((today.getTime() - birth.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+  
+  // More accurate age calculation that considers month and day
+  const yearDiff = today.getFullYear() - birth.getFullYear();
+  // Adjust age if birthday hasn't occurred yet this year
+  const hasBirthdayOccurredThisYear = 
+    today.getMonth() > birth.getMonth() || 
+    (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
+  
+  const age = hasBirthdayOccurredThisYear ? yearDiff : yearDiff - 1;
   
   const errors: string[] = [];
 

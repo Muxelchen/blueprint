@@ -108,7 +108,13 @@ export class DevErrorBoundary extends Component<Props, State> {
                       Reload Page
                     </button>
                     <button
-                      onClick={() => this.setState({ hasError: false, error: undefined, errorInfo: undefined })}
+                      onClick={() => {
+                        this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+                        // Force a re-render of the child component tree
+                        if (this.props.onError) {
+                          this.props.onError(new Error('Manual recovery triggered'), { componentStack: '' });
+                        }
+                      }}
                       className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
                     >
                       Try Again
