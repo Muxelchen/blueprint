@@ -142,10 +142,10 @@ export const password = (value: string, options: {
 export const creditCard = (value: string): ValidationResult => {
   const cleaned = value.replace(/\D/g, '');
   
-  // Luhn algorithm - start with isEven = true since we process right to left
+  // Luhn algorithm - start with isEven = false since we process right to left
   // and we want to double every second digit starting from the second-to-last
   let sum = 0;
-  let isEven = true;
+  let isEven = false;
   
   for (let i = cleaned.length - 1; i >= 0; i--) {
     let digit = parseInt(cleaned[i]);

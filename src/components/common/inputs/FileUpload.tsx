@@ -108,8 +108,29 @@ const FileUpload: React.FC<FileUploadProps> = ({
       return `File size must be less than ${formatFileSize(maxSize)}`;
     }
 
-    // Check file type
-    if (allowedTypes.length > 0) {
+    // Consolidate file type validation - use accept attribute as primary validation
+    if (accept && accept !== '*/*') {
+      const acceptTypes = accept.split(',').map(type => type.trim());
+      const fileType = file.type;
+      const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+      
+      const isAccepted = acceptTypes.some(type => {
+        if (type.startsWith('.')) {
+          return fileExtension === type;
+        }
+        if (type.includes('/')) {
+          // Handle exact MIME type or wildcard (e.g., 'image/*')
+          return fileType === type || fileType.startsWith(type.replace('*', ''));
+        }
+        return false;
+      });
+
+      if (!isAccepted) {
+        return `File type not accepted. Accepted types: ${accept}`;
+      }
+    }
+    // Fallback to allowedTypes only if accept is not specified
+    else if (allowedTypes.length > 0) {
       const fileType = file.type;
       const fileExtension = file.name.split('.').pop()?.toLowerCase();
       
@@ -125,27 +146,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
       if (!isTypeAllowed) {
         return `File type not allowed. Allowed types: ${allowedTypes.join(', ')}`;
-      }
-    }
-
-    // Check accept attribute
-    if (accept) {
-      const acceptTypes = accept.split(',').map(type => type.trim());
-      const fileType = file.type;
-      const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
-      
-      const isAccepted = acceptTypes.some(type => {
-        if (type.startsWith('.')) {
-          return fileExtension === type;
-        }
-        if (type.includes('/')) {
-          return fileType === type || fileType.startsWith(type.replace('*', ''));
-        }
-        return false;
-      });
-
-      if (!isAccepted) {
-        return `File type not accepted`;
       }
     }
 

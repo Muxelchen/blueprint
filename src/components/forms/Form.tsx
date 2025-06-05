@@ -279,9 +279,7 @@ export const Form: React.FC<FormProps> = ({
 
   // Set field value
   const setFieldValue = useCallback(async (name: string, value: any) => {
-    // First update the state with new value
     setState(prev => {
-      // Create a copy of the updated fields with the new value
       const updatedFields = {
         ...prev.fields,
         [name]: {
@@ -291,16 +289,16 @@ export const Form: React.FC<FormProps> = ({
         }
       };
       
-      // Start with the current state
-      const newState = {
+      let newState = {
         ...prev,
         fields: updatedFields,
         isDirty: true
       };
-      
-      // Handle validation in the same state update if needed
+
+      // If validateOnChange is enabled, validate synchronously within the same state update
       if (validateOnChange) {
-        // Schedule validation to run after state update
+        // We can't use async validation here, so we'll handle it differently
+        // Schedule validation after state update
         setTimeout(async () => {
           const allValues = Object.fromEntries(
             Object.entries(updatedFields).map(([k, v]) => [k, v.value])
@@ -308,41 +306,27 @@ export const Form: React.FC<FormProps> = ({
           
           const error = await validateValue(name, value, allValues);
           
-          // Update state directly for the error
+          // Update state with validation result
           setState(currentState => {
-            // If there's an error, add it
-            if (error) {
+            // Only update if the field value hasn't changed since validation started
+            if (currentState.fields[name]?.value === value) {
               return {
                 ...currentState,
                 fields: {
                   ...currentState.fields,
                   [name]: {
                     ...currentState.fields[name],
-                    valid: false
+                    valid: !error
                   }
                 },
-                errors: {
-                  ...currentState.errors,
-                  [name]: error
-                }
-              };
-            } 
-            // If no error, remove any existing error
-            else if (currentState.errors[name]) {
-              const { [name]: removed, ...restErrors } = currentState.errors;
-              return {
-                ...currentState,
-                fields: {
-                  ...currentState.fields,
-                  [name]: {
-                    ...currentState.fields[name],
-                    valid: true
-                  }
-                },
-                errors: restErrors
+                errors: error 
+                  ? { ...currentState.errors, [name]: error }
+                  : (() => {
+                      const { [name]: removed, ...rest } = currentState.errors;
+                      return rest;
+                    })()
               };
             }
-            
             return currentState;
           });
         }, 0);
