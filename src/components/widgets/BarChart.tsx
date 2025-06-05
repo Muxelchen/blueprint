@@ -200,55 +200,57 @@ export const BarChart: React.FC<BarChartProps> = memo(({
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all duration-300 hover:shadow-md ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6 transition-all duration-300 hover:shadow-md h-full flex flex-col ${className}`} style={{ minHeight: '300px' }}>
+      <div className="flex items-center justify-between mb-3 sm:mb-4 flex-shrink-0 gap-2">
+        <h3 className="text-sm sm:text-lg font-semibold text-gray-800 truncate flex-1">{title}</h3>
         {showControls && (
-          <div className="flex space-x-2">
+          <div className="flex space-x-1 sm:space-x-2 flex-shrink-0">
             <button
               onClick={() => setIsVisible(!isVisible)}
-              className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+              className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
               title="Toggle visibility"
             >
-              <Eye className="w-4 h-4" />
+              <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={handleExport}
-              className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200"
+              className="p-1.5 sm:p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200"
               title="Export data"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={handleReset}
-              className="p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200"
+              className="p-1.5 sm:p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200"
               title="Reset chart"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
           </div>
         )}
       </div>
 
       <div 
-        className="h-64"
+        className="h-48 sm:h-64 flex-shrink-0"
         onMouseEnter={() => setIsChartHovered(true)}
         onMouseLeave={() => setIsChartHovered(false)}
       >
         <ResponsiveContainer width="100%" height="100%">
-          <RechartsBarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <RechartsBarChart data={data} margin={{ top: 5, right: 15, left: 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
             <XAxis 
               dataKey="name" 
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 10 }}
               stroke="#6b7280"
+              interval={0}
             />
             <YAxis 
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 10 }}
               stroke="#6b7280"
+              width={40}
             />
             <Tooltip content={<MemoizedTooltip />} />
-            <Legend />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
             <Bar 
               dataKey="sales" 
               fill="#3b82f6" 
@@ -274,11 +276,13 @@ export const BarChart: React.FC<BarChartProps> = memo(({
         </ResponsiveContainer>
       </div>
 
-      <MemoizedStatisticsPanel 
-        data={data} 
-        isChartHovered={isChartHovered} 
-        statistics={statistics}
-      />
+      <div className="flex-1 mt-2 min-h-0">
+        <MemoizedStatisticsPanel 
+          data={data} 
+          isChartHovered={isChartHovered} 
+          statistics={statistics}
+        />
+      </div>
     </div>
   );
 });

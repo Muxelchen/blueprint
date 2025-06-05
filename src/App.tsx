@@ -25,13 +25,31 @@ import {
 import toast from 'react-hot-toast'
 
 // Import all Blueprint components
+import { 
+  // Common components
+  ErrorBoundary, 
+  AdvancedThemeProvider, 
+  useTheme,
+  Button, 
+  IconButton, 
+  PrintButton
+} from './components/common'
 import { DevErrorBoundary } from './components/common/feedback/DevErrorBoundary'
 import { TemplateShowcase } from './components'
-import { Button, IconButton, PrintButton } from './components/common/buttons'
 import { AlertBanner, LoadingState, SkeletonScreen, ToastNotification, ErrorPage } from './components/common/feedback'
 import { TabNavigation, Accordion, Stepper, Pagination, StatusIndicator, BadgeCounter } from './components/common/display'
-import { Header, Sidebar, MainContent } from './components/layout'
-import { AdvancedLayoutManager, WidgetManager } from './components/layout/containers'
+import { 
+  Header, 
+  Sidebar, 
+  MainContent, 
+  // Import updated layout components
+  AdvancedDashboardLayout,
+  DragDropLayoutManager,
+  IntelligentLayoutManager,
+  ResponsiveLayoutManager,
+  VirtualizedLayoutManager,
+  WidgetManager 
+} from './components/layout'
 import { DashboardAnalytics } from './components/data-visualization/analytics'
 import { HeatmapOverlay } from './components/data-visualization/maps'
 import { 
@@ -138,7 +156,7 @@ const ComponentShowcase: React.FC = () => {
             <h2 className={`text-2xl font-bold mb-6 ${
               isDarkMode ? 'text-white' : 'text-gray-900'
             }`}>Chart & Widget Components</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-full">
               {[
                 { title: 'Area Chart', component: <AreaChart /> },
                 { title: 'Bar Chart', component: <BarChart /> },
@@ -161,7 +179,9 @@ const ComponentShowcase: React.FC = () => {
                   <h3 className={`text-lg font-semibold mb-4 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                   }`}>{title}</h3>
-                  {component}
+                  <div className="w-full min-h-[240px] overflow-hidden">
+                    {component}
+                  </div>
                 </div>
               ))}
             </div>
@@ -284,14 +304,36 @@ const ComponentShowcase: React.FC = () => {
                 Drag-and-drop dashboard layout system with resizable widgets, grid snapping, and layout persistence.
               </p>
               <div className="h-96 bg-gray-100 rounded-lg overflow-hidden">
-                <AdvancedLayoutManager 
-                  gridSize={40}
-                  cols={12}
-                  rows={6}
-                  showGrid={true}
-                  showToolbar={true}
-                  snapToGrid={true}
-                  enableCollisions={true}
+                <AdvancedDashboardLayout 
+                  widgets={[
+                    {
+                      id: 'widget1',
+                      component: KPICard,
+                      props: { data: mockKPIData[0] },
+                      height: 180,
+                      priority: 'high'
+                    },
+                    {
+                      id: 'widget2',
+                      component: LineChart,
+                      props: {},
+                      height: 200,
+                      priority: 'medium'
+                    }
+                  ]}
+                  layouts={{
+                    lg: [
+                      { i: 'widget1', x: 0, y: 0, w: 3, h: 2 },
+                      { i: 'widget2', x: 3, y: 0, w: 6, h: 3 }
+                    ],
+                    md: [
+                      { i: 'widget1', x: 0, y: 0, w: 4, h: 2 },
+                      { i: 'widget2', x: 0, y: 2, w: 8, h: 3 }
+                    ]
+                  }}
+                  enableVirtualization={true}
+                  enableAdvancedDragDrop={true}
+                  performanceMode="balanced"
                 />
               </div>
             </div>

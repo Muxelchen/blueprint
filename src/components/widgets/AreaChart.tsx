@@ -209,15 +209,15 @@ const AreaChart: React.FC<AreaChartProps> = ({
   };
 
   return (
-    <div className={`${compact ? 'p-3' : 'p-6'} rounded-lg shadow-sm border flex flex-col ${
+    <div className={`${compact ? 'p-2 sm:p-3' : 'p-4 sm:p-6'} rounded-lg shadow-sm border flex flex-col h-full ${
       isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    }`} style={{ height: compact ? 'auto' : `${height}px` }}>
-      <div className="flex justify-between items-center mb-3 flex-shrink-0">
-        <h3 className={`${compact ? 'text-sm' : 'text-lg'} font-semibold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+    }`} style={{ minHeight: compact ? '240px' : `${height}px` }}>
+      <div className="flex justify-between items-start mb-2 sm:mb-3 flex-shrink-0 gap-2">
+        <h3 className={`${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-lg'} font-semibold flex-1 min-w-0 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
           {title}
         </h3>
         {!compact && (
-          <div className="flex space-x-2">
+          <div className="flex space-x-1 sm:space-x-2 flex-shrink-0">
             <button
               onClick={() => setLocalStackedMode(!localStackedMode)}
               className={`px-2 py-1 text-xs rounded border transition-colors ${
@@ -235,20 +235,20 @@ const AreaChart: React.FC<AreaChartProps> = ({
       </div>
 
       {/* Legend */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 mb-2">
         <CustomLegend />
       </div>
 
       {/* Chart */}
-      <div className="flex-1 min-h-0" style={{ minHeight: compact ? '200px' : '250px' }}>
+      <div className="flex-1 min-h-0 w-full" style={{ minHeight: compact ? '160px' : '200px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <RechartsAreaChart
             data={data}
             margin={{ 
-              top: compact ? 10 : 20, 
-              right: compact ? 15 : 30, 
-              left: compact ? 10 : 20, 
-              bottom: compact ? 5 : 5 
+              top: compact ? 5 : 10, 
+              right: compact ? 8 : 15, 
+              left: compact ? 5 : 10, 
+              bottom: compact ? 5 : 10 
             }}
             onMouseEnter={onAreaMouseEnter}
             onMouseLeave={onAreaMouseLeave}
@@ -322,7 +322,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
 
       {/* Statistics Summary - Conditional display */}
       {!compact && (
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 flex-shrink-0">
+        <div className="mt-2 sm:mt-4 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 flex-shrink-0">
           {areas.slice(0, 4).map((area) => {
             if (hiddenAreas.has(area.dataKey)) return null;
             
@@ -332,12 +332,12 @@ const AreaChart: React.FC<AreaChartProps> = ({
             const growth = ((values[values.length - 1] - values[0]) / values[0] * 100);
             
             return (
-              <div key={area.dataKey} className={`p-3 rounded-lg ${
+              <div key={area.dataKey} className={`p-2 sm:p-3 rounded-lg ${
                 isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
               }`}>
-                <div className="flex items-center mb-2">
+                <div className="flex items-center mb-1 sm:mb-2 gap-1">
                   <div 
-                    className="w-2 h-2 rounded-full mr-2"
+                    className="w-2 h-2 rounded-full flex-shrink-0"
                     style={{ backgroundColor: area.color }}
                   ></div>
                   <h4 className={`text-xs font-medium truncate ${
@@ -345,13 +345,13 @@ const AreaChart: React.FC<AreaChartProps> = ({
                   }`}>{area.name}</h4>
                 </div>
                 <div className="space-y-1 text-xs">
-                  <div className="flex justify-between">
-                    <span>Total:</span>
-                    <span className="font-bold">{(total/1000).toFixed(0)}k</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs">Total:</span>
+                    <span className="font-bold text-xs">{(total/1000).toFixed(0)}k</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Growth:</span>
-                    <span className={`font-bold ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs">Growth:</span>
+                    <span className={`font-bold text-xs ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {growth >= 0 ? '+' : ''}{growth.toFixed(0)}%
                     </span>
                   </div>
@@ -364,7 +364,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
 
       {/* Controls hint - Only for non-compact mode */}
       {!compact && (
-        <div className={`mt-3 text-xs text-center ${
+        <div className={`mt-2 sm:mt-3 text-xs text-center ${
           isDarkMode ? 'text-gray-400' : 'text-gray-500'
         }`}>
           Click legend items to toggle areas • Hover for details

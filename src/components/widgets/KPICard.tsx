@@ -192,27 +192,27 @@ const KPICard: React.FC<KPICardProps> = ({
 
   // Enhanced size classes with better responsive fitting
   const sizeClasses = {
-    small: 'p-2 min-h-[120px] max-h-[160px]',    // More compact for small widgets
-    medium: 'p-3 min-h-[140px] max-h-[200px]',   // Better medium size
-    large: 'p-4 min-h-[180px] max-h-[280px]'     // Larger but constrained
+    small: 'p-2 sm:p-3 min-h-[120px] max-h-[160px]',    // More compact for small widgets
+    medium: 'p-3 sm:p-4 min-h-[140px] max-h-[200px]',   // Better medium size
+    large: 'p-4 sm:p-6 min-h-[180px] max-h-[280px]'     // Larger but constrained
   };
 
   const iconSizes = {
-    small: 'w-6 h-6',   // Smaller icons for compact layouts
-    medium: 'w-8 h-8',  // Balanced size
-    large: 'w-10 h-10'  // Appropriate large size
+    small: 'w-5 h-5 sm:w-6 sm:h-6',   // Better scaling
+    medium: 'w-6 h-6 sm:w-8 sm:h-8',  // Responsive sizing
+    large: 'w-8 h-8 sm:w-10 sm:h-10'  // Appropriate large size
   };
 
   const titleSizes = {
-    small: 'text-xs',    // Smaller text for compact widgets
-    medium: 'text-sm',   // Standard readable size
-    large: 'text-base'   // Larger for big widgets
+    small: 'text-xs sm:text-sm',    // Better mobile readability
+    medium: 'text-sm sm:text-base', // Improved scaling
+    large: 'text-base sm:text-lg'   // Better large sizing
   };
 
   const valueSizes = {
-    small: 'text-lg',    // Smaller but still prominent
-    medium: 'text-xl',   // Good balance
-    large: 'text-2xl'    // Large but not overwhelming
+    small: 'text-base sm:text-lg',    // More readable on mobile
+    medium: 'text-lg sm:text-xl',     // Better balance
+    large: 'text-xl sm:text-2xl'      // Improved scaling
   };
 
   const Icon = kpi.icon;

@@ -119,52 +119,53 @@ const LineChart: React.FC<LineChartProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        <div className="flex items-center space-x-2">
+    <div className="bg-white p-3 sm:p-6 rounded-lg shadow-lg h-full flex flex-col" style={{ minHeight: '400px' }}>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 gap-2 flex-shrink-0">
+        <h3 className="text-sm sm:text-lg font-semibold truncate">{title}</h3>
+        <div className="flex items-center space-x-1 sm:space-x-2 justify-end">
           {zoomDomain && (
             <button
               onClick={resetZoom}
-              className="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors"
+              className="px-2 sm:px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors"
             >
               Reset Zoom
             </button>
           )}
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 whitespace-nowrap">
             {zoomDomain ? `${displayData.length} of ${data.length} periods` : `${data.length} periods`}
           </span>
         </div>
       </div>
 
       {/* Line toggles */}
-      <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
+      <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4 p-2 sm:p-3 bg-gray-50 rounded-lg flex-shrink-0">
         {Object.entries(activeLines).map(([key, isActive]) => (
           <button
             key={key}
             onClick={() => toggleLine(key as keyof typeof activeLines)}
-            className={`px-3 py-1 text-xs rounded transition-all ${
+            className={`px-2 sm:px-3 py-1 text-xs rounded transition-all ${
               isActive 
                 ? 'bg-blue-100 text-blue-800 shadow-sm' 
                 : 'bg-white text-gray-600 hover:bg-gray-100'
             }`}
           >
-            <span className={`inline-block w-3 h-3 rounded-full mr-2 ${
+            <span className={`inline-block w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2 ${
               key === 'sales' ? 'bg-blue-500' :
               key === 'revenue' ? 'bg-green-500' :
               key === 'profit' ? 'bg-orange-500' :
               'bg-purple-500'
             }`}></span>
-            {key.charAt(0).toUpperCase() + key.slice(1)}
+            <span className="hidden sm:inline">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+            <span className="sm:hidden">{key.charAt(0).toUpperCase()}</span>
           </button>
         ))}
       </div>
 
-      <div className="h-80">
+      <div className="h-48 sm:h-64 lg:h-80 flex-1 min-h-0">
         <ResponsiveContainer width="100%" height="100%">
           <RechartsLineChart
             data={displayData}
-            margin={{ top: 5, right: 30, left: 20, bottom: 60 }}
+            margin={{ top: 5, right: 15, left: 10, bottom: 40 }}
             onMouseMove={(e: any) => {
               if (e && e.activeLabel) {
                 setHoveredPoint(e.activeLabel);
@@ -176,29 +177,31 @@ const LineChart: React.FC<LineChartProps> = ({
             <XAxis 
               dataKey="name" 
               stroke="#666"
-              fontSize={12}
+              fontSize={10}
+              interval={0}
             />
             <YAxis 
               stroke="#666"
-              fontSize={12}
+              fontSize={10}
+              width={40}
               tickFormatter={(value) => 
                 activeLines.visitors && !activeLines.sales && !activeLines.revenue && !activeLines.profit
-                  ? value.toLocaleString()
-                  : `$${value}`
+                  ? value >= 1000 ? `${(value/1000).toFixed(0)}k` : value.toString()
+                  : value >= 1000 ? `$${(value/1000).toFixed(0)}k` : `$${value}`
               }
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend />
+            <Legend wrapperStyle={{ fontSize: '11px' }} />
             
             {activeLines.sales && (
               <Line 
                 type="monotone" 
                 dataKey="sales" 
                 stroke="#3B82F6"
-                strokeWidth={3}
+                strokeWidth={2}
                 name="Sales"
                 dot={<CustomDot />}
-                activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2, fill: '#ffffff' }}
+                activeDot={{ r: 4, stroke: '#3B82F6', strokeWidth: 2, fill: '#ffffff' }}
                 animationDuration={1000}
               />
             )}
@@ -208,10 +211,10 @@ const LineChart: React.FC<LineChartProps> = ({
                 type="monotone" 
                 dataKey="revenue" 
                 stroke="#10B981"
-                strokeWidth={3}
+                strokeWidth={2}
                 name="Revenue"
                 dot={<CustomDot />}
-                activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2, fill: '#ffffff' }}
+                activeDot={{ r: 4, stroke: '#10B981', strokeWidth: 2, fill: '#ffffff' }}
                 animationDuration={1200}
               />
             )}
@@ -221,10 +224,10 @@ const LineChart: React.FC<LineChartProps> = ({
                 type="monotone" 
                 dataKey="profit" 
                 stroke="#F59E0B"
-                strokeWidth={3}
+                strokeWidth={2}
                 name="Profit"
                 dot={<CustomDot />}
-                activeDot={{ r: 6, stroke: '#F59E0B', strokeWidth: 2, fill: '#ffffff' }}
+                activeDot={{ r: 4, stroke: '#F59E0B', strokeWidth: 2, fill: '#ffffff' }}
                 animationDuration={1400}
               />
             )}
@@ -234,10 +237,10 @@ const LineChart: React.FC<LineChartProps> = ({
                 type="monotone" 
                 dataKey="visitors" 
                 stroke="#8B5CF6"
-                strokeWidth={3}
+                strokeWidth={2}
                 name="Visitors"
                 dot={<CustomDot />}
-                activeDot={{ r: 6, stroke: '#8B5CF6', strokeWidth: 2, fill: '#ffffff' }}
+                activeDot={{ r: 4, stroke: '#8B5CF6', strokeWidth: 2, fill: '#ffffff' }}
                 animationDuration={1600}
                 yAxisId="visitors"
               />
@@ -246,7 +249,7 @@ const LineChart: React.FC<LineChartProps> = ({
             {/* Brush for zooming */}
             <Brush 
               dataKey="name" 
-              height={30} 
+              height={25} 
               stroke="#8884d8"
               onChange={onBrushChange}
             />
@@ -255,7 +258,7 @@ const LineChart: React.FC<LineChartProps> = ({
       </div>
 
       {/* Statistics panel */}
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="mt-3 sm:mt-6 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 flex-shrink-0">
         {Object.entries(activeLines)
           .filter(([_, isActive]) => isActive)
           .map(([key]) => {
@@ -263,28 +266,34 @@ const LineChart: React.FC<LineChartProps> = ({
             const isVisitors = key === 'visitors';
             
             return (
-              <div key={key} className="bg-gray-50 p-4 rounded-lg">
-                <div className="flex items-center mb-2">
-                  <div className={`w-3 h-3 rounded-full mr-2 ${
+              <div key={key} className="bg-gray-50 p-2 sm:p-4 rounded-lg">
+                <div className="flex items-center mb-1 sm:mb-2">
+                  <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2 ${
                     key === 'sales' ? 'bg-blue-500' :
                     key === 'revenue' ? 'bg-green-500' :
                     key === 'profit' ? 'bg-orange-500' :
                     'bg-purple-500'
                   }`}></div>
-                  <span className="font-medium text-sm capitalize">{key}</span>
+                  <span className="font-medium text-xs sm:text-sm capitalize truncate">{key}</span>
                 </div>
                 
-                <div className="space-y-1 text-xs">
+                <div className="space-y-0.5 sm:space-y-1 text-xs">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Max:</span>
                     <span className="font-bold">
-                      {isVisitors ? stats.max.toLocaleString() : `$${stats.max.toLocaleString()}`}
+                      {isVisitors ? 
+                        (stats.max >= 1000 ? `${(stats.max/1000).toFixed(0)}k` : stats.max.toLocaleString()) : 
+                        (stats.max >= 1000 ? `$${(stats.max/1000).toFixed(0)}k` : `$${stats.max.toLocaleString()}`)
+                      }
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Avg:</span>
                     <span className="font-bold">
-                      {isVisitors ? Math.round(stats.avg).toLocaleString() : `$${Math.round(stats.avg).toLocaleString()}`}
+                      {isVisitors ? 
+                        (stats.avg >= 1000 ? `${(stats.avg/1000).toFixed(0)}k` : Math.round(stats.avg).toLocaleString()) : 
+                        (stats.avg >= 1000 ? `$${(stats.avg/1000).toFixed(0)}k` : `$${Math.round(stats.avg).toLocaleString()}`)
+                      }
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -300,8 +309,9 @@ const LineChart: React.FC<LineChartProps> = ({
       </div>
 
       {/* Instructions */}
-      <div className="mt-4 text-xs text-gray-500 text-center">
-        Use brush at bottom to zoom • Toggle lines above • Hover for details • Click reset to zoom out
+      <div className="mt-2 sm:mt-4 text-xs text-gray-500 text-center">
+        <span className="hidden sm:inline">Use brush at bottom to zoom • Toggle lines above • Hover for details • Click reset to zoom out</span>
+        <span className="sm:hidden">Tap toggles • Brush to zoom</span>
       </div>
     </div>
   );
