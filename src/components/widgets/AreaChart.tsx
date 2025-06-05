@@ -51,7 +51,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   ];
 
   const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+    if (active && payload && payload.length > 0) {
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold mb-3 text-gray-800">{`Month: ${label}`}</p>
@@ -68,7 +68,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
                     <span className="text-sm">{item.name}:</span>
                   </div>
                   <span className="font-bold ml-4">
-                    {item.value.toLocaleString()}
+                    {item.value?.toLocaleString() || '0'}
                   </span>
                 </div>
               ))}
@@ -77,7 +77,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
             <div className="flex justify-between text-xs text-gray-600">
               <span>Total Interactions:</span>
               <span className="font-semibold">
-                {payload.reduce((sum: number, item: any) => sum + item.value, 0).toLocaleString()}
+                {payload.filter((item: any) => !hiddenAreas.has(item.dataKey))
+                  .reduce((sum: number, item: any) => sum + (item.value || 0), 0)
+                  .toLocaleString()}
               </span>
             </div>
           </div>

@@ -8,32 +8,91 @@
   }
   
   body {
-    @apply bg-secondary-50 text-secondary-900;
+    @apply bg-secondary-50 text-secondary-900 dark:bg-gray-900 dark:text-white transition-colors duration-300;
   }
 }
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
   }
   
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 dark:bg-primary-500 dark:hover:bg-primary-600;
   }
   
   .btn-secondary {
-    @apply btn bg-secondary-200 text-secondary-800 hover:bg-secondary-300 focus:ring-secondary-500;
+    @apply btn bg-secondary-200 text-secondary-800 hover:bg-secondary-300 focus:ring-secondary-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:focus:ring-gray-500;
   }
   
   .btn-accent {
-    @apply btn bg-accent-600 text-white hover:bg-accent-700 focus:ring-accent-500;
+    @apply btn bg-accent-600 text-white hover:bg-accent-700 focus:ring-accent-500 dark:bg-accent-500 dark:hover:bg-accent-600;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-lg border border-secondary-200 p-6;
+    @apply bg-white rounded-lg shadow-lg border border-secondary-200 p-6 dark:bg-gray-800 dark:border-gray-700 dark:shadow-xl transition-colors duration-300;
   }
   
   .input {
-    @apply w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:ring-primary-400 transition-colors duration-200;
+  }
+
+  /* Dark mode navigation styles */
+  .nav-link {
+    @apply text-secondary-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors duration-200;
+  }
+
+  .nav-link.active {
+    @apply text-primary-600 dark:text-primary-400;
+  }
+
+  /* Dark mode chart containers */
+  .chart-container {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-secondary-200 dark:border-gray-700 transition-colors duration-300;
+  }
+
+  /* Dark mode table styles */
+  .table-header {
+    @apply bg-secondary-50 dark:bg-gray-700 text-secondary-900 dark:text-gray-200;
+  }
+
+  .table-row {
+    @apply bg-white dark:bg-gray-800 hover:bg-secondary-50 dark:hover:bg-gray-700 border-b border-secondary-200 dark:border-gray-700 transition-colors duration-200;
+  }
+
+  /* Dark mode modal and overlay styles */
+  .modal-overlay {
+    @apply bg-black bg-opacity-50 dark:bg-opacity-70;
+  }
+
+  .modal-content {
+    @apply bg-white dark:bg-gray-800 border border-secondary-200 dark:border-gray-700;
+  }
+
+  /* Custom scrollbar for dark mode */
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 hover:bg-gray-500 rounded;
+  }
+
+  /* Dark mode text colors */
+  .text-primary-dark {
+    @apply text-secondary-900 dark:text-white;
+  }
+
+  .text-secondary-dark {
+    @apply text-secondary-600 dark:text-gray-400;
+  }
+
+  .text-muted-dark {
+    @apply text-secondary-500 dark:text-gray-500;
   }
 }
