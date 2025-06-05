@@ -86,13 +86,15 @@ const sampleWidgets: LayoutWidget[] = [
     id: 'analytics-chart',
     title: 'Analytics Chart',
     component: ({ title }: { title: string }) => (
-      <div className="h-full bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-        <h3 className="font-semibold text-blue-900 mb-2">{title}</h3>
-        <div className="h-32 bg-blue-200 rounded animate-pulse"></div>
+      <div className="h-full w-full bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+        <h3 className="font-semibold text-blue-900 mb-4">{title}</h3>
+        <div className="h-full flex-1 bg-blue-200 rounded animate-pulse min-h-[200px]"></div>
       </div>
     ),
-    minWidth: 2,
-    minHeight: 2,
+    minWidth: 3,
+    minHeight: 3,
+    maxWidth: 8,
+    maxHeight: 6,
     category: 'Analytics',
     icon: <Grid className="w-4 h-4" />,
     description: 'Interactive analytics chart widget'
@@ -101,14 +103,18 @@ const sampleWidgets: LayoutWidget[] = [
     id: 'kpi-card',
     title: 'KPI Card',
     component: ({ title }: { title: string }) => (
-      <div className="h-full bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+      <div className="h-full w-full bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg flex flex-col">
         <h3 className="font-semibold text-green-900 mb-2">{title}</h3>
-        <div className="text-2xl font-bold text-green-700">$12,345</div>
-        <div className="text-sm text-green-600">+12% from last month</div>
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="text-3xl font-bold text-green-700 mb-1">$12,345</div>
+          <div className="text-sm text-green-600">+12% from last month</div>
+        </div>
       </div>
     ),
-    minWidth: 1,
-    minHeight: 1,
+    minWidth: 2,
+    minHeight: 2,
+    maxWidth: 4,
+    maxHeight: 3,
     category: 'Metrics',
     icon: <Grid className="w-4 h-4" />,
     description: 'Key performance indicator card'
@@ -117,25 +123,28 @@ const sampleWidgets: LayoutWidget[] = [
     id: 'data-table',
     title: 'Data Table',
     component: ({ title }: { title: string }) => (
-      <div className="h-full bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="bg-gray-50 px-4 py-3 border-b">
+      <div className="h-full w-full bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col">
+        <div className="bg-gray-50 px-4 py-3 border-b flex-shrink-0">
           <h3 className="font-semibold text-gray-900">{title}</h3>
         </div>
-        <div className="p-4">
+        <div className="flex-1 p-4 overflow-auto">
           <div className="space-y-2">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3, 4, 5].map(i => (
               <div key={i} className="flex space-x-4 py-2 border-b border-gray-100">
                 <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
                 <div className="w-24 h-4 bg-gray-200 rounded animate-pulse"></div>
                 <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="flex-1 h-4 bg-gray-200 rounded animate-pulse"></div>
               </div>
             ))}
           </div>
         </div>
       </div>
     ),
-    minWidth: 3,
-    minHeight: 2,
+    minWidth: 4,
+    minHeight: 3,
+    maxWidth: 12,
+    maxHeight: 8,
     category: 'Data',
     icon: <Grid className="w-4 h-4" />,
     description: 'Sortable data table widget'
@@ -480,19 +489,26 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
     }));
   }, []);
 
+  // Enhanced widget rendering with better size constraints
   const renderWidget = (item: LayoutItem) => {
     const widget = widgets.find(w => w.id === item.widgetId);
-    if (!widget || !widget.visible !== false) return null;
+    if (!widget || widget.visible === false) return null; // Fixed: was !widget.visible !== false
 
     const isSelected = state.selectedItem === item.id;
     const isDragging = state.draggedItem === item.id;
     const isLocked = widget.locked || layout.locked;
 
+    // Enhanced sizing calculation with minimum viable dimensions
+    const minGridWidth = Math.max(item.width, widget.minWidth || 1);
+    const minGridHeight = Math.max(item.height, widget.minHeight || 1);
+    
     const style = {
       left: item.x * gridSize,
       top: item.y * gridSize,
-      width: item.width * gridSize - gap,
-      height: item.height * gridSize - gap,
+      width: minGridWidth * gridSize - gap,
+      height: minGridHeight * gridSize - gap,
+      minWidth: (widget.minWidth || 1) * gridSize - gap,
+      minHeight: (widget.minHeight || 1) * gridSize - gap,
       zIndex: item.zIndex || 1,
       transform: state.viewMode === 'preview' ? `scale(${state.zoom})` : undefined
     };
@@ -500,7 +516,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
     return (
       <div
         key={item.id}
-        className={`absolute border-2 rounded-lg transition-all duration-200 ${
+        className={`absolute border-2 rounded-lg transition-all duration-200 overflow-hidden ${
           isSelected ? 'border-blue-500 shadow-lg' : 'border-gray-200'
         } ${isDragging ? 'opacity-75 cursor-grabbing' : 'cursor-pointer'}
         ${isLocked ? 'opacity-75' : ''}
@@ -520,6 +536,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
               {widget.icon && <div>{widget.icon}</div>}
               <span className="font-medium">{widget.title}</span>
               {isLocked && <Lock className="w-3 h-3 text-gray-400" />}
+              <span className="text-gray-400">({minGridWidth}×{minGridHeight})</span>
             </div>
             <div className="flex items-center space-x-1">
               {widget.collapsible && (
@@ -557,26 +574,35 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
           </div>
         )}
 
-        {/* Widget Content */}
+        {/* Widget Content with proper container fitting */}
         {!item.collapsed && (
-          <div className="h-full overflow-hidden">
-            <widget.component title={widget.title} {...widget.props} />
+          <div className="h-full w-full overflow-hidden p-1 min-h-0">
+            <div className="h-full w-full min-h-0">
+              <widget.component title={widget.title} {...widget.props} />
+            </div>
           </div>
         )}
 
-        {/* Resize Handles */}
+        {/* Enhanced Resize Handles */}
         {state.viewMode === 'edit' && !isLocked && widget.resizable !== false && isSelected && !item.collapsed && (
           <>
+            {/* Corner resize handle */}
             <div
-              className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 cursor-se-resize"
+              className="absolute bottom-0 right-0 w-4 h-4 bg-blue-500 cursor-se-resize hover:bg-blue-600 transition-colors"
+              style={{
+                borderRadius: '0 0 4px 0',
+                clipPath: 'polygon(100% 0, 100% 100%, 0 100%)'
+              }}
               onMouseDown={(e) => handleMouseDown(e, item.id, 'resize', 'bottom-right')}
             />
+            
+            {/* Edge resize handles */}
             <div
-              className="absolute bottom-0 right-1 left-1 h-1 bg-blue-300 cursor-s-resize"
+              className="absolute bottom-0 right-4 left-4 h-2 bg-blue-300 cursor-s-resize opacity-0 hover:opacity-100 transition-opacity"
               onMouseDown={(e) => handleMouseDown(e, item.id, 'resize', 'bottom')}
             />
             <div
-              className="absolute top-1 bottom-1 right-0 w-1 bg-blue-300 cursor-e-resize"
+              className="absolute top-4 bottom-4 right-0 w-2 bg-blue-300 cursor-e-resize opacity-0 hover:opacity-100 transition-opacity"
               onMouseDown={(e) => handleMouseDown(e, item.id, 'resize', 'right')}
             />
           </>

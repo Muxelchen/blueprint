@@ -84,6 +84,7 @@ const DataTable: React.FC<DataTableProps> = ({
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  const [compactMode, setCompactMode] = useState(false);
 
   // Filter options
   const departments = useMemo(() => 
@@ -192,69 +193,78 @@ const DataTable: React.FC<DataTableProps> = ({
   }), [filteredAndSortedData]);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-        <div className="flex items-center space-x-2">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col overflow-hidden">
+      {/* Header - More compact */}
+      <div className="flex items-center justify-between p-3 border-b border-gray-200 flex-shrink-0">
+        <h3 className="text-base font-semibold text-gray-800 truncate">{title}</h3>
+        <div className="flex items-center space-x-1">
+          <button 
+            onClick={() => setCompactMode(!compactMode)}
+            className={`p-1.5 text-xs rounded transition-colors ${compactMode ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:text-blue-600'}`}
+            title="Toggle compact mode"
+          >
+            Compact
+          </button>
           {exportable && (
             <button 
               onClick={exportToCSV}
-              className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+              className="p-1.5 text-gray-500 hover:text-blue-600 transition-colors"
               title="Export to CSV"
             >
               <Download className="w-4 h-4" />
             </button>
           )}
-          <button className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
+          <button className="p-1.5 text-gray-500 hover:text-blue-600 transition-colors">
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Statistics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-50 p-3 rounded-lg">
-          <p className="text-sm text-blue-600 font-medium">Total Records</p>
-          <p className="text-2xl font-bold text-blue-800">{statistics.total}</p>
+      {/* Statistics - Conditional display based on space */}
+      {!compactMode && (
+        <div className="grid grid-cols-4 gap-2 p-3 border-b border-gray-200 flex-shrink-0">
+          <div className="bg-blue-50 p-2 rounded text-center">
+            <p className="text-xs text-blue-600 font-medium">Total</p>
+            <p className="text-lg font-bold text-blue-800">{statistics.total}</p>
+          </div>
+          <div className="bg-green-50 p-2 rounded text-center">
+            <p className="text-xs text-green-600 font-medium">Active</p>
+            <p className="text-lg font-bold text-green-800">{statistics.active}</p>
+          </div>
+          <div className="bg-purple-50 p-2 rounded text-center">
+            <p className="text-xs text-purple-600 font-medium">Avg $</p>
+            <p className="text-lg font-bold text-purple-800">{Math.round(statistics.avgSalary / 1000)}k</p>
+          </div>
+          <div className="bg-orange-50 p-2 rounded text-center">
+            <p className="text-xs text-orange-600 font-medium">Perf</p>
+            <p className="text-lg font-bold text-orange-800">{statistics.avgPerformance}%</p>
+          </div>
         </div>
-        <div className="bg-green-50 p-3 rounded-lg">
-          <p className="text-sm text-green-600 font-medium">Active</p>
-          <p className="text-2xl font-bold text-green-800">{statistics.active}</p>
-        </div>
-        <div className="bg-purple-50 p-3 rounded-lg">
-          <p className="text-sm text-purple-600 font-medium">Avg Salary</p>
-          <p className="text-2xl font-bold text-purple-800">${Math.round(statistics.avgSalary).toLocaleString()}</p>
-        </div>
-        <div className="bg-orange-50 p-3 rounded-lg">
-          <p className="text-sm text-orange-600 font-medium">Avg Performance</p>
-          <p className="text-2xl font-bold text-orange-800">{statistics.avgPerformance}%</p>
-        </div>
-      </div>
+      )}
 
-      {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      {/* Controls - More compact layout */}
+      <div className="flex flex-col gap-2 p-3 border-b border-gray-200 flex-shrink-0">
         {/* Search */}
         {searchable && (
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3" />
             <input
               type="text"
-              placeholder="Search employees..."
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-7 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         )}
 
-        {/* Filters */}
+        {/* Filters - Horizontal layout for space efficiency */}
         {filterable && (
           <div className="flex gap-2">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
             >
               <option value="">All Status</option>
               {statuses.map((status) => (
@@ -265,9 +275,9 @@ const DataTable: React.FC<DataTableProps> = ({
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
             >
-              <option value="">All Departments</option>
+              <option value="">All Depts</option>
               {departments.map((dept) => (
                 <option key={dept as string} value={dept as string}>{dept as string}</option>
               ))}
@@ -276,12 +286,12 @@ const DataTable: React.FC<DataTableProps> = ({
         )}
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {/* Table - Enhanced responsive design with better overflow handling */}
+      <div className="flex-1 overflow-auto min-h-0">
         <table className="w-full">
-          <thead>
+          <thead className="bg-gray-50 sticky top-0">
             <tr className="border-b border-gray-200">
-              <th className="text-left py-3 px-4">
+              <th className="text-left py-2 px-2 w-8">
                 <input
                   type="checkbox"
                   checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
@@ -289,37 +299,39 @@ const DataTable: React.FC<DataTableProps> = ({
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
               </th>
-              <th className="text-left py-3 px-4">
+              <th className="text-left py-2 px-2 min-w-[140px]">
                 <SortButton field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>
                   Employee
                 </SortButton>
               </th>
-              <th className="text-left py-3 px-4">
+              <th className="text-left py-2 px-2 min-w-[80px]">
                 <SortButton field="department" currentField={sortField} direction={sortDirection} onSort={handleSort}>
-                  Department
+                  Dept
                 </SortButton>
               </th>
-              <th className="text-left py-3 px-4">
+              <th className="text-left py-2 px-2 min-w-[60px]">
                 <SortButton field="status" currentField={sortField} direction={sortDirection} onSort={handleSort}>
                   Status
                 </SortButton>
               </th>
-              <th className="text-left py-3 px-4">
+              <th className="text-left py-2 px-2 min-w-[70px]">
                 <SortButton field="salary" currentField={sortField} direction={sortDirection} onSort={handleSort}>
                   Salary
                 </SortButton>
               </th>
-              <th className="text-left py-3 px-4">
-                <SortButton field="performance" currentField={sortField} direction={sortDirection} onSort={handleSort}>
-                  Performance
-                </SortButton>
-              </th>
+              {!compactMode && (
+                <th className="text-left py-2 px-2 min-w-[100px]">
+                  <SortButton field="performance" currentField={sortField} direction={sortDirection} onSort={handleSort}>
+                    Performance
+                  </SortButton>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
             {paginatedData.map((item: TableData, index: number) => (
               <tr key={item.id} className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                <td className="py-3 px-4">
+                <td className="py-2 px-2">
                   <input
                     type="checkbox"
                     checked={selectedRows.has(item.id)}
@@ -327,88 +339,113 @@ const DataTable: React.FC<DataTableProps> = ({
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                 </td>
-                <td className="py-3 px-4">
-                  <AvatarCell item={item} />
+                <td className="py-2 px-2">
+                  {compactMode ? (
+                    <div className="text-sm">
+                      <div className="font-medium text-gray-900 truncate">{item.name}</div>
+                      <div className="text-xs text-gray-500 truncate">{item.email}</div>
+                    </div>
+                  ) : (
+                    <AvatarCell item={item} />
+                  )}
                 </td>
-                <td className="py-3 px-4 text-gray-900">{item.department}</td>
-                <td className="py-3 px-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                <td className="py-2 px-2 text-sm text-gray-900 truncate">{item.department}</td>
+                <td className="py-2 px-2">
+                  <span className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${
                     item.status === 'Active' ? 'bg-green-100 text-green-800' :
                     item.status === 'Inactive' ? 'bg-red-100 text-red-800' :
                     'bg-yellow-100 text-yellow-800'
                   }`}>
-                    {item.status}
+                    {compactMode ? item.status.charAt(0) : item.status}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-gray-900">${item.salary.toLocaleString()}</td>
-                <td className="py-3 px-4">
-                  <div className="flex items-center">
-                    <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full" 
-                        style={{ width: `${item.performance}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm text-gray-600">{item.performance}%</span>
-                  </div>
+                <td className="py-2 px-2 text-sm text-gray-900">
+                  ${compactMode ? `${Math.round(item.salary / 1000)}k` : item.salary.toLocaleString()}
                 </td>
+                {!compactMode && (
+                  <td className="py-2 px-2">
+                    <div className="flex items-center">
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mr-2">
+                        <div 
+                          className="bg-blue-600 h-1.5 rounded-full" 
+                          style={{ width: `${item.performance}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-xs text-gray-600 whitespace-nowrap">{item.performance}%</span>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-6">
-        <div className="text-sm text-gray-700">
-          Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, filteredAndSortedData.length)} of {filteredAndSortedData.length} results
+      {/* Pagination - Compact version */}
+      <div className="flex items-center justify-between p-3 border-t border-gray-200 flex-shrink-0">
+        <div className="text-xs text-gray-700">
+          {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, filteredAndSortedData.length)} of {filteredAndSortedData.length}
         </div>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1">
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 rounded border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3 h-3" />
           </button>
           
           <div className="flex items-center space-x-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded-lg ${
-                  currentPage === page 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              let page;
+              if (totalPages <= 5) {
+                page = i + 1;
+              } else {
+                if (currentPage <= 3) {
+                  page = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  page = totalPages - 4 + i;
+                } else {
+                  page = currentPage - 2 + i;
+                }
+              }
+              return (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-2 py-1 text-xs rounded ${
+                    currentPage === page 
+                      ? 'bg-blue-600 text-white' 
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  {page}
+                </button>
+              );
+            })}
           </div>
           
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 rounded border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3 h-3" />
           </button>
         </div>
       </div>
 
-      {/* Selected items info */}
+      {/* Selected items info - Compact */}
       {selectedRows.size > 0 && (
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800">
-            {selectedRows.size} item(s) selected
+        <div className="p-2 bg-blue-50 border-t border-blue-200 flex-shrink-0">
+          <p className="text-xs text-blue-800">
+            {selectedRows.size} selected
             <button 
               onClick={() => setSelectedRows(new Set())}
               className="ml-2 text-blue-600 hover:text-blue-800 underline"
             >
-              Clear selection
+              Clear
             </button>
           </p>
         </div>

@@ -3,7 +3,13 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    // Add CLI generated files
+    "./cli/**/*.{js,ts}",
+    // Include template files
+    "./src/templates/**/*.{js,ts,jsx,tsx}",
   ],
+  // Enable JIT mode for better performance
+  mode: 'jit',
   darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {
@@ -101,6 +107,9 @@ export default {
           950: '#030712',
         },
       },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'fade-out': 'fadeOut 0.5s ease-in-out',
@@ -117,6 +126,10 @@ export default {
         'scale-in': 'scaleIn 0.3s ease-out',
         'hover-lift': 'hoverLift 0.3s ease-out',
         'shimmer': 'shimmer 2s linear infinite',
+        // Add performance-optimized animations
+        'fade-in-fast': 'fadeIn 0.2s ease-out',
+        'slide-up-fast': 'slideUp 0.15s ease-out',
+        'scale-in-fast': 'scaleIn 0.1s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -189,6 +202,10 @@ export default {
         'elastic': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
       },
       transitionDuration: {
+        '50': '50ms',
+        '75': '75ms',
+        '100': '100ms',
+        '150': '150ms',
         '250': '250ms',
         '350': '350ms',
         '400': '400ms',
@@ -216,5 +233,41 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Add performance optimizations
+    function({ addUtilities }) {
+      addUtilities({
+        '.gpu-accelerated': {
+          'transform': 'translateZ(0)',
+          'backface-visibility': 'hidden',
+          'perspective': '1000px',
+        },
+        '.contain-layout': {
+          'contain': 'layout',
+        },
+        '.contain-paint': {
+          'contain': 'paint',
+        },
+        '.contain-strict': {
+          'contain': 'strict',
+        },
+        '.will-change-transform': {
+          'will-change': 'transform',
+        },
+        '.will-change-opacity': {
+          'will-change': 'opacity',
+        },
+      })
+    }
+  ],
+  // Purge unused styles more aggressively
+  safelist: [
+    // Keep dynamic classes that might be generated
+    {
+      pattern: /^(bg|text|border)-(red|green|blue|yellow|purple|gray)-(100|200|300|400|500|600|700|800|900)$/,
+    },
+    {
+      pattern: /^(w|h)-(4|6|8|10|12|16|20|24)$/,
+    }
+  ]
 }

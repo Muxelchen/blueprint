@@ -190,57 +190,58 @@ const KPICard: React.FC<KPICardProps> = ({
     }
   };
 
+  // Enhanced size classes with better responsive fitting
   const sizeClasses = {
-    small: 'p-4',
-    medium: 'p-6',
-    large: 'p-8'
+    small: 'p-2 min-h-[120px] max-h-[160px]',    // More compact for small widgets
+    medium: 'p-3 min-h-[140px] max-h-[200px]',   // Better medium size
+    large: 'p-4 min-h-[180px] max-h-[280px]'     // Larger but constrained
   };
 
   const iconSizes = {
-    small: 'w-8 h-8',
-    medium: 'w-10 h-10',
-    large: 'w-12 h-12'
+    small: 'w-6 h-6',   // Smaller icons for compact layouts
+    medium: 'w-8 h-8',  // Balanced size
+    large: 'w-10 h-10'  // Appropriate large size
   };
 
   const titleSizes = {
-    small: 'text-sm',
-    medium: 'text-base',
-    large: 'text-lg'
+    small: 'text-xs',    // Smaller text for compact widgets
+    medium: 'text-sm',   // Standard readable size
+    large: 'text-base'   // Larger for big widgets
   };
 
   const valueSizes = {
-    small: 'text-xl',
-    medium: 'text-2xl',
-    large: 'text-3xl'
+    small: 'text-lg',    // Smaller but still prominent
+    medium: 'text-xl',   // Good balance
+    large: 'text-2xl'    // Large but not overwhelming
   };
 
   const Icon = kpi.icon;
 
   return (
     <div 
-      className={`bg-white rounded-lg shadow-lg border border-gray-200 performance-hover cursor-pointer ${sizeClasses[size]} gpu-accelerated`}
+      className={`bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer ${sizeClasses[size]} flex flex-col h-full overflow-hidden`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
+      {/* Header - Optimized for space */}
+      <div className="flex items-start justify-between mb-2 flex-shrink-0">
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
           <div 
-            className={`${iconSizes[size]} rounded-lg flex items-center justify-center text-white transition-colors duration-200`}
+            className={`${iconSizes[size]} rounded-lg flex items-center justify-center text-white transition-colors duration-200 flex-shrink-0`}
             style={{ backgroundColor: kpi.color }}
           >
-            <Icon className={`${size === 'small' ? 'w-4 h-4' : size === 'medium' ? 'w-5 h-5' : 'w-6 h-6'}`} />
+            <Icon className={`${size === 'small' ? 'w-3 h-3' : size === 'medium' ? 'w-4 h-4' : 'w-5 h-5'}`} />
           </div>
-          <div>
-            <h3 className={`font-semibold text-gray-900 ${titleSizes[size]}`}>{kpi.title}</h3>
-            {kpi.description && (
-              <p className="text-xs text-gray-500 mt-1">{kpi.description}</p>
+          <div className="min-w-0 flex-1">
+            <h3 className={`font-semibold text-gray-900 ${titleSizes[size]} truncate leading-tight`}>{kpi.title}</h3>
+            {kpi.description && size === 'large' && (
+              <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{kpi.description}</p>
             )}
           </div>
         </div>
         
         {showTrend && (
-          <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 hover-bounce ${getTrendColor()}`}>
+          <div className={`flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium transition-all duration-200 ${getTrendColor()} flex-shrink-0 ml-2`}>
             {getTrendIcon()}
             <span className="ml-1">
               {kpi.changePercent > 0 ? '+' : ''}{kpi.changePercent.toFixed(1)}%
@@ -249,10 +250,10 @@ const KPICard: React.FC<KPICardProps> = ({
         )}
       </div>
 
-      {/* Main Value */}
-      <div className="mb-4">
+      {/* Main Value - Better space utilization */}
+      <div className="mb-2 flex-grow flex flex-col justify-center">
         <div 
-          className={`font-bold text-gray-900 transition-colors duration-300 ${valueSizes[size]}`}
+          className={`font-bold text-gray-900 transition-colors duration-300 ${valueSizes[size]} leading-none`}
           style={{ 
             color: isHovered ? kpi.color : undefined
           }}
@@ -260,26 +261,26 @@ const KPICard: React.FC<KPICardProps> = ({
           {formattedValue}
         </div>
         
-        {showTrend && (
-          <div className="flex items-center space-x-2 mt-2 opacity-70 transition-opacity duration-200">
-            <span className="text-sm text-gray-600">vs last period:</span>
-            <span className="text-sm font-medium text-gray-900">
+        {showTrend && size !== 'small' && (
+          <div className="flex items-center space-x-2 mt-1 opacity-70 transition-opacity duration-200">
+            <span className="text-xs text-gray-600">vs last:</span>
+            <span className="text-xs font-medium text-gray-900">
               {formattedPreviousValue}
             </span>
           </div>
         )}
       </div>
 
-      {/* Target Progress */}
-      {showTarget && kpi.target && (
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600">Target Progress</span>
-            <span className="text-sm font-medium" style={{ color: kpi.color }}>
-              {targetProgress.toFixed(1)}%
+      {/* Target Progress - Compact version */}
+      {showTarget && kpi.target && size !== 'small' && (
+        <div className="mb-2 flex-shrink-0">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs text-gray-600">Target</span>
+            <span className="text-xs font-medium" style={{ color: kpi.color }}>
+              {targetProgress.toFixed(0)}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-1">
             <div 
               className="h-full rounded-full transition-all duration-500 ease-out"
               style={{ 
@@ -288,58 +289,53 @@ const KPICard: React.FC<KPICardProps> = ({
               }}
             ></div>
           </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>Current</span>
-            <span>Target: {formatValue(kpi.target, kpi.format, kpi.unit)}</span>
-          </div>
         </div>
       )}
 
-      {/* Simplified Mini Trend Chart - Better Performance */}
-      <div className="mt-4">
-        <div className="flex items-end space-x-1 h-8">
-          {Array.from({ length: 7 }, (_, i) => {
-            const height = Math.max(10, 20 + Math.random() * 12);
+      {/* Mini Trend Chart - Optimized for small spaces */}
+      <div className="mt-auto flex-shrink-0">
+        <div className="flex items-end space-x-0.5 h-4">
+          {Array.from({ length: size === 'small' ? 4 : size === 'medium' ? 6 : 8 }, (_, i) => {
+            const height = Math.max(4, 6 + Math.random() * 10);
+            const isLast = i === (size === 'small' ? 3 : size === 'medium' ? 5 : 7);
             return (
               <div
                 key={i}
                 className="flex-1 rounded-t transition-colors duration-200 hover:opacity-80 cursor-pointer"
                 style={{ 
                   height: `${height}px`,
-                  backgroundColor: i === 6 ? kpi.color : `${kpi.color}66`
+                  backgroundColor: isLast ? kpi.color : `${kpi.color}66`
                 }}
               ></div>
             );
           })}
         </div>
-        <div className="text-xs text-gray-500 text-center mt-2">7-day trend</div>
+        {size !== 'small' && (
+          <div className="text-xs text-gray-500 text-center mt-0.5">
+            {size === 'medium' ? '6d' : '8d'} trend
+          </div>
+        )}
       </div>
 
-      {/* Performance Insights - Only show on hover with animation */}
-      {isHovered && (
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 animate-fade-in">
-          <div className="text-xs text-blue-800 font-medium mb-2">Performance Insights</div>
-          <div className="space-y-1 text-xs text-blue-700">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-600">Change:</span>
-              <span className="font-medium text-gray-900">
-                {kpi.change > 0 ? '+' : ''}{kpi.change.toFixed(kpi.format === 'percentage' ? 1 : 0)} {kpi.unit}
-              </span>
+      {/* Performance Insights - Compact hover display */}
+      {isHovered && size === 'large' && (
+        <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200 animate-fade-in flex-shrink-0">
+          <div className="text-xs text-blue-800 font-medium mb-1">Quick Stats</div>
+          <div className="grid grid-cols-2 gap-2 text-xs text-blue-700">
+            <div className="text-center">
+              <div className="font-medium text-gray-900">
+                {kpi.change > 0 ? '+' : ''}{kpi.change.toFixed(kpi.format === 'percentage' ? 1 : 0)}
+              </div>
+              <div className="text-gray-600">Change</div>
             </div>
             {kpi.target && (
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">To target:</span>
-                <span className="font-medium text-gray-900">
-                  {kpi.target - kpi.value > 0 ? '+' : ''}{(kpi.target - kpi.value).toFixed(kpi.format === 'percentage' ? 1 : 0)} {kpi.unit}
-                </span>
+              <div className="text-center">
+                <div className="font-medium text-gray-900">
+                  {(kpi.target - kpi.value).toFixed(kpi.format === 'percentage' ? 1 : 0)}
+                </div>
+                <div className="text-gray-600">To Target</div>
               </div>
             )}
-            <div className="flex items-center justify-between border-t border-blue-200 pt-1">
-              <span className="text-gray-600">Performance:</span>
-              <span className={`font-medium ${targetProgress >= 90 ? 'text-green-600' : targetProgress >= 70 ? 'text-yellow-600' : 'text-red-600'}`}>
-                {targetProgress >= 90 ? 'Excellent' : targetProgress >= 70 ? 'Good' : 'Needs Improvement'}
-              </span>
-            </div>
           </div>
         </div>
       )}

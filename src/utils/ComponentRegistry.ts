@@ -1,54 +1,136 @@
 import { ComponentType, lazy } from 'react';
 
-// Component registry type definitions
+// Component registry type definitions with performance enhancements
 interface ComponentEntry {
-  name: string;
   component: ComponentType<any>;
   category: string;
-  description?: string;
-  props?: Record<string, any>;
-  lazy?: boolean;
+  metadata?: {
+    description?: string;
+    version?: string;
+    dependencies?: string[];
+    preload?: boolean;
+    priority?: 'high' | 'medium' | 'low';
+    size?: 'small' | 'medium' | 'large';
+  };
+  preloadPromise?: Promise<ComponentType<any>>;
 }
 
 class ComponentRegistry {
-  private components: Map<string, ComponentEntry> = new Map();
-  private categories: Set<string> = new Set();
+  private components = new Map<string, ComponentEntry>();
+  private preloadCache = new Map<string, Promise<ComponentType<any> | null>>();
+  private loadedComponents = new Set<string>();
 
-  // Register a component
-  register(name: string, component: ComponentType<any>, category: string, options?: {
-    description?: string;
-    props?: Record<string, any>;
-    lazy?: boolean;
-  }): void {
-    this.components.set(name, {
-      name,
+  // Enhanced registration with performance metadata
+  register(
+    name: string, 
+    component: ComponentType<any>, 
+    category: string,
+    metadata: ComponentEntry['metadata'] = {}
+  ) {
+    const entry: ComponentEntry = {
       component,
       category,
-      description: options?.description,
-      props: options?.props,
-      lazy: options?.lazy
+      metadata: {
+        preload: false,
+        priority: 'medium',
+        size: 'medium',
+        ...metadata
+      }
+    };
+
+    this.components.set(name, entry);
+
+    // Auto-preload high priority components
+    if (metadata.priority === 'high' || metadata.preload) {
+      this.preloadComponent(name);
+    }
+  }
+
+  // Preload components for better performance
+  async preloadComponent(name: string): Promise<ComponentType<any> | null> {
+    if (this.loadedComponents.has(name)) {
+      return this.get(name);
+    }
+
+    if (this.preloadCache.has(name)) {
+      return this.preloadCache.get(name)!;
+    }
+
+    const entry = this.components.get(name);
+    if (!entry) return null;
+
+    const preloadPromise = this.loadComponent(name);
+    this.preloadCache.set(name, preloadPromise);
+    
+    try {
+      const component = await preloadPromise;
+      this.loadedComponents.add(name);
+      return component;
+    } catch (error) {
+      console.error(`Failed to preload component ${name}:`, error);
+      this.preloadCache.delete(name);
+      return null;
+    }
+  }
+
+  // Preload components by category
+  async preloadCategory(category: string): Promise<void> {
+    const categoryComponents = this.getByCategory(category);
+    await Promise.all(
+      categoryComponents.map(entry => this.preloadComponent(entry.name))
+    );
+  }
+
+  // Get components by category with metadata
+  getByCategory(category: string): Array<{name: string; entry: ComponentEntry}> {
+    return Array.from(this.components.entries())
+      .filter(([, entry]) => entry.category === category)
+      .map(([name, entry]) => ({ name, entry }));
+  }
+
+  // Enhanced component loading with error boundaries
+  async loadComponent(name: string): Promise<ComponentType<any> | null> {
+    const entry = this.components.get(name);
+    if (!entry) return null;
+
+    try {
+      const loadedComponent = entry.component;
+      // Handle both default and named exports
+      const component = (loadedComponent as any).default || loadedComponent;
+      
+      // Mark as loaded for performance tracking
+      this.loadedComponents.add(name);
+      
+      return component;
+    } catch (error) {
+      console.error(`Failed to load component ${name}:`, error);
+      return null;
+    }
+  }
+
+  // Performance analytics
+  getPerformanceMetrics() {
+    return {
+      totalComponents: this.components.size,
+      loadedComponents: this.loadedComponents.size,
+      preloadedComponents: this.preloadCache.size,
+      loadRatio: this.loadedComponents.size / this.components.size,
+      categoryBreakdown: this.getCategoryBreakdown()
+    };
+  }
+
+  private getCategoryBreakdown() {
+    const breakdown: Record<string, number> = {};
+    this.components.forEach(entry => {
+      breakdown[entry.category] = (breakdown[entry.category] || 0) + 1;
     });
-    this.categories.add(category);
+    return breakdown;
   }
 
   // Get a component by name
   get(name: string): ComponentType<any> | null {
     const entry = this.components.get(name);
-    if (!entry) return null;
-    
-    return entry.component;
-  }
-
-  // Get all components in a category
-  getByCategory(category: string): ComponentEntry[] {
-    return Array.from(this.components.values()).filter(
-      entry => entry.category === category
-    );
-  }
-
-  // Get all categories
-  getCategories(): string[] {
-    return Array.from(this.categories);
+    return entry?.component || null;
   }
 
   // Get all components
@@ -56,14 +138,20 @@ class ComponentRegistry {
     return Array.from(this.components.values());
   }
 
-  // Load component dynamically
-  async loadComponent(name: string): Promise<ComponentType<any> | null> {
-    const entry = this.components.get(name);
-    if (!entry) return null;
+  has(name: string): boolean {
+    return this.components.has(name);
+  }
 
-    const loadedComponent = entry.component;
-    // Handle both default and named exports
-    return (loadedComponent as any).default || loadedComponent;
+  remove(name: string): boolean {
+    this.loadedComponents.delete(name);
+    this.preloadCache.delete(name);
+    return this.components.delete(name);
+  }
+
+  clear(): void {
+    this.components.clear();
+    this.loadedComponents.clear();
+    this.preloadCache.clear();
   }
 }
 

@@ -23,10 +23,10 @@ const WidgetArea: React.FC<WidgetAreaProps> = ({
   variant = 'default'
 }) => {
   const sizeClasses = {
-    small: 'col-span-1',
-    medium: 'col-span-1 md:col-span-2',
-    large: 'col-span-1 md:col-span-2 lg:col-span-3',
-    full: 'col-span-full'
+    small: 'col-span-1 min-h-[200px]',
+    medium: 'col-span-1 md:col-span-2 min-h-[280px]',
+    large: 'col-span-1 md:col-span-2 lg:col-span-3 min-h-[350px]',
+    full: 'col-span-full min-h-[400px]'
   }
 
   const variantClasses = {
@@ -42,18 +42,21 @@ const WidgetArea: React.FC<WidgetAreaProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={`
-        ${sizeClasses[size]}
-        ${variantClasses[variant]}
-        rounded-lg p-6 hover:shadow-md transition-shadow duration-200
+        ${sizeClasses[size]} 
+        ${variantClasses[variant]} 
+        rounded-lg p-6 
         ${className}
+        flex flex-col
       `}
     >
       {title && (
-        <div className="mb-4 pb-2 border-b border-secondary-200">
+        <div className="flex items-center justify-between mb-4 flex-shrink-0">
           <h3 className="text-lg font-semibold text-secondary-900">{title}</h3>
         </div>
       )}
-      {children}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        {children}
+      </div>
     </motion.div>
   )
 }

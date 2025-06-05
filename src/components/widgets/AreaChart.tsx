@@ -30,13 +30,17 @@ interface AreaChartProps {
   title?: string;
   showDots?: boolean;
   stackedMode?: boolean;
+  compact?: boolean;
+  height?: number;
 }
 
 const AreaChart: React.FC<AreaChartProps> = ({ 
   data = mockData, 
   title = 'Website Analytics Trends',
   showDots = true,
-  stackedMode = false
+  stackedMode = false,
+  compact = false,
+  height = 320
 }) => {
   const { isDarkMode } = useDarkMode();
   const [activeArea, setActiveArea] = useState<string | null>(null);
@@ -55,41 +59,34 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length > 0) {
       return (
-        <div className={`p-4 border rounded-lg shadow-lg ${
+        <div className={`p-3 border rounded-lg shadow-lg ${compact ? 'text-xs' : 'text-sm'} ${
           isDarkMode 
             ? 'bg-gray-800 border-gray-600 text-white' 
             : 'bg-white border-gray-200 text-gray-800'
         }`}>
-          <p className={`font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-            {`Month: ${label}`}
+          <p className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+            {`${label}`}
           </p>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {payload
               .filter((item: any) => !hiddenAreas.has(item.dataKey))
+              .slice(0, compact ? 2 : 4)
               .map((item: any, index: number) => (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div 
-                      className="w-3 h-3 rounded-full mr-2"
+                      className="w-2 h-2 rounded-full mr-2"
                       style={{ backgroundColor: item.color }}
                     ></div>
-                    <span className="text-sm">{item.name}:</span>
+                    <span className="truncate">{compact ? item.name.split(' ')[0] : item.name}:</span>
                   </div>
-                  <span className="font-bold ml-4">
-                    {item.value?.toLocaleString() || '0'}
+                  <span className="font-bold ml-2">
+                    {compact && item.value >= 1000 
+                      ? `${(item.value / 1000).toFixed(1)}k`
+                      : item.value?.toLocaleString() || '0'}
                   </span>
                 </div>
               ))}
-          </div>
-          <div className={`mt-3 pt-2 border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
-            <div className={`flex justify-between text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              <span>Total Interactions:</span>
-              <span className="font-semibold">
-                {payload.filter((item: any) => !hiddenAreas.has(item.dataKey))
-                  .reduce((sum: number, item: any) => sum + (item.value || 0), 0)
-                  .toLocaleString()}
-              </span>
-            </div>
           </div>
         </div>
       );
@@ -120,6 +117,36 @@ const AreaChart: React.FC<AreaChartProps> = ({
   };
 
   const CustomLegend = () => {
+    if (compact) {
+      return (
+        <div className="flex flex-wrap justify-center gap-1 mb-3">
+          {areas.slice(0, 3).map((area) => {
+            const isHidden = hiddenAreas.has(area.dataKey);
+            
+            return (
+              <button
+                key={area.dataKey}
+                onClick={() => toggleArea(area.dataKey)}
+                className={`flex items-center px-2 py-1 rounded text-xs transition-all ${
+                  isHidden 
+                    ? 'opacity-50' 
+                    : isDarkMode
+                      ? 'bg-gray-700 hover:bg-gray-600'
+                      : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
+                <div 
+                  className="w-2 h-2 rounded-full mr-1"
+                  style={{ backgroundColor: area.color }}
+                ></div>
+                <span className={isHidden ? 'line-through' : ''}>{area.name.split(' ')[0]}</span>
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+    
     return (
       <div className="flex flex-wrap justify-center gap-3 mb-4">
         {areas.map((area) => {
@@ -173,58 +200,56 @@ const AreaChart: React.FC<AreaChartProps> = ({
   };
 
   const formatYAxisTick = (value: number) => {
-    if (value >= 1000) {
+    if (compact && value >= 1000) {
+      return `${(value / 1000).toFixed(0)}k`;
+    } else if (value >= 1000) {
       return `${(value / 1000).toFixed(0)}k`;
     }
     return value.toString();
   };
 
   return (
-    <div className={`p-6 rounded-lg shadow-lg ${
+    <div className={`${compact ? 'p-3' : 'p-6'} rounded-lg shadow-sm border flex flex-col ${
       isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    }`}>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+    }`} style={{ height: compact ? 'auto' : `${height}px` }}>
+      <div className="flex justify-between items-center mb-3 flex-shrink-0">
+        <h3 className={`${compact ? 'text-sm' : 'text-lg'} font-semibold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
           {title}
         </h3>
+        {!compact && (
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setLocalStackedMode(!localStackedMode)}
+              className={`px-2 py-1 text-xs rounded border transition-colors ${
+                localStackedMode 
+                  ? 'bg-blue-100 text-blue-700 border-blue-300' 
+                  : isDarkMode
+                    ? 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+              }`}
+            >
+              {localStackedMode ? 'Stacked' : 'Overlay'}
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Controls */}
-      <div className="flex justify-between items-center mb-4">
+      {/* Legend */}
+      <div className="flex-shrink-0">
         <CustomLegend />
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setLocalStackedMode(!localStackedMode)}
-            className={`px-3 py-1 text-xs rounded-lg border transition-colors ${
-              localStackedMode 
-                ? 'bg-blue-100 text-blue-700 border-blue-300' 
-                : isDarkMode
-                  ? 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
-                  : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-            }`}
-          >
-            {localStackedMode ? 'Stacked' : 'Overlayed'}
-          </button>
-          <button
-            onClick={() => setLocalShowDots(!localShowDots)}
-            className={`px-3 py-1 text-xs rounded-lg border transition-colors ${
-              localShowDots 
-                ? 'bg-green-100 text-green-700 border-green-300' 
-                : isDarkMode
-                  ? 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
-                  : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-            }`}
-          >
-            {localShowDots ? 'Dots On' : 'Dots Off'}
-          </button>
-        </div>
       </div>
 
-      <div className="h-80">
+      {/* Chart */}
+      <div className="flex-1 min-h-0" style={{ minHeight: compact ? '200px' : '250px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <RechartsAreaChart
             data={data}
-            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            margin={{ 
+              top: compact ? 10 : 20, 
+              right: compact ? 15 : 30, 
+              left: compact ? 10 : 20, 
+              bottom: compact ? 5 : 5 
+            }}
             onMouseEnter={onAreaMouseEnter}
             onMouseLeave={onAreaMouseLeave}
           >
@@ -244,14 +269,16 @@ const AreaChart: React.FC<AreaChartProps> = ({
             <XAxis 
               dataKey="month" 
               stroke={isDarkMode ? '#9CA3AF' : '#666'}
-              fontSize={12}
+              fontSize={compact ? 10 : 12}
               tick={{ fill: isDarkMode ? '#9CA3AF' : '#666' }}
+              interval={compact ? 1 : 0}
             />
             <YAxis 
               stroke={isDarkMode ? '#9CA3AF' : '#666'}
-              fontSize={12}
+              fontSize={compact ? 10 : 12}
               tickFormatter={formatYAxisTick}
               tick={{ fill: isDarkMode ? '#9CA3AF' : '#666' }}
+              width={compact ? 40 : 60}
             />
             <Tooltip content={<CustomTooltip />} />
 
@@ -267,24 +294,24 @@ const AreaChart: React.FC<AreaChartProps> = ({
                   dataKey={area.dataKey}
                   stackId={localStackedMode ? "1" : area.dataKey}
                   stroke={area.color}
-                  strokeWidth={isActive ? 3 : 2}
+                  strokeWidth={isActive ? 3 : compact ? 1.5 : 2}
                   fill={`url(#gradient${area.dataKey})`}
                   fillOpacity={isActive ? 1 : 0.8}
-                  dot={localShowDots ? { 
+                  dot={!compact && localShowDots ? { 
                     fill: area.color, 
                     strokeWidth: 2, 
                     stroke: '#fff',
                     r: isActive ? 5 : 3,
                     filter: isActive ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' : 'none'
                   } : false}
-                  activeDot={localShowDots ? { 
+                  activeDot={!compact && localShowDots ? { 
                     r: 6, 
                     fill: area.color,
                     stroke: '#fff',
                     strokeWidth: 3,
                     filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))'
                   } : undefined}
-                  animationDuration={1000 + index * 200}
+                  animationDuration={compact ? 500 : 1000 + index * 200}
                   animationEasing="ease-out"
                 />
               );
@@ -293,56 +320,56 @@ const AreaChart: React.FC<AreaChartProps> = ({
         </ResponsiveContainer>
       </div>
 
-      {/* Statistics Summary */}
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-        {areas.map((area) => {
-          if (hiddenAreas.has(area.dataKey)) return null;
-          
-          const values = data.map(d => d[area.dataKey as keyof AreaData] as number);
-          const total = values.reduce((sum, val) => sum + val, 0);
-          const average = total / values.length;
-          const growth = ((values[values.length - 1] - values[0]) / values[0] * 100);
-          
-          return (
-            <div key={area.dataKey} className={`p-4 rounded-lg ${
-              isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
-            }`}>
-              <div className="flex items-center mb-2">
-                <div 
-                  className="w-3 h-3 rounded-full mr-2"
-                  style={{ backgroundColor: area.color }}
-                ></div>
-                <h4 className={`text-sm font-medium ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>{area.name}</h4>
-              </div>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span>Total:</span>
-                  <span className="font-bold">{total.toLocaleString()}</span>
+      {/* Statistics Summary - Conditional display */}
+      {!compact && (
+        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 flex-shrink-0">
+          {areas.slice(0, 4).map((area) => {
+            if (hiddenAreas.has(area.dataKey)) return null;
+            
+            const values = data.map(d => d[area.dataKey as keyof AreaData] as number);
+            const total = values.reduce((sum, val) => sum + val, 0);
+            const average = total / values.length;
+            const growth = ((values[values.length - 1] - values[0]) / values[0] * 100);
+            
+            return (
+              <div key={area.dataKey} className={`p-3 rounded-lg ${
+                isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+              }`}>
+                <div className="flex items-center mb-2">
+                  <div 
+                    className="w-2 h-2 rounded-full mr-2"
+                    style={{ backgroundColor: area.color }}
+                  ></div>
+                  <h4 className={`text-xs font-medium truncate ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>{area.name}</h4>
                 </div>
-                <div className="flex justify-between">
-                  <span>Average:</span>
-                  <span className="font-bold">{Math.round(average).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Growth:</span>
-                  <span className={`font-bold ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {growth >= 0 ? '+' : ''}{growth.toFixed(1)}%
-                  </span>
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between">
+                    <span>Total:</span>
+                    <span className="font-bold">{(total/1000).toFixed(0)}k</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Growth:</span>
+                    <span className={`font-bold ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {growth >= 0 ? '+' : ''}{growth.toFixed(0)}%
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
-      {/* Controls hint */}
-      <div className={`mt-4 text-xs text-center ${
-        isDarkMode ? 'text-gray-400' : 'text-gray-500'
-      }`}>
-        Click legend items to toggle areas • Use mode buttons to change visualization • Hover for details
-      </div>
+      {/* Controls hint - Only for non-compact mode */}
+      {!compact && (
+        <div className={`mt-3 text-xs text-center ${
+          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+        }`}>
+          Click legend items to toggle areas • Hover for details
+        </div>
+      )}
     </div>
   );
 };

@@ -19,10 +19,10 @@ const ResizableWidget: React.FC<ResizableWidgetProps> = ({
   children,
   initialWidth = 300,
   initialHeight = 200,
-  minWidth = 150,
+  minWidth = 120,  // Increased from 150 for better mobile support
   minHeight = 100,
-  maxWidth = 800,
-  maxHeight = 600,
+  maxWidth = 1200, // Increased from 800 for better large screen support
+  maxHeight = 800, // Increased from 600
   className = '',
   onResize,
   disabled = false,
@@ -35,31 +35,41 @@ const ResizableWidget: React.FC<ResizableWidgetProps> = ({
   const startPos = useRef({ x: 0, y: 0 });
   const startSize = useRef({ width: 0, height: 0 });
 
-  // Save size to localStorage
+  // Save size to localStorage with improved key generation
   useEffect(() => {
-    const key = `resizable-widget-${className}`;
+    const key = `resizable-widget-${className}-${initialWidth}x${initialHeight}`;
     const saved = localStorage.getItem(key);
     if (saved) {
       try {
         const savedSize = JSON.parse(saved);
-        setSize(savedSize);
+        // Validate saved size is within bounds
+        const validatedSize = constrainSize(savedSize.width, savedSize.height);
+        setSize(validatedSize);
       } catch (e) {
         console.warn('Failed to parse saved widget size');
       }
     }
-  }, [className]);
+  }, [className, initialWidth, initialHeight]);
 
   // Save size when it changes
   useEffect(() => {
-    const key = `resizable-widget-${className}`;
+    const key = `resizable-widget-${className}-${initialWidth}x${initialHeight}`;
     localStorage.setItem(key, JSON.stringify(size));
     onResize?.(size.width, size.height);
-  }, [size, className, onResize]);
+  }, [size, className, onResize, initialWidth, initialHeight]);
 
   const constrainSize = useCallback((width: number, height: number) => {
+    // Enhanced constraint logic with aspect ratio preservation option
+    const constrainedWidth = Math.max(minWidth, Math.min(maxWidth, width));
+    const constrainedHeight = Math.max(minHeight, Math.min(maxHeight, height));
+    
+    // Ensure minimum viable content area
+    const finalWidth = Math.max(constrainedWidth, 120);
+    const finalHeight = Math.max(constrainedHeight, 80);
+    
     return {
-      width: Math.max(minWidth, Math.min(maxWidth, width)),
-      height: Math.max(minHeight, Math.min(maxHeight, height))
+      width: finalWidth,
+      height: finalHeight
     };
   }, [minWidth, minHeight, maxWidth, maxHeight]);
 
