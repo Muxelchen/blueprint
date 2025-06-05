@@ -2,27 +2,61 @@
 
 This document contains AI prompts specifically designed for building web applications using the Blueprint framework. These prompts are optimized to provide maximum functionality with minimal input from developers.
 
-## Main Blueprint Web App Generation Prompt
+**IMPORTANT PRINCIPLE**: The AI should adapt and modify existing Blueprint files rather than creating new ones. The entire Blueprint framework can and should be restructured to meet your specific needs.
 
-Use this comprehensive prompt to generate a complete Blueprint web application with minimal input:
+**EXCEPTION RULE**: Creating new files is only allowed when absolutely necessary (e.g., specific configuration files, deployment scripts, or documentation that doesn't exist in the current Blueprint structure). Always prioritize modifying existing files first.
+
+## Main Blueprint Web App Transformation Prompt
+
+Use this comprehensive prompt to transform the existing Blueprint framework into your specific application:
 
 ```
-I need to build a web application using the Blueprint framework for [ORGANIZATION/COMPANY NAME]. 
+I need to transform the existing Blueprint framework into a web application for [ORGANIZATION/COMPANY NAME]. 
 
 PURPOSE: This application will [primary purpose - e.g., "track customer sales data", "manage employee schedules", "visualize marketing analytics"].
 
 USERS: The primary users will be [brief user description - e.g., "sales managers", "HR staff", "marketing team"].
 
-Please generate a complete Blueprint implementation plan including:
+CRITICAL REQUIREMENTS - FRAMEWORK TRANSFORMATION FIRST:
+- ALWAYS modify existing Blueprint files as the primary approach
+- Only create new files when absolutely necessary (e.g., specific config files, deployment scripts, or missing documentation)
+- The entire Blueprint framework structure must be completely adapted to my needs
+- Transform existing components (src/components/) to fit my specific use case
+- Modify existing templates (src/templates/) rather than creating new ones
+- Adapt existing widgets (src/widgets/) to display my specific data
+- Restructure existing layout components (src/layout/) for my workflow
+- Transform the existing store (src/store/appStore.ts) for my data structure
+- Modify existing hooks (src/hooks/) to support my functionality
+- The Blueprint framework should be completely reshaped around my application
 
-1. The most appropriate Blueprint template for this use case
-2. CLI commands to set up the project
-3. Key components from Blueprint's library that should be included
-4. A recommended layout structure
-5. Data management approach
-6. Styling customization to match our brand/needs
-7. Performance optimizations for our specific use case
-8. Implementation steps in order of priority
+TRANSFORMATION APPROACH:
+1. Analyze existing Blueprint file structure first
+2. Identify which existing files need modification for my use case
+3. Show specific modifications to existing components, not new file creation
+4. Adapt the current templates (DashboardTemplate.tsx, AnalyticsTemplate.tsx, etc.) for my needs
+5. Transform existing widgets (KPICard.tsx, DataTable.tsx, charts, etc.) to display my data
+6. Modify layout components (Header.tsx, Sidebar.tsx, MainContent.tsx) for my workflow
+7. Restructure the existing store and data flow for my requirements
+8. Adapt existing styling and theme files for my branding
+9. Only suggest new files if essential functionality is missing from the current Blueprint structure
+
+REQUIRED OUTPUT:
+Start with the most important file modifications for my specific use case. Focus on practical implementation steps.
+
+OPTIONAL DETAILED TRANSFORMATION PLAN (if you want a comprehensive overview):
+If you need a complete analysis, I can also provide:
+1. EXISTING FILE MODIFICATIONS: Which current Blueprint files need to be modified and how
+2. COMPONENT TRANSFORMATION: How to adapt existing src/components/ for my use case
+3. TEMPLATE RESTRUCTURING: Modifications needed to existing src/templates/ files
+4. WIDGET REPURPOSING: How to transform existing src/widgets/ for my data
+5. LAYOUT ADAPTATION: Changes to existing src/layout/ components
+6. STORE TRANSFORMATION: Modifications to existing src/store/appStore.ts
+7. HOOK MODIFICATIONS: Adaptations needed to existing src/hooks/
+8. STYLING UPDATES: Changes to existing theme and CSS files
+9. NEW FILES (ONLY IF NECESSARY): Any essential files that must be created (with justification)
+10. STEP-BY-STEP PROCESS: Prioritized modification sequence
+
+PRIORITY: Transform existing Blueprint codebase first, create new files only when essential!
 
 OPTIONAL SPECIFICATIONS (include any that apply):
 - Features needed: [list any specific features you want]
@@ -31,153 +65,144 @@ OPTIONAL SPECIFICATIONS (include any that apply):
 - Authentication needs: [simple/complex/SSO/etc.]
 - Data visualization needs: [charts/maps/tables/etc.]
 
-Please provide code examples for the most critical parts and explain any important architectural decisions.
+Show me the specific file modifications needed and explain how to transform the existing Blueprint structure for my use case. Focus on adapting what already exists, and only suggest new files when absolutely necessary for functionality that cannot be achieved through modification.
+
+If you want the complete detailed transformation plan, just ask for it specifically.
 ```
 
-## Focused Short Prompts
+## Focused Adaptation Prompts
 
-Use these focused prompts when you need specific aspects of your Blueprint application:
+Use these focused prompts when you need to modify specific aspects of the existing Blueprint framework:
 
-### 1. Initial Project Setup
-
-```
-I want to create a web app using Blueprint. My app will be a [type of app: dashboard/analytics/data table/maps] for [brief purpose]. Generate the CLI commands to create this project and explain the initial file structure.
-```
-
-**Example:**
-```
-I want to create a web app using Blueprint. My app will be a dashboard for tracking sales performance. Generate the CLI commands to create this project and explain the initial file structure.
-```
-
-### 2. Component Selection
+### 1. Component Transformation
 
 ```
-For my Blueprint app, I need components for [1-3 specific features]. Suggest the most appropriate Blueprint components and show how to integrate them into my project.
+I need to adapt existing Blueprint components for [specific use case]. Show me how to modify the current [component names] to work for [new purpose]. Don't create new files - transform the existing ones.
 ```
 
 **Example:**
 ```
-For my Blueprint app, I need components for data visualization, user notifications, and real-time charts. Suggest the most appropriate Blueprint components and show how to integrate them into my project.
+I need to adapt existing Blueprint components for inventory management. Show me how to modify the current DataTable.tsx and KPICard.tsx to work for product tracking. Don't create new files - transform the existing ones.
 ```
 
-### 3. Layout Definition
+### 2. Template Restructuring
 
 ```
-Using Blueprint's layout system, help me structure a page with [describe basic layout needs: header, sidebar, main content, etc]. Show the code for this layout structure.
-```
-
-**Example:**
-```
-Using Blueprint's layout system, help me structure a page with a fixed header, collapsible sidebar, main dashboard area, and footer. Show the code for this layout structure.
-```
-
-### 4. Styling Customization
-
-```
-I want to customize the visual theme of my Blueprint app to match [brief description: brand colors, dark mode, etc]. Show me how to modify the theme configuration.
+Transform the existing Blueprint templates (DashboardTemplate.tsx, AnalyticsTemplate.tsx) to create a [specific type] interface. Modify the current template structure rather than creating new templates.
 ```
 
 **Example:**
 ```
-I want to customize the visual theme of my Blueprint app to match our company's green and blue brand colors with dark mode support. Show me how to modify the theme configuration.
+Transform the existing Blueprint templates (DashboardTemplate.tsx, AnalyticsTemplate.tsx) to create a customer support interface. Modify the current template structure rather than creating new templates.
 ```
 
-### 5. Data Handling
+### 3. Layout Adaptation
 
 ```
-Show me how to connect Blueprint components to display [type of data] from a mock data source.
-```
-
-**Example:**
-```
-Show me how to connect Blueprint components to display sales metrics and user analytics from a mock data source.
-```
-
-### 6. Performance Optimization
-
-```
-What Blueprint features should I use to optimize performance for my [specific feature] that will handle [brief description of scale/complexity]?
+Adapt the existing Blueprint layout components (Header.tsx, Sidebar.tsx, MainContent.tsx) for [specific use case]. Show me the exact modifications needed to transform the current layout structure.
 ```
 
 **Example:**
 ```
-What Blueprint features should I use to optimize performance for my data table that will handle 10,000+ rows with real-time updates?
+Adapt the existing Blueprint layout components (Header.tsx, Sidebar.tsx, MainContent.tsx) for a project management tool. Show me the exact modifications needed to transform the current layout structure.
 ```
 
-## Advanced Feature-Specific Prompts
+### 4. Widget Repurposing
 
-### Authentication Integration
 ```
-Help me integrate authentication into my Blueprint app. I need [simple login/OAuth/SSO] with user profile management and role-based access control.
-```
-
-### Real-time Features
-```
-I want to add real-time functionality to my Blueprint app for [specific feature]. Show me how to implement WebSocket connections and real-time data updates.
+I want to repurpose the existing Blueprint widgets [list specific widgets] to display [new data type]. Show me how to modify these widgets instead of creating new ones.
 ```
 
-### Mobile Optimization
+**Example:**
 ```
-Help me make my Blueprint app mobile-responsive with touch-friendly interactions for [specific use case].
-```
-
-### API Integration
-```
-Show me how to integrate my Blueprint app with a REST API for [specific data type] including error handling and loading states.
+I want to repurpose the existing Blueprint widgets (AreaChart.tsx, BarChart.tsx, KPICard.tsx) to display employee performance metrics. Show me how to modify these widgets instead of creating new ones.
 ```
 
-### Advanced Charts
+### 5. Store and Data Flow Modification
+
 ```
-I need advanced data visualization in my Blueprint app including [specific chart types] with interactive features and real-time updates.
+Modify the existing Blueprint store (appStore.ts) and data management to handle [specific data type] instead of the current structure. Transform the existing data flow rather than creating new stores.
 ```
 
-## Tips for Using These Prompts
+**Example:**
+```
+Modify the existing Blueprint store (appStore.ts) and data management to handle real estate listings instead of the current structure. Transform the existing data flow rather than creating new stores.
+```
 
-1. **Be Specific**: Replace bracketed placeholders with your actual requirements
-2. **Combine Prompts**: You can combine multiple focused prompts for complex requirements
-3. **Iterate**: Start with the main prompt, then use focused prompts to refine specific areas
-4. **Context**: Provide context about your users and use case for better recommendations
-5. **Follow-up**: Ask follow-up questions about implementation details or alternative approaches
+### 6. Theme and Styling Transformation
 
-## Example Complete Workflow
+```
+Transform the existing Blueprint theme system (tailwind.config.js, index.css, AdvancedThemeProvider.tsx) to match [specific branding/style requirements]. Modify the current styling approach.
+```
 
-1. **Start with Main Prompt:**
+**Example:**
+```
+Transform the existing Blueprint theme system (tailwind.config.js, index.css, AdvancedThemeProvider.tsx) to match medical software styling with clean, professional colors. Modify the current styling approach.
+```
+
+## Advanced Framework Transformation Prompts
+
+### Complete Structure Overhaul
+```
+I need to completely restructure the Blueprint framework for [specific industry/use case]. Show me how to reorganize the entire src/ folder structure and modify key files to better suit [specific requirements]. The framework can be completely transformed.
+```
+
+### Multi-Purpose Application
+```
+Transform the Blueprint framework to handle multiple related functions: [list 2-3 related functions]. Modify existing components and templates to work across these different use cases.
+```
+
+### Legacy System Integration
+```
+Adapt the Blueprint framework to integrate with my existing [type of system]. Show me how to modify the current API handling, data structures, and components to work with legacy data formats.
+```
+
+### Industry-Specific Transformation
+```
+Transform the Blueprint framework specifically for [industry: healthcare/finance/education/etc.]. Modify existing components, workflows, and data structures to match industry standards and requirements.
+```
+
+## Key Principles for AI Implementation
+
+1. **Modify, Don't Create**: Always adapt existing files rather than creating new ones
+2. **Complete Transformation**: The entire Blueprint structure can be changed to fit your needs
+3. **Repurpose Everything**: Every component, template, and utility can be transformed
+4. **Preserve Architecture**: Keep the overall TypeScript/React/Vite architecture while changing functionality
+5. **Incremental Changes**: Show step-by-step modifications to existing files
+
+## Example Transformation Workflow
+
+1. **Start with Framework Analysis:**
    ```
-   I need to build a web application using the Blueprint framework for TechCorp Inc. 
-   
-   PURPOSE: This application will track customer support tickets and team performance metrics.
-   
-   USERS: The primary users will be support managers and customer service representatives.
+   Analyze the current Blueprint framework structure and show me how to transform it for a restaurant management system. The primary users will be restaurant managers and staff.
    ```
 
-2. **Refine with Focused Prompts:**
+2. **Component Transformation:**
    ```
-   For my Blueprint app, I need components for ticket management, performance dashboards, and team communication. Suggest the most appropriate Blueprint components and show how to integrate them into my project.
-   ```
-
-3. **Customize Further:**
-   ```
-   I want to customize the visual theme of my Blueprint app to match our corporate blue and white brand colors with professional styling. Show me how to modify the theme configuration.
+   Transform the existing DataTable.tsx into a reservation management table and modify KPICard.tsx to show restaurant metrics like daily revenue and table turnover.
    ```
 
-## Blueprint CLI Integration
+3. **Template Adaptation:**
+   ```
+   Adapt the DashboardTemplate.tsx to create a restaurant operations dashboard by modifying the current layout and widget arrangement.
+   ```
 
-Before using these prompts, ensure you have Blueprint set up:
+4. **Final Integration:**
+   ```
+   Show me how to modify the App.tsx and routing to integrate all these transformed components into a cohesive restaurant management application.
+   ```
 
-```bash
-# Install dependencies
-npm install
+## Before You Start
 
-# View available templates
-npm run cli list
+Remember that Blueprint is designed to be completely adaptable:
 
-# Create new app (replace with AI-suggested template)
-npm run cli create my-app --template dashboard
+- Every component can be modified for your specific needs
+- The folder structure can be reorganized
+- Templates are starting points, not fixed structures
+- The entire framework serves your application, not the other way around
 
-# Start development
-cd my-app && npm run dev
-```
+**The goal is transformation, not creation!**
 
 ---
 
-**Note**: These prompts are designed to work with AI assistants that understand the Blueprint framework structure and components. Always review generated code and adapt it to your specific requirements.
+**Note**: These prompts emphasize adapting and modifying the existing Blueprint codebase. The AI should focus on showing specific file modifications and transformations rather than suggesting new file creation.
