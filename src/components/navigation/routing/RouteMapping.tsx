@@ -1,22 +1,15 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Polyline, Marker, Popup, useMap } from 'react-leaflet';
+import React, { useState, useRef, useEffect } from 'react';
+import { Polyline, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { 
-  Route, 
-  Navigation, 
-  Clock, 
-  MapPin, 
-  Truck, 
+import {
+  MapPin,
+  Navigation,
+  Timer,
   Car,
+  Truck,
   Bike,
-  Navigation2,
-  Play,
-  Pause,
-  RotateCcw,
-  Settings,
-  Download,
-  Zap,
-  AlertTriangle
+  MapIcon,
+  RefreshCw
 } from 'lucide-react';
 
 export interface RoutePoint {
@@ -50,9 +43,7 @@ export interface RouteMapProps {
   showAnimation?: boolean;
   animationSpeed?: number;
   showWaypoints?: boolean;
-  showTraffic?: boolean;
   onRouteClick?: (route: RouteData) => void;
-  onWaypointClick?: (point: RoutePoint, route: RouteData) => void;
   className?: string;
 }
 
@@ -321,14 +312,14 @@ const RouteControls: React.FC<{
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-gray-200">
         <div className="flex items-center space-x-2">
-          <Route className="w-4 h-4 text-blue-500" />
+          <MapIcon className="w-4 h-4 text-blue-500" />
           <span className="font-medium text-sm">Routes</span>
         </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-1 hover:bg-gray-100 rounded transition-colors"
         >
-          <Settings className="w-4 h-4" />
+          <RefreshCw className="w-4 h-4" />
         </button>
       </div>
 
@@ -343,7 +334,7 @@ const RouteControls: React.FC<{
                 : 'bg-green-100 text-green-700 hover:bg-green-200'
             }`}
           >
-            {isAnimating ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+            {isAnimating ? <Timer className="w-3 h-3" /> : <Timer className="w-3 h-3" />}
             <span>{isAnimating ? 'Pause' : 'Play'}</span>
           </button>
           
@@ -364,7 +355,7 @@ const RouteControls: React.FC<{
             className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
             title="Reset view"
           >
-            <RotateCcw className="w-3 h-3" />
+            <RefreshCw className="w-3 h-3" />
           </button>
           
           <button
@@ -372,7 +363,7 @@ const RouteControls: React.FC<{
             className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
             title="Export routes"
           >
-            <Download className="w-3 h-3" />
+            <RefreshCw className="w-3 h-3" />
           </button>
         </div>
 
@@ -576,9 +567,7 @@ const RouteMapping: React.FC<RouteMapProps> = ({
   showAnimation = true,
   animationSpeed = 500,
   showWaypoints = false,
-  showTraffic = false,
   onRouteClick,
-  onWaypointClick,
   className = ''
 }) => {
   const [localRoutes, setLocalRoutes] = useState<RouteData[]>(routes);
@@ -687,8 +676,6 @@ const RouteMapping: React.FC<RouteMapProps> = ({
         
         const startPoint = route.points[0];
         const endPoint = route.points[route.points.length - 1];
-        const config = routeTypeConfig[route.type];
-        const Icon = config.icon;
 
         return (
           <React.Fragment key={`markers_${route.id}`}>

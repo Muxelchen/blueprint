@@ -4,7 +4,6 @@ import L from 'leaflet';
 import { 
   Thermometer, 
   TrendingUp, 
-  TrendingDown, 
   Activity, 
   Settings,
   Play,
@@ -13,6 +12,16 @@ import {
   Download,
   Palette
 } from 'lucide-react';
+
+// Extend Leaflet types for heat layer
+declare module 'leaflet' {
+  interface HeatLayer extends L.Layer {
+    setLatLngs(latlngs: number[][]): this;
+    addLatLng(latlng: number[]): this;
+  }
+  
+  function heatLayer(latlngs: number[][], options?: any): HeatLayer;
+}
 
 export interface HeatmapPoint {
   id: string;
@@ -39,7 +48,6 @@ export interface HeatmapOverlayProps {
   animationSpeed?: number;
   className?: string;
   onIntensityChange?: (intensity: number) => void;
-  onPointClick?: (point: HeatmapPoint) => void;
 }
 
 // Mock heatmap data for different categories
@@ -446,14 +454,12 @@ const HeatmapOverlay: React.FC<HeatmapOverlayProps> = ({
   maxZoom = 18,
   minOpacity = 0.1,
   maxOpacity = 0.8,
-  gradient = gradients.heat,
   showControls = true,
   showLegend = true,
   showAnimation = true,
   animationSpeed = 1000,
   className = '',
-  onIntensityChange,
-  onPointClick
+  onIntensityChange
 }) => {
   const map = useMap();
   const heatLayerRef = useRef<L.HeatLayer | null>(null);

@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Calendar, Clock, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 export interface DateTimePickerProps {
-  value?: Date;
-  defaultValue?: Date;
+  value?: Date | null;
+  defaultValue?: Date | null;
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
@@ -13,8 +13,6 @@ export interface DateTimePickerProps {
   use24Hour?: boolean;
   minDate?: Date;
   maxDate?: Date;
-  minTime?: string;
-  maxTime?: string;
   excludeDates?: Date[];
   includeDates?: Date[];
   size?: 'sm' | 'md' | 'lg';
@@ -57,8 +55,6 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   use24Hour = false,
   minDate,
   maxDate,
-  minTime,
-  maxTime,
   excludeDates = [],
   includeDates = [],
   size = 'md',
@@ -81,7 +77,6 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const calendarRef = useRef<HTMLDivElement>(null);
   const isControlled = controlledValue !== undefined;
 
   const [state, setState] = useState<DateTimePickerState>({
@@ -793,8 +788,6 @@ export const ExampleDateTimePickers: React.FC = () => {
   const [dateValue, setDateValue] = useState<Date | null>(null);
   const [timeValue, setTimeValue] = useState<Date | null>(new Date());
   const [datetimeValue, setDatetimeValue] = useState<Date | null>(null);
-  const [rangeStart, setRangeStart] = useState<Date | null>(null);
-  const [rangeEnd, setRangeEnd] = useState<Date | null>(null);
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -863,7 +856,7 @@ export const ExampleDateTimePickers: React.FC = () => {
               minDate={tomorrow}
               maxDate={nextWeek}
               placeholder="Choose future date..."
-              variant="primary"
+              variant="success"
             />
           </div>
 

@@ -7,7 +7,6 @@ import {
   Locate, 
   Navigation, 
   Layers, 
-  Settings,
   MapPin,
   Search,
   Download,
@@ -55,7 +54,6 @@ export interface InteractiveMapProps {
   onMapClick?: (lat: number, lng: number) => void;
   onBoundsChange?: (bounds: MapBounds) => void;
   className?: string;
-  variant?: 'default' | 'satellite' | 'terrain';
   interactive?: boolean;
   showScale?: boolean;
   showAttribution?: boolean;
@@ -374,14 +372,12 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   onMapClick,
   onBoundsChange,
   className = '',
-  variant = 'default',
   interactive = true,
   showScale = true,
   showAttribution = true
 }) => {
   const [mapControls, setMapControls] = useState<any>(null);
   const [currentLayer, setCurrentLayer] = useState<string>('openstreetmap');
-  const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
   const mapRef = useRef<any>(null);
 
   // Tile layer configurations
@@ -401,7 +397,6 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   };
 
   const handleLocationClick = (location: MapLocation) => {
-    setSelectedLocation(location);
     if (mapControls) {
       mapControls.flyTo(location.lat, location.lng, 12);
     }

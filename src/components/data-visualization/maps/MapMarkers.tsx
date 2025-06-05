@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Marker, Popup, useMap } from 'react-leaflet';
+import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { 
-  MapPin, 
   Building, 
   Warehouse, 
   Palette, 
@@ -12,7 +11,6 @@ import {
   Eye,
   EyeOff,
   RotateCcw,
-  Plus,
   Edit,
   Trash2
 } from 'lucide-react';
@@ -48,7 +46,6 @@ export interface MapMarkersProps {
   showLegend?: boolean;
   enableClustering?: boolean;
   onMarkerClick?: (marker: MarkerData) => void;
-  onMarkerAdd?: (lat: number, lng: number) => void;
   onMarkerEdit?: (marker: MarkerData) => void;
   onMarkerDelete?: (markerId: string) => void;
   className?: string;
@@ -545,14 +542,12 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   showFilters = true,
   showLegend = true,
   onMarkerClick,
-  onMarkerAdd,
   onMarkerEdit,
   onMarkerDelete,
   className = ''
 }) => {
   const [localMarkers, setLocalMarkers] = useState<MarkerData[]>(markers);
   const [localCategories, setLocalCategories] = useState<MarkerCategory[]>(categories);
-  const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
 
   // Filter visible markers based on category visibility
   const visibleMarkers = useMemo(() => {
@@ -565,7 +560,6 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   }, [localMarkers, localCategories]);
 
   const handleMarkerClick = (marker: MarkerData) => {
-    setSelectedMarker(marker);
     onMarkerClick?.(marker);
   };
 

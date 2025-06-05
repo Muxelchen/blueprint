@@ -12,31 +12,35 @@ export interface SelectOption {
 
 export interface DropdownSelectProps {
   options: SelectOption[];
-  value?: string | number;
-  defaultValue?: string | number;
+  value?: string | number | null;
+  defaultValue?: string | number | null;
+  onChange?: (value: string | number | null) => void;
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
+  multiple?: boolean;
   searchable?: boolean;
   clearable?: boolean;
+  loading?: boolean;
+  error?: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'error' | 'success' | 'warning';
+  maxHeight?: number;
+  virtualized?: boolean;
+  groupBy?: string;
   label?: string;
   description?: string;
-  error?: string;
-  maxHeight?: number;
-  loading?: boolean;
-  noOptionsText?: string;
-  searchPlaceholder?: string;
-  onChange?: (value: string | number | null) => void;
-  onSearchChange?: (search: string) => void;
-  onOpen?: () => void;
-  onClose?: () => void;
-  className?: string;
-  dropdownClassName?: string;
-  optionClassName?: string;
   name?: string;
   id?: string;
+  className?: string;
+  optionClassName?: string;
+  menuClassName?: string;
+  dropdownClassName?: string;
+  noOptionsText?: string;
+  searchPlaceholder?: string;
+  onSearchChange?: (searchTerm: string) => void;
+  onOpen?: () => void;
+  onClose?: () => void;
 }
 
 export interface DropdownSelectState {
@@ -457,7 +461,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
                     )}
 
                     {/* Group Options */}
-                    {groupOptions.map((option, index) => {
+                    {groupOptions.map((option) => {
                       const globalIndex = filteredOptions.indexOf(option);
                       const isHighlighted = globalIndex === state.highlightedIndex;
                       const isSelected = option.value === selectedValue;
@@ -518,7 +522,6 @@ export const ExampleDropdownSelects: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState<string | number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | number | null>('electronics');
   const [selectedUser, setSelectedUser] = useState<string | number | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
 
   const countryOptions: SelectOption[] = [
     { value: 'us', label: 'United States', icon: '🇺🇸' },
@@ -612,7 +615,7 @@ export const ExampleDropdownSelects: React.FC = () => {
               options={userOptions}
               value={selectedUser}
               onChange={setSelectedUser}
-              variant="primary"
+              variant="success"
             />
           </div>
 
@@ -704,7 +707,6 @@ export const ExampleDropdownSelects: React.FC = () => {
             <p><strong>Country:</strong> {selectedCountry || 'None'}</p>
             <p><strong>Category:</strong> {selectedCategory || 'None'}</p>
             <p><strong>User:</strong> {selectedUser || 'None'}</p>
-            <p><strong>Search Term:</strong> {searchTerm || 'None'}</p>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Marker, Popup, useMap } from 'react-leaflet';
+import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { 
   Filter, 
@@ -23,12 +23,9 @@ import {
   CreditCard,
   Phone,
   Globe,
-  Calendar,
   CheckCircle,
-  AlertCircle,
   Settings,
   Download,
-  Upload,
   RotateCcw
 } from 'lucide-react';
 
@@ -89,7 +86,6 @@ export interface FilterOptions {
 }
 
 export interface LocationFilterProps {
-  locations?: Location[];
   showControls?: boolean;
   showSearch?: boolean;
   showCategoryFilter?: boolean;
@@ -102,14 +98,11 @@ export interface LocationFilterProps {
   onFilterChange?: (filteredLocations: Location[], filters: FilterOptions) => void;
   className?: string;
   markerSize?: 'sm' | 'md' | 'lg';
-  showClusterMarkers?: boolean;
   maxResults?: number;
 }
 
 // Generate comprehensive mock location data
 const generateMockLocations = (): Location[] => {
-  const locations: Location[] = [];
-
   // New York City locations
   const nycLocations = [
     {
@@ -424,9 +417,10 @@ const generateMockLocations = (): Location[] => {
   // Add calculated distances (mock)
   const allLocations = [...nycLocations, ...sfLocations, ...laLocations, ...chicagoLocations, ...gasStations];
   
-  allLocations.forEach((location, index) => {
-    location.distance = Math.random() * 50; // Random distance up to 50 miles
-    location.lastUpdated = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000); // Random date within last 30 days
+  allLocations.forEach((location) => {
+    // Add missing properties to satisfy TypeScript
+    (location as any).distance = Math.random() * 50; // Random distance up to 50 miles
+    (location as any).lastUpdated = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000); // Random date within last 30 days
   });
 
   return allLocations;
@@ -463,7 +457,6 @@ const featureConfig = {
 };
 
 const LocationFilter: React.FC<LocationFilterProps> = ({
-  locations = generateMockLocations(),
   showControls = true,
   showSearch = true,
   showCategoryFilter = true,
@@ -476,9 +469,10 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   onFilterChange,
   className = '',
   markerSize = 'md',
-  showClusterMarkers = true,
   maxResults = 100
 }) => {
+  const locations = useMemo(() => generateMockLocations(), []);
+  
   const [filters, setFilters] = useState<FilterOptions>({
     categories: [],
     rating: 0,
@@ -492,7 +486,6 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   });
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
   // Filter locations based on current filters
   const filteredLocations = useMemo(() => {
@@ -626,7 +619,6 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   // Create custom marker icon
   const createMarkerIcon = (location: Location) => {
     const config = categoryConfig[location.category];
-    const IconComponent = config.icon;
     
     const iconHtml = `
       <div style="
@@ -730,7 +722,6 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
           icon={createMarkerIcon(location)}
           eventHandlers={{
             click: () => {
-              setSelectedLocation(location);
               onLocationClick?.(location);
             }
           }}

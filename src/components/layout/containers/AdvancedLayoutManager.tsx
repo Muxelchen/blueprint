@@ -4,19 +4,13 @@ import {
   Maximize2, 
   Minimize2, 
   RotateCcw, 
-  Settings, 
-  Save, 
-  Download, 
-  Upload,
   Lock,
   Unlock,
-  Eye,
-  EyeOff,
-  Move,
   Copy,
   Trash2,
   Plus,
-  Minus
+  Minus,
+  X
 } from 'lucide-react';
 
 export interface LayoutWidget {
@@ -75,7 +69,6 @@ export interface AdvancedLayoutManagerProps {
   showToolbar?: boolean;
   showWidgetLibrary?: boolean;
   allowLayoutSave?: boolean;
-  allowLayoutLoad?: boolean;
   autoSave?: boolean;
   autoSaveInterval?: number;
   snapToGrid?: boolean;
@@ -84,7 +77,6 @@ export interface AdvancedLayoutManagerProps {
   onWidgetAdd?: (widget: LayoutWidget) => void;
   onWidgetRemove?: (widgetId: string) => void;
   onSaveLayout?: (layout: LayoutConfig) => void;
-  onLoadLayout?: (layoutId: string) => void;
   className?: string;
 }
 
@@ -161,7 +153,6 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
   showToolbar = true,
   showWidgetLibrary = true,
   allowLayoutSave = true,
-  allowLayoutLoad = true,
   autoSave = true,
   autoSaveInterval = 5000,
   snapToGrid = true,
@@ -170,7 +161,6 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
   onWidgetAdd,
   onWidgetRemove,
   onSaveLayout,
-  onLoadLayout,
   className = ''
 }) => {
   const [layout, setLayout] = useState<LayoutConfig>(
@@ -365,13 +355,14 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
     onSaveLayout?.(layoutToSave);
   }, [layout, state.layoutName, onSaveLayout]);
 
-  const loadLayout = useCallback((layoutId: string) => {
-    const savedLayout = state.savedLayouts.find(l => l.id === layoutId);
-    if (savedLayout) {
-      setLayout(savedLayout);
-      onLoadLayout?.(layoutId);
-    }
-  }, [state.savedLayouts, onLoadLayout]);
+  // Comment out unused loadLayout function
+  // const loadLayout = useCallback((layoutId: string) => {
+  //   const savedLayout = state.savedLayouts.find(l => l.id === layoutId);
+  //   if (savedLayout) {
+  //     setLayout(savedLayout);
+  //     onLoadLayout?.(layoutId);
+  //   }
+  // }, [state.savedLayouts, onLoadLayout]);
 
   const resetLayout = useCallback(() => {
     setLayout(prev => ({
@@ -495,7 +486,6 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
 
     const isSelected = state.selectedItem === item.id;
     const isDragging = state.draggedItem === item.id;
-    const isResizing = state.resizingItem === item.id;
     const isLocked = widget.locked || layout.locked;
 
     const style = {

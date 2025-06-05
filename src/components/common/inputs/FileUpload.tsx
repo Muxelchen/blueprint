@@ -338,20 +338,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  // Get file icon
-  function getFileIcon(file: File, className: string = 'w-6 h-6') {
-    const type = file.type;
-    
-    if (type.startsWith('image/')) return <Image className={className} />;
-    if (type.startsWith('video/')) return <Video className={className} />;
-    if (type.startsWith('audio/')) return <Music className={className} />;
-    if (type.includes('pdf') || type.includes('document') || type.includes('text')) {
-      return <FileText className={className} />;
-    }
-    
-    return <File className={className} />;
-  }
-
   // Size configurations
   const getSizeConfig = () => {
     const configs = {
@@ -581,19 +567,6 @@ const FilePreviewItem: React.FC<FilePreviewItemProps> = ({
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  function getFileIcon(file: File, className: string = 'w-6 h-6') {
-    const type = file.type;
-    
-    if (type.startsWith('image/')) return <Image className={className} />;
-    if (type.startsWith('video/')) return <Video className={className} />;
-    if (type.startsWith('audio/')) return <Music className={className} />;
-    if (type.includes('pdf') || type.includes('document') || type.includes('text')) {
-      return <FileText className={className} />;
-    }
-    
-    return <File className={className} />;
   }
 
   return (
@@ -881,5 +854,33 @@ export const ExampleFileUploads: React.FC = () => {
     </div>
   );
 };
+
+function getFileIcon(file: File, iconClass?: string) {
+  const fileType = file.type;
+  const fileExtension = file.name.split('.').pop()?.toLowerCase();
+
+  // For known image types, show a generic image icon
+  if (fileType.startsWith('image/')) {
+    return <Image className={iconClass} />;
+  }
+
+  // For known video types, show a generic video icon
+  if (fileType.startsWith('video/')) {
+    return <Video className={iconClass} />;
+  }
+
+  // For known audio types, show a generic audio icon
+  if (fileType.startsWith('audio/')) {
+    return <Music className={iconClass} />;
+  }
+
+  // For common document types, show a document icon
+  if (fileExtension && ['pdf', 'doc', 'docx', 'txt'].includes(fileExtension)) {
+    return <FileText className={iconClass} />;
+  }
+
+  // For other file types, show a generic file icon
+  return <File className={iconClass} />;
+}
 
 export default FileUpload;

@@ -1,21 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
+  Menu, 
+  X, 
   ChevronDown, 
   ChevronRight, 
   Home, 
-  Users, 
   Settings, 
-  BarChart3, 
-  FileText, 
-  Shield, 
-  Bell,
-  Search,
-  Menu,
-  X,
-  Star,
+  Search, 
+  Bell, 
+  Star, 
+  Shield,
+  Zap,
+  Users,
+  ExternalLink,
   Clock,
-  Bookmark,
-  ExternalLink
+  FileText
 } from 'lucide-react';
 
 export interface NavigationItem {
@@ -74,7 +73,7 @@ const defaultNavigationItems: NavigationItem[] = [
     id: 'analytics',
     label: 'Analytics',
     href: '/analytics',
-    icon: <BarChart3 className="w-5 h-5" />,
+    icon: <Zap className="w-5 h-5" />,
     badge: 'New',
     isNew: true,
     description: 'Data analytics and insights',
@@ -226,7 +225,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
     ],
     favoriteItems: [
       { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: <Home className="w-4 h-4" /> },
-      { id: 'metrics', label: 'Metrics', href: '/analytics/metrics', icon: <BarChart3 className="w-4 h-4" /> }
+      { id: 'metrics', label: 'Metrics', href: '/analytics/metrics', icon: <Zap className="w-4 h-4" /> }
     ]
   });
 
@@ -646,6 +645,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
+          {renderBreadcrumbs()}
           {renderQuickAccess()}
           
           <div className="space-y-1">

@@ -366,7 +366,7 @@ export const ExampleToggleSwitches: React.FC = () => {
   const [analytics, setAnalytics] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const { toggles, updateToggle, toggleValue } = useToggleGroup({
+  const { toggles, updateToggle } = useToggleGroup({
     feature1: true,
     feature2: false,
     feature3: true,

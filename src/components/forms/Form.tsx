@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, FormEvent } from 'react';
-import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 // Form Context Types
 export interface FormField {

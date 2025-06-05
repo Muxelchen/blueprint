@@ -392,7 +392,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
 
       {/* Options */}
       <div className={getContainerClasses()} role="group" aria-labelledby={label ? `${groupId}-label` : undefined}>
-        {options.map((option, index) => (
+        {options.map((option) => (
           <Checkbox
             key={option.value}
             name={name}
@@ -474,7 +474,7 @@ export const ExampleCheckboxes: React.FC = () => {
     child3: false
   });
 
-  const { selectedValues: interests, toggleValue: toggleInterest } = useCheckboxGroup(['reading', 'music']);
+  const { selectedValues: interests } = useCheckboxGroup(['reading', 'music']);
   const [permissions, setPermissions] = useState<string[]>(['read']);
   const [features, setFeatures] = useState<string[]>([]);
 
