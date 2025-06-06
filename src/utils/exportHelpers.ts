@@ -1,6 +1,6 @@
 // Complete client-side export functions with additional helpers
 import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 
 // Base interfaces (extending existing ExportFunctions)
 export interface ExportOptions {
@@ -60,10 +60,28 @@ export const convertToCSV = (data: any[], delimiter = ','): string => {
   return csvContent;
 };
 
-export const convertToWorkbook = (data: any[], sheetName = 'Sheet1'): XLSX.WorkBook => {
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+export const convertToWorkbook = async (data: any[], sheetName = 'Sheet1'): Promise<ExcelJS.Workbook> => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet(sheetName);
+  
+  if (data && data.length > 0) {
+    const headers = Object.keys(data[0]);
+    worksheet.addRow(headers);
+    
+    data.forEach(row => {
+      const values = headers.map(header => row[header]);
+      worksheet.addRow(values);
+    });
+    
+    // Style the header row
+    worksheet.getRow(1).font = { bold: true };
+    worksheet.getRow(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE6E6E6' }
+    };
+  }
+  
   return workbook;
 };
 
@@ -112,30 +130,47 @@ export const exportChartAsSVG = (elementId: string, options: ChartExportOptions 
   saveAs(blob, `${options.filename || 'chart'}.svg`);
 };
 
-export const exportTableToExcel = (data: any[], options: TableExportOptions = { format: 'xlsx' }): void => {
+export const exportTableToExcel = async (data: any[], options: TableExportOptions = { format: 'xlsx' }): Promise<void> => {
   let processedData = data;
   
   if (options.filterFunction) {
     processedData = data.filter(options.filterFunction);
   }
   
-  const workbook = convertToWorkbook(processedData, options.sheetName);
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const workbook = await convertToWorkbook(processedData, options.sheetName);
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   
   saveAs(blob, `${options.filename || 'export'}.xlsx`);
 };
 
-export const exportMultipleSheets = (datasets: { name: string; data: any[] }[], filename = 'export'): void => {
-  const workbook = XLSX.utils.book_new();
+export const exportMultipleSheets = async (datasets: { name: string; data: any[] }[], filename = 'export'): Promise<void> => {
+  const workbook = new ExcelJS.Workbook();
   
-  datasets.forEach(({ name, data }) => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    XLSX.utils.book_append_sheet(workbook, worksheet, name);
-  });
+  for (const { name, data } of datasets) {
+    const worksheet = workbook.addWorksheet(name);
+    
+    if (data && data.length > 0) {
+      const headers = Object.keys(data[0]);
+      worksheet.addRow(headers);
+      
+      data.forEach(row => {
+        const values = headers.map(header => row[header]);
+        worksheet.addRow(values);
+      });
+      
+      // Style the header row
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE6E6E6' }
+      };
+    }
+  }
   
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   
   saveAs(blob, `${filename}.xlsx`);
 };

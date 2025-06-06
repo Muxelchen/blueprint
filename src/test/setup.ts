@@ -45,8 +45,8 @@ Object.defineProperty(window, 'performance', {
   },
 })
 
-// Mock requestIdleCallback
-global.requestIdleCallback = vi.fn((cb) => setTimeout(cb, 0))
+// Mock requestIdleCallback for testing environments
+global.requestIdleCallback = vi.fn((cb) => setTimeout(cb, 0) as unknown as number)
 global.cancelIdleCallback = vi.fn()
 
 // Suppress console warnings in tests
