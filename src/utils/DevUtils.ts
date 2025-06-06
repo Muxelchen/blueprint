@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
 // Development utilities for rapid prototyping
 export class DevUtils {
   

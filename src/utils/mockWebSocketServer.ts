@@ -10,10 +10,10 @@ export class MockWebSocketServer {
   private static instance: MockWebSocketServer;
   private connections: Set<WebSocket> = new Set();
   private subscriptions: Map<string, Set<WebSocket>> = new Map();
-  private timers: Map<string, NodeJS.Timeout> = new Map();
+  private timers: Map<string, number> = new Map();
   private isRunning = false;
   private userIds: Map<WebSocket, string> = new Map();
-  private interval: NodeJS.Timeout | null = null;
+  private interval: number | null = null;
   private listeners: Map<string, (message: WebSocketMessage) => void> = new Map();
   private channels: Set<string> = new Set();
 

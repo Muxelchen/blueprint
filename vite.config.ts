@@ -1,13 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { splitVendorChunkPlugin } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    splitVendorChunkPlugin(),
     // Bundle analyzer - generates bundle analysis report
     process.env.ANALYZE && visualizer({
       filename: 'dist/stats.html',
@@ -15,7 +13,7 @@ export default defineConfig({
       gzipSize: true,
       brotliSize: true,
     })
-  ],
+  ].filter(Boolean),
   server: {
     port: 3000,
     open: true
@@ -28,23 +26,38 @@ export default defineConfig({
   build: {
     // Optimize bundle splitting
     rollupOptions: {
+      external: [
+        // Exclude Node.js-specific modules from browser build
+        'fs',
+        'path',
+        'child_process',
+        'os'
+      ],
       output: {
-        manualChunks: {
-          // Separate vendor chunks for better caching
-          'react-vendor': ['react', 'react-dom'],
-          'chart-vendor': ['recharts', 'chart.js'],
-          'ui-vendor': ['framer-motion', 'lucide-react'],
-          'layout-vendor': ['react-grid-layout', 'react-window'],
-          // Blueprint core chunks
-          'blueprint-core': [
-            './src/utils/ComponentRegistry',
-            './src/utils/ComponentGenerator',
-            './src/utils/TemplateGenerator'
-          ],
-          'blueprint-components': [
-            './src/components/common',
-            './src/components/widgets'
-          ]
+        manualChunks: (id) => {
+          // Exclude Node.js utilities from browser build
+          if (id.includes('ComponentGenerator') || id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('recharts') || id.includes('chart.js')) {
+              return 'chart-vendor';
+            }
+            if (id.includes('framer-motion') || id.includes('lucide-react')) {
+              return 'ui-vendor';
+            }
+            if (id.includes('react-grid-layout') || id.includes('react-window')) {
+              return 'layout-vendor';
+            }
+          }
+          // Blueprint components
+          if (id.includes('src/components')) {
+            return 'blueprint-components';
+          }
+          // Blueprint utilities (browser-safe only)
+          if (id.includes('src/utils') && !id.includes('ComponentGenerator')) {
+            return 'blueprint-utils';
+          }
         }
       }
     },
@@ -75,5 +88,9 @@ export default defineConfig({
       'recharts'
     ],
     exclude: ['@vite/client', '@vite/env']
+  },
+  // Define browser-safe environment
+  define: {
+    __IS_BROWSER__: true
   }
 })

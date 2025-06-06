@@ -1,20 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-import { TrendingUp, Eye, Download, RotateCcw } from 'lucide-react';
+import { TrendingUp, Eye, Download, RotateCcw, Zap, Activity } from 'lucide-react';
 
 interface PieData {
   name: string;
   value: number;
   color: string;
-  category: string;
+  id?: string;
+}
+
+// Performance metrics tracking
+interface PerformanceMetrics {
+  renderTime: number;
+  dataProcessingTime: number;
+  totalRenderCount: number;
+  lastOptimization: string;
 }
 
 const mockData: PieData[] = [
-  { name: 'Product Sales', value: 35, color: '#3B82F6', category: 'Revenue' },
-  { name: 'Service Revenue', value: 25, color: '#10B981', category: 'Revenue' },
-  { name: 'Subscriptions', value: 20, color: '#F59E0B', category: 'Revenue' },
-  { name: 'Licensing', value: 12, color: '#EF4444', category: 'Revenue' },
-  { name: 'Partnerships', value: 8, color: '#8B5CF6', category: 'Revenue' },
+  { name: 'Product Sales', value: 35, color: '#3B82F6', id: 'product-sales' },
+  { name: 'Service Revenue', value: 25, color: '#10B981', id: 'service-revenue' },
+  { name: 'Subscriptions', value: 20, color: '#F59E0B', id: 'subscriptions' },
+  { name: 'Licensing', value: 12, color: '#EF4444', id: 'licensing' },
+  { name: 'Partnerships', value: 8, color: '#8B5CF6', id: 'partnerships' },
 ];
 
 interface PieChartProps {
@@ -23,291 +31,464 @@ interface PieChartProps {
   showLegend?: boolean;
   showTooltip?: boolean;
   centerText?: string;
+  size?: 'small' | 'medium' | 'large';
+  compact?: boolean;
+  height?: number;
+  maxDataPoints?: number;
+  enableVirtualization?: boolean;
+  enablePerformanceMonitoring?: boolean;
+  animationDuration?: number;
+  onPerformanceUpdate?: (metrics: PerformanceMetrics) => void;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ 
-  data = mockData, 
-  title = 'Data Distribution',
+// Advanced data processing with virtualization
+const processDataWithVirtualization = (
+  data: PieData[], 
+  maxPoints: number = 10,
+  enableVirtualization: boolean = false
+): { processedData: PieData[], isVirtualized: boolean } => {
+  if (!enableVirtualization || data.length <= maxPoints) {
+    return { processedData: data, isVirtualized: false };
+  }
+
+  // Sort by value and take top items, combine rest into "Others"
+  const sortedData = [...data].sort((a, b) => b.value - a.value);
+  const topItems = sortedData.slice(0, maxPoints - 1);
+  const otherItems = sortedData.slice(maxPoints - 1);
+  
+  if (otherItems.length > 0) {
+    const othersValue = otherItems.reduce((sum, item) => sum + item.value, 0);
+    const othersItem: PieData = {
+      name: `Others (${otherItems.length} items)`,
+      value: othersValue,
+      color: '#6B7280',
+      id: 'others-virtualized'
+    };
+    
+    return { 
+      processedData: [...topItems, othersItem], 
+      isVirtualized: true 
+    };
+  }
+
+  return { processedData: topItems, isVirtualized: false };
+};
+
+// Enhanced dimension calculation with performance optimization
+const getDimensions = (size: string, compact: boolean, height?: number) => {
+  if (height) {
+    return {
+      minHeight: Math.max(height, 200),
+      pieRadius: Math.min(height * 0.15, 140),
+      containerPadding: 'p-4',
+      titleSize: 'text-lg',
+      legendCols: 'grid-cols-2',
+    };
+  }
+
+  const sizeMap = {
+    small: {
+      minHeight: 250,
+      pieRadius: 60,
+      containerPadding: 'p-3',
+      titleSize: 'text-sm',
+      legendCols: 'grid-cols-1',
+    },
+    medium: {
+      minHeight: 350,
+      pieRadius: 80,
+      containerPadding: 'p-4',
+      titleSize: 'text-base',
+      legendCols: 'grid-cols-2',
+    },
+    large: {
+      minHeight: 450,
+      pieRadius: 120,
+      containerPadding: 'p-6',
+      titleSize: 'text-lg',
+      legendCols: 'grid-cols-3',
+    },
+  };
+
+  return compact 
+    ? { ...sizeMap[size as keyof typeof sizeMap], minHeight: sizeMap[size as keyof typeof sizeMap].minHeight * 0.8 }
+    : sizeMap[size as keyof typeof sizeMap];
+};
+
+// Custom hook for performance monitoring
+const usePerformanceMonitoring = (
+  enabled: boolean, 
+  onUpdate?: (metrics: PerformanceMetrics) => void
+) => {
+  const metricsRef = useRef<PerformanceMetrics>({
+    renderTime: 0,
+    dataProcessingTime: 0,
+    totalRenderCount: 0,
+    lastOptimization: 'initial'
+  });
+
+  const startTiming = useCallback(() => {
+    return enabled ? performance.now() : 0;
+  }, [enabled]);
+
+  const endTiming = useCallback((startTime: number, operation: keyof PerformanceMetrics) => {
+    if (!enabled) return;
+    
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    
+    metricsRef.current = {
+      ...metricsRef.current,
+      [operation]: duration,
+      totalRenderCount: metricsRef.current.totalRenderCount + 1,
+      lastOptimization: new Date().toISOString()
+    };
+
+    onUpdate?.(metricsRef.current);
+  }, [enabled, onUpdate]);
+
+  return { startTiming, endTiming, metrics: metricsRef.current };
+};
+
+const PieChart: React.FC<PieChartProps> = ({
+  data = mockData,
+  title = 'Revenue Distribution',
   showLegend = true,
   showTooltip = true,
-  centerText = ''
+  centerText,
+  size = 'medium',
+  compact = false,
+  height,
+  maxDataPoints = 10,
+  enableVirtualization = false,
+  enablePerformanceMonitoring = false,
+  animationDuration = 800,
+  onPerformanceUpdate
 }) => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
-  const [animationComplete, setAnimationComplete] = useState(false);
-  const [hoveredSegment, setHoveredSegment] = useState<string | null>(null);
-  const [isChartHovered, setIsChartHovered] = useState(false);
+  // Performance monitoring
+  const { startTiming, endTiming, metrics } = usePerformanceMonitoring(
+    enablePerformanceMonitoring, 
+    onPerformanceUpdate
+  );
 
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  // State management
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showPerformanceStats, setShowPerformanceStats] = useState(false);
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  // Refs for performance optimization
+  const chartRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number>();
+
+  // Memoized data processing with virtualization
+  const { processedData, calculatedTotal, dimensions, isVirtualized } = useMemo(() => {
+    const processingStart = startTiming();
+    
+    const { processedData: virtualizedData, isVirtualized: isDataVirtualized } = 
+      processDataWithVirtualization(data, maxDataPoints, enableVirtualization);
+    
+    const total = virtualizedData.reduce((sum, item) => sum + item.value, 0);
+    const dims = getDimensions(size, compact, height);
+    
+    endTiming(processingStart, 'dataProcessingTime');
+    
+    return {
+      processedData: virtualizedData,
+      calculatedTotal: total,
+      dimensions: dims,
+      isVirtualized: isDataVirtualized
+    };
+  }, [data, size, compact, height, maxDataPoints, enableVirtualization, startTiming, endTiming]);
+
+  // Optimized percentage calculation
+  const getPercentage = useCallback((value: number) => {
+    return calculatedTotal > 0 ? ((value / calculatedTotal) * 100).toFixed(1) : '0.0';
+  }, [calculatedTotal]);
+
+  // Enhanced mouse handlers with throttling
+  const handleMouseEnter = useCallback((index: number) => {
+    if (animationRef.current) {
+      clearTimeout(animationRef.current);
+    }
+    setHoveredIndex(index);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    animationRef.current = window.setTimeout(() => {
+      setHoveredIndex(null);
+    }, 150);
+  }, []);
+
+  // Refresh functionality with performance tracking
+  const handleRefresh = useCallback(() => {
+    const refreshStart = startTiming();
+    setIsAnimating(true);
+    
+    // Simulate data refresh
+    setTimeout(() => {
+      setIsAnimating(false);
+      endTiming(refreshStart, 'renderTime');
+    }, animationDuration);
+  }, [startTiming, endTiming, animationDuration]);
+
+  // Performance stats toggle
+  const togglePerformanceStats = useCallback(() => {
+    setShowPerformanceStats(prev => !prev);
+  }, []);
+
+  // Enhanced tooltip content
+  const CustomTooltip = useCallback(({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      const data = payload[0];
-      const percentage = ((data.value / total) * 100).toFixed(1);
-      
+      const data = payload[0].payload;
       return (
-        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-xl transform transition-all duration-200 scale-105">
-          <div className="flex items-center mb-2">
-            <div 
-              className="w-4 h-4 rounded-full mr-2 animate-pulse"
-              style={{ backgroundColor: data.payload.color }}
-            ></div>
-            <p className="font-semibold text-gray-800">{data.name}</p>
-          </div>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span>Value:</span>
-              <span className="font-bold">{data.value.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Percentage:</span>
-              <span className="font-bold text-blue-600">{percentage}%</span>
-            </div>
-            <div className="flex justify-between">
-              <span>of Total:</span>
-              <span className="font-bold text-gray-600">{total.toLocaleString()}</span>
-            </div>
-          </div>
+        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
+          <p className="font-medium text-gray-900 dark:text-white">{data.name}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Value: <span className="font-semibold">{data.value}</span>
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Percentage: <span className="font-semibold">{getPercentage(data.value)}%</span>
+          </p>
         </div>
       );
     }
     return null;
-  };
+  }, [getPercentage]);
 
-  const onPieEnter = (_: any, index: number) => {
-    setActiveIndex(index);
-    setHoveredSegment(data[index]?.name || null);
-    setIsChartHovered(true);
-  };
+  // Custom legend with enhanced features
+  const CustomLegend = useMemo(() => {
+    if (!showLegend) return null;
 
-  const onPieLeave = () => {
-    setActiveIndex(null);
-    setHoveredSegment(null);
-    setIsChartHovered(false);
-  };
+    return (
+      <div className={`grid ${dimensions.legendCols} gap-2 mt-4`}>
+        {processedData.map((entry, index) => (
+          <div
+            key={entry.id || entry.name}
+            className={`flex items-center space-x-2 p-2 rounded cursor-pointer transition-all duration-200 ${
+              hoveredIndex === index 
+                ? 'bg-gray-100 dark:bg-gray-700 scale-105' 
+                : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+            }`}
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div
+              className="w-3 h-3 rounded-full flex-shrink-0"
+              style={{ backgroundColor: entry.color }}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                {entry.name}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {entry.value} ({getPercentage(entry.value)}%)
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }, [processedData, showLegend, dimensions.legendCols, hoveredIndex, getPercentage, handleMouseEnter, handleMouseLeave]);
 
-  const handleSegmentClick = (entry: any, index: number) => {
-    setSelectedSegment(selectedSegment === entry.name ? null : entry.name);
-  };
+  // Export functionality
+  const handleExport = useCallback(async () => {
+    if (!chartRef.current) return;
+
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Simple export - in a real implementation, you'd use a library like html2canvas
+      const dataStr = JSON.stringify(processedData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `pie-chart-data-${Date.now()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Export failed:', error);
+    }
+  }, [processedData]);
+
+  // Performance stats component
+  const PerformanceStats = useMemo(() => {
+    if (!showPerformanceStats || !enablePerformanceMonitoring) return null;
+
+    return (
+      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <div className="flex items-center space-x-2 mb-2">
+          <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+            Performance Metrics
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="text-blue-800 dark:text-blue-200">
+            Render Time: {(metrics.renderTime || 0).toFixed(2)}ms
+          </div>
+          <div className="text-blue-800 dark:text-blue-200">
+            Data Processing: {(metrics.dataProcessingTime || 0).toFixed(2)}ms
+          </div>
+          <div className="text-blue-800 dark:text-blue-200">
+            Total Renders: {metrics.totalRenderCount || 0}
+          </div>
+          {isVirtualized && (
+            <div className="text-orange-600 dark:text-orange-400 col-span-2">
+              Data virtualized: Showing {processedData.length} of {data.length} items
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }, [showPerformanceStats, enablePerformanceMonitoring, isVirtualized, processedData.length, data.length]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        clearTimeout(animationRef.current);
+      }
+    };
+  }, []);
+
+  // Track render performance
+  useEffect(() => {
+    const renderStart = startTiming();
+    const timeoutId = setTimeout(() => {
+      endTiming(renderStart, 'renderTime');
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [processedData, startTiming, endTiming]);
 
   return (
-    <div className={`bg-white p-6 rounded-lg shadow-lg border border-gray-200 transition-all duration-300 ${
-      isChartHovered ? 'shadow-2xl scale-[1.02] border-blue-300' : 'hover:shadow-xl'
-    }`}>
+    <div 
+      ref={chartRef}
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${dimensions.containerPadding} ${
+        isAnimating ? 'opacity-75 pointer-events-none' : ''
+      }`}
+      style={{ minHeight: dimensions.minHeight }}
+    >
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-          isChartHovered ? 'text-blue-600' : 'text-gray-900'
-        }`}>{title}</h3>
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
-          <button 
-            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
-            title="Toggle view"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-          <button 
-            className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 hover:scale-110"
-            title="Download chart"
+          <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h3 className={`font-semibold text-gray-900 dark:text-white ${dimensions.titleSize}`}>
+            {title}
+          </h3>
+          {isVirtualized && (
+            <span className="px-2 py-1 text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded">
+              Virtualized
+            </span>
+          )}
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          {enablePerformanceMonitoring && (
+            <button
+              onClick={togglePerformanceStats}
+              className={`p-1.5 rounded-md transition-colors ${
+                showPerformanceStats
+                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                  : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+              }`}
+              title="Toggle Performance Stats"
+            >
+              <Zap className="w-4 h-4" />
+            </button>
+          )}
+          
+          <button
+            onClick={handleExport}
+            className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-md transition-colors"
+            title="Export Data"
           >
             <Download className="w-4 h-4" />
           </button>
-          <button 
-            className="p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200 hover:scale-110"
-            title="Reset view"
-            onClick={() => {
-              setSelectedSegment(null);
-              setActiveIndex(null);
-            }}
+          
+          <button
+            onClick={handleRefresh}
+            className={`p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-md transition-all ${
+              isAnimating ? 'animate-spin' : ''
+            }`}
+            title="Refresh"
+            disabled={isAnimating}
           >
             <RotateCcw className="w-4 h-4" />
+          </button>
+          
+          <button
+            onClick={() => setShowPerformanceStats(prev => !prev)}
+            className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-md transition-colors"
+            title="Toggle Details"
+          >
+            <Eye className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Chart */}
-      <div className={`h-80 transition-all duration-500 ${isChartHovered ? 'scale-105' : ''}`}>
-        <ResponsiveContainer width="100%" height="100%">
+      {/* Chart Container */}
+      <div className="relative">
+        <ResponsiveContainer width="100%" height={dimensions.minHeight - 100}>
           <RechartsPieChart>
             <Pie
-              data={data}
+              data={processedData}
               cx="50%"
               cy="50%"
-              innerRadius={centerText ? 60 : 0}
-              outerRadius={120}
+              innerRadius={compact ? dimensions.pieRadius * 0.5 : dimensions.pieRadius * 0.6}
+              outerRadius={dimensions.pieRadius}
               paddingAngle={2}
               dataKey="value"
-              onMouseEnter={onPieEnter}
-              onMouseLeave={onPieLeave}
-              onClick={handleSegmentClick}
-              animationBegin={0}
-              animationDuration={1500}
-              onAnimationEnd={() => setAnimationComplete(true)}
+              animationDuration={animationDuration}
+              onMouseEnter={(_, index) => handleMouseEnter(index)}
+              onMouseLeave={handleMouseLeave}
             >
-              {data.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
+              {processedData.map((entry, index) => (
+                <Cell
+                  key={`cell-${entry.id || index}`}
                   fill={entry.color}
-                  stroke={activeIndex === index ? '#ffffff' : 'none'}
-                  strokeWidth={activeIndex === index ? 3 : 0}
+                  stroke={hoveredIndex === index ? "#ffffff" : "transparent"}
+                  strokeWidth={hoveredIndex === index ? 2 : 0}
                   style={{
-                    filter: activeIndex === index ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' : 'none',
-                    cursor: 'pointer',
-                    transform: activeIndex === index ? 'scale(1.05)' : 'scale(1)',
+                    filter: hoveredIndex === index ? 'brightness(1.1)' : 'none',
                     transformOrigin: 'center',
-                    transition: 'all 0.3s ease'
+                    transform: hoveredIndex === index ? 'scale(1.05)' : 'scale(1)',
+                    transition: 'all 0.2s ease-in-out'
                   }}
                 />
               ))}
             </Pie>
-            {showTooltip && <Tooltip content={<CustomTooltip />} />}
-            {centerText && (
-              <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="fill-current text-lg font-bold">
-                {centerText}
-              </text>
-            )}
+            
+            {showTooltip && <Tooltip content={CustomTooltip} />}
           </RechartsPieChart>
         </ResponsiveContainer>
+
+        {/* Center Text */}
+        {centerText && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {centerText}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Total: {calculatedTotal}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Enhanced Legend with interaction */}
-      {showLegend && (
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          {data.map((item, index) => {
-            const percentage = ((item.value / total) * 100).toFixed(1);
-            const isHovered = hoveredSegment === item.name;
-            const isSelected = selectedSegment === item.name;
-            
-            return (
-              <div 
-                key={item.name}
-                className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-300 transform ${
-                  isHovered ? 'bg-blue-50 scale-105 shadow-md border-2 border-blue-200' : 
-                  isSelected ? 'bg-gray-100 scale-102 shadow-sm border-2 border-gray-300' :
-                  'bg-gray-50 hover:bg-gray-100 hover:scale-102'
-                }`}
-                onMouseEnter={() => {
-                  setActiveIndex(index);
-                  setHoveredSegment(item.name);
-                }}
-                onMouseLeave={() => {
-                  setActiveIndex(null);
-                  setHoveredSegment(null);
-                }}
-                onClick={() => handleSegmentClick(item, index)}
-                style={{
-                  boxShadow: isHovered ? `0 4px 20px ${item.color}30` : undefined
-                }}
-              >
-                <div 
-                  className={`w-4 h-4 rounded-full mr-3 flex-shrink-0 transition-all duration-300 ${
-                    isHovered ? 'w-5 h-5 shadow-lg animate-pulse' : ''
-                  }`}
-                  style={{ 
-                    backgroundColor: item.color,
-                    boxShadow: isHovered ? `0 0 15px ${item.color}60` : undefined
-                  }}
-                ></div>
-                <div className="flex-1 min-w-0">
-                  <div className={`flex items-center justify-between ${isHovered ? 'text-blue-900' : ''}`}>
-                    <span className={`font-medium text-sm truncate transition-colors duration-300 ${
-                      isHovered ? 'text-blue-900 font-semibold' : 'text-gray-700'
-                    }`}>
-                      {item.name}
-                    </span>
-                    <span className={`text-xs font-bold ml-2 transition-all duration-300 ${
-                      isHovered ? 'text-blue-600 scale-110' : 'text-gray-500'
-                    }`}>
-                      {percentage}%
-                    </span>
-                  </div>
-                  <div className={`text-xs text-gray-500 transition-all duration-300 ${
-                    isHovered ? 'text-gray-700 font-medium' : ''
-                  }`}>
-                    {item.value.toLocaleString()} units
-                  </div>
-                  {isHovered && (
-                    <div className="mt-1 w-full bg-gray-200 rounded-full h-1">
-                      <div 
-                        className="h-1 rounded-full transition-all duration-500"
-                        style={{ 
-                          width: `${percentage}%`,
-                          backgroundColor: item.color
-                        }}
-                      ></div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {/* Custom Legend */}
+      {CustomLegend}
 
-      {/* Enhanced Statistics */}
-      <div className={`mt-6 p-4 rounded-lg transition-all duration-300 ${
-        isChartHovered ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'
-      }`}>
-        <div className="flex items-center justify-between mb-3">
-          <h4 className={`text-sm font-medium transition-colors duration-300 ${
-            isChartHovered ? 'text-blue-800' : 'text-gray-700'
-          }`}>Summary Statistics</h4>
-          <TrendingUp className={`w-4 h-4 transition-colors duration-300 ${
-            isChartHovered ? 'text-blue-500' : 'text-gray-500'
-          }`} />
-        </div>
-        <div className="grid grid-cols-3 gap-4 text-center text-sm">
-          <div className={`transition-all duration-300 ${isChartHovered ? 'transform scale-105' : ''}`}>
-            <p className={`font-bold text-lg transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-600' : 'text-gray-800'
-            }`}>
-              {data.length}
-            </p>
-            <p className={`transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-700' : 'text-gray-600'
-            }`}>Categories</p>
-          </div>
-          <div className={`transition-all duration-300 ${isChartHovered ? 'transform scale-105' : ''}`}>
-            <p className={`font-bold text-lg transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-600' : 'text-gray-800'
-            }`}>
-              {total.toLocaleString()}
-            </p>
-            <p className={`transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-700' : 'text-gray-600'
-            }`}>Total</p>
-          </div>
-          <div className={`transition-all duration-300 ${isChartHovered ? 'transform scale-105' : ''}`}>
-            <p className={`font-bold text-lg transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-600' : 'text-gray-800'
-            }`}>
-              {Math.round(total / data.length).toLocaleString()}
-            </p>
-            <p className={`transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-700' : 'text-gray-600'
-            }`}>Average</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Interactive hints */}
-      <div className={`mt-4 text-xs text-center transition-all duration-300 ${
-        isChartHovered ? 'text-blue-600 font-medium' : 'text-gray-500'
-      }`}>
-        {hoveredSegment 
-          ? `Hovering: ${hoveredSegment} • Click to select/deselect` 
-          : "Hover over segments or legend items for details • Click to select"}
-      </div>
-
-      {/* Loading animation indicator */}
-      {!animationComplete && (
-        <div className="mt-4 flex justify-center">
-          <div className="flex items-center text-xs text-gray-500">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-            Loading animation...
-          </div>
-        </div>
-      )}
+      {/* Performance Stats */}
+      {PerformanceStats}
     </div>
   );
 };

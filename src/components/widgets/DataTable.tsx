@@ -67,6 +67,11 @@ interface DataTableProps {
   filterable?: boolean;
   exportable?: boolean;
   pageSize?: number;
+  size?: 'small' | 'medium' | 'large' | 'auto';
+  height?: number;
+  compact?: boolean;
+  showStats?: boolean;
+  maxRows?: number; // Limit visible rows for compact layouts
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -75,7 +80,12 @@ const DataTable: React.FC<DataTableProps> = ({
   searchable = true,
   filterable = true,
   exportable = true,
-  pageSize = 5
+  pageSize = 5,
+  size = 'medium',
+  height,
+  compact: compactProp,
+  showStats = true,
+  maxRows,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -84,7 +94,67 @@ const DataTable: React.FC<DataTableProps> = ({
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [compactMode, setCompactMode] = useState(false);
+  const [compactMode, setCompactMode] = useState(compactProp);
+
+  // Calculate adaptive dimensions based on content complexity
+  const getAdaptiveDimensions = () => {
+    const dataVolume = data.length;
+    const visibleColumns = compactMode ? 5 : 6; // Fewer columns in compact mode
+    const effectivePageSize = maxRows ? Math.min(pageSize, maxRows) : pageSize;
+    
+    let rowHeight: number;
+    let containerMinHeight: number;
+    let tableMaxHeight: number;
+    
+    if (height) {
+      // Use provided height if specified
+      containerMinHeight = height;
+      tableMaxHeight = height - 200; // Account for headers and controls
+      rowHeight = compactMode ? 32 : 48;
+    } else if (size === 'small' || compactMode) {
+      rowHeight = 32; // Compact row height
+      tableMaxHeight = Math.max(200, effectivePageSize * rowHeight + 50);
+      containerMinHeight = tableMaxHeight + 180;
+    } else if (size === 'large') {
+      rowHeight = Math.max(56, 56 + Math.floor(dataVolume / 100)); // Scale with data volume
+      tableMaxHeight = Math.max(400, effectivePageSize * rowHeight + 60);
+      containerMinHeight = tableMaxHeight + 250;
+    } else if (size === 'medium') {
+      rowHeight = 48;
+      tableMaxHeight = Math.max(300, effectivePageSize * rowHeight + 50);
+      containerMinHeight = tableMaxHeight + 200;
+    } else {
+      // Auto sizing based on data complexity
+      const baseRowHeight = 44;
+      const volumeBonus = Math.min(Math.floor(dataVolume / 50), 8); // Max 8px bonus
+      const columnComplexity = visibleColumns * 2; // Account for column count
+      
+      rowHeight = baseRowHeight + volumeBonus + columnComplexity;
+      tableMaxHeight = Math.max(250, effectivePageSize * rowHeight + 60);
+      containerMinHeight = tableMaxHeight + (showStats ? 220 : 180);
+    }
+    
+    return {
+      rowHeight: Math.max(rowHeight, compactMode ? 28 : 40),
+      containerMinHeight: Math.max(containerMinHeight, compactMode ? 300 : 400),
+      tableMaxHeight: Math.max(tableMaxHeight, 200),
+      columnMinWidths: compactMode ? {
+        name: '120px',
+        department: '60px',
+        status: '50px',
+        salary: '60px',
+        performance: '80px'
+      } : {
+        name: '160px',
+        department: '100px',
+        status: '80px',
+        salary: '90px',
+        performance: '120px'
+      }
+    };
+  };
+
+  const dimensions = getAdaptiveDimensions();
 
   // Filter options
   const departments = useMemo(() => 
@@ -193,7 +263,13 @@ const DataTable: React.FC<DataTableProps> = ({
   }), [filteredAndSortedData]);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col overflow-hidden">
+    <div 
+      className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col overflow-hidden"
+      style={{ 
+        minHeight: `${dimensions.containerMinHeight}px`,
+        height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto'
+      }}
+    >
       {/* Header - More compact */}
       <div className="flex items-center justify-between p-3 border-b border-gray-200 flex-shrink-0">
         <h3 className="text-base font-semibold text-gray-800 truncate">{title}</h3>
@@ -221,7 +297,7 @@ const DataTable: React.FC<DataTableProps> = ({
       </div>
 
       {/* Statistics - Conditional display based on space */}
-      {!compactMode && (
+      {!compactMode && showStats && (
         <div className="grid grid-cols-4 gap-2 p-3 border-b border-gray-200 flex-shrink-0">
           <div className="bg-blue-50 p-2 rounded text-center">
             <p className="text-xs text-blue-600 font-medium">Total</p>
@@ -286,11 +362,16 @@ const DataTable: React.FC<DataTableProps> = ({
         )}
       </div>
 
-      {/* Table - Enhanced responsive design with better overflow handling */}
-      <div className="flex-1 overflow-auto min-h-0">
+      {/* Table - Enhanced responsive design with adaptive sizing */}
+      <div 
+        className="flex-1 overflow-auto min-h-0" 
+        style={{ 
+          maxHeight: `${dimensions.tableMaxHeight}px`
+        }}
+      >
         <table className="w-full">
           <thead className="bg-gray-50 sticky top-0">
-            <tr className="border-b border-gray-200">
+            <tr className="border-b border-gray-200" style={{ height: `${Math.max(dimensions.rowHeight * 0.8, 32)}px` }}>
               <th className="text-left py-2 px-2 w-8">
                 <input
                   type="checkbox"
@@ -299,28 +380,28 @@ const DataTable: React.FC<DataTableProps> = ({
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
               </th>
-              <th className="text-left py-2 px-2 min-w-[140px]">
+              <th className="text-left py-2 px-2" style={{ minWidth: dimensions.columnMinWidths.name }}>
                 <SortButton field="name" currentField={sortField} direction={sortDirection} onSort={handleSort}>
                   Employee
                 </SortButton>
               </th>
-              <th className="text-left py-2 px-2 min-w-[80px]">
+              <th className="text-left py-2 px-2" style={{ minWidth: dimensions.columnMinWidths.department }}>
                 <SortButton field="department" currentField={sortField} direction={sortDirection} onSort={handleSort}>
-                  Dept
+                  {compactMode ? 'Dept' : 'Department'}
                 </SortButton>
               </th>
-              <th className="text-left py-2 px-2 min-w-[60px]">
+              <th className="text-left py-2 px-2" style={{ minWidth: dimensions.columnMinWidths.status }}>
                 <SortButton field="status" currentField={sortField} direction={sortDirection} onSort={handleSort}>
                   Status
                 </SortButton>
               </th>
-              <th className="text-left py-2 px-2 min-w-[70px]">
+              <th className="text-left py-2 px-2" style={{ minWidth: dimensions.columnMinWidths.salary }}>
                 <SortButton field="salary" currentField={sortField} direction={sortDirection} onSort={handleSort}>
                   Salary
                 </SortButton>
               </th>
               {!compactMode && (
-                <th className="text-left py-2 px-2 min-w-[100px]">
+                <th className="text-left py-2 px-2" style={{ minWidth: dimensions.columnMinWidths.performance }}>
                   <SortButton field="performance" currentField={sortField} direction={sortDirection} onSort={handleSort}>
                     Performance
                   </SortButton>
@@ -330,7 +411,11 @@ const DataTable: React.FC<DataTableProps> = ({
           </thead>
           <tbody>
             {paginatedData.map((item: TableData, index: number) => (
-              <tr key={item.id} className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+              <tr 
+                key={item.id} 
+                className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
+                style={{ height: `${dimensions.rowHeight}px` }}
+              >
                 <td className="py-2 px-2">
                   <input
                     type="checkbox"

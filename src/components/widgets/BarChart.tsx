@@ -24,6 +24,9 @@ interface BarChartProps {
   title?: string;
   showControls?: boolean;
   className?: string;
+  size?: 'small' | 'medium' | 'large' | 'auto'; // New size prop for better control
+  height?: number; // Custom height override
+  compact?: boolean; // Compact mode for smaller spaces
 }
 
 const MemoizedTooltip = memo(({ active, payload, label }: any) => {
@@ -134,10 +137,53 @@ export const BarChart: React.FC<BarChartProps> = memo(({
   data = mockData, 
   title = "Monthly Performance", 
   showControls = true,
-  className = ""
+  className = "",
+  size = 'auto',
+  height,
+  compact = false,
 }) => {
   const [isChartHovered, setIsChartHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+
+  // Calculate adaptive dimensions based on content complexity
+  const getAdaptiveDimensions = () => {
+    const dataPoints = data.length;
+    const numberOfBars = 3; // sales, revenue, profit
+    
+    // Base dimensions
+    let chartHeight: number;
+    let containerMinHeight: number;
+    
+    if (height) {
+      // Use provided height if specified
+      chartHeight = height;
+      containerMinHeight = height + (compact ? 120 : 180);
+    } else if (size === 'small' || compact) {
+      chartHeight = Math.max(180, dataPoints * 15); // Minimum 180px, scale with data
+      containerMinHeight = chartHeight + 160;
+    } else if (size === 'large') {
+      chartHeight = Math.max(400, dataPoints * 25 + numberOfBars * 30);
+      containerMinHeight = chartHeight + 220;
+    } else if (size === 'medium') {
+      chartHeight = Math.max(280, dataPoints * 20 + numberOfBars * 20);
+      containerMinHeight = chartHeight + 190;
+    } else {
+      // Auto sizing based on content complexity
+      const baseHeight = 250;
+      const dataComplexity = Math.min(dataPoints * 18, 120); // Scale with data points
+      const barComplexity = numberOfBars * 15; // Account for multiple bars
+      
+      chartHeight = baseHeight + dataComplexity + barComplexity;
+      containerMinHeight = chartHeight + (compact ? 140 : 200);
+    }
+    
+    return {
+      chartHeight: Math.max(chartHeight, compact ? 160 : 220),
+      containerMinHeight: Math.max(containerMinHeight, compact ? 320 : 420),
+    };
+  };
+
+  const dimensions = getAdaptiveDimensions();
 
   const statistics = useMemo(() => {
     const sales = data.map(d => d.sales);
@@ -200,10 +246,13 @@ export const BarChart: React.FC<BarChartProps> = memo(({
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6 transition-all duration-300 hover:shadow-md h-full flex flex-col ${className}`} style={{ minHeight: '300px' }}>
+    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${compact ? 'p-2 sm:p-3' : 'p-3 sm:p-6'} transition-all duration-300 hover:shadow-md h-full flex flex-col ${className}`} style={{ 
+      minHeight: `${dimensions.containerMinHeight}px`,
+      height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto'
+    }}>
       <div className="flex items-center justify-between mb-3 sm:mb-4 flex-shrink-0 gap-2">
-        <h3 className="text-sm sm:text-lg font-semibold text-gray-800 truncate flex-1">{title}</h3>
-        {showControls && (
+        <h3 className={`${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-lg'} font-semibold text-gray-800 truncate flex-1`}>{title}</h3>
+        {showControls && !compact && (
           <div className="flex space-x-1 sm:space-x-2 flex-shrink-0">
             <button
               onClick={() => setIsVisible(!isVisible)}
@@ -231,26 +280,35 @@ export const BarChart: React.FC<BarChartProps> = memo(({
       </div>
 
       <div 
-        className="h-48 sm:h-64 flex-shrink-0"
+        className="flex-shrink-0"
         onMouseEnter={() => setIsChartHovered(true)}
         onMouseLeave={() => setIsChartHovered(false)}
+        style={{ height: `${dimensions.chartHeight}px` }}
       >
         <ResponsiveContainer width="100%" height="100%">
-          <RechartsBarChart data={data} margin={{ top: 5, right: 15, left: 10, bottom: 5 }}>
+          <RechartsBarChart 
+            data={data} 
+            margin={{ 
+              top: compact ? 5 : 10, 
+              right: compact ? 8 : 15, 
+              left: compact ? 5 : 10, 
+              bottom: compact ? 5 : 10 
+            }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
             <XAxis 
               dataKey="name" 
-              tick={{ fontSize: 10 }}
+              tick={{ fontSize: compact ? 9 : 10 }}
               stroke="#6b7280"
-              interval={0}
+              interval={compact && data.length > 6 ? 1 : 0}
             />
             <YAxis 
-              tick={{ fontSize: 10 }}
+              tick={{ fontSize: compact ? 9 : 10 }}
               stroke="#6b7280"
-              width={40}
+              width={compact ? 35 : 40}
             />
             <Tooltip content={<MemoizedTooltip />} />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            {!compact && <Legend wrapperStyle={{ fontSize: '12px' }} />}
             <Bar 
               dataKey="sales" 
               fill="#3b82f6" 
@@ -276,13 +334,16 @@ export const BarChart: React.FC<BarChartProps> = memo(({
         </ResponsiveContainer>
       </div>
 
-      <div className="flex-1 mt-2 min-h-0">
-        <MemoizedStatisticsPanel 
-          data={data} 
-          isChartHovered={isChartHovered} 
-          statistics={statistics}
-        />
-      </div>
+      {/* Statistics Panel - Only show in non-compact mode */}
+      {!compact && (
+        <div className="flex-1 mt-2 min-h-0">
+          <MemoizedStatisticsPanel 
+            data={data} 
+            isChartHovered={isChartHovered} 
+            statistics={statistics}
+          />
+        </div>
+      )}
     </div>
   );
 });

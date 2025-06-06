@@ -322,11 +322,11 @@ export const createDebouncedValidator = (
   validator: ValidatorFunction,
   delay = 300
 ) => {
-  let timeoutId: NodeJS.Timeout;
+  let timeoutId: number;
   
   return (value: any, callback: (result: ValidationResult) => void) => {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
+    timeoutId = window.setTimeout(() => {
       const result = validator(value);
       callback(result);
     }, delay);

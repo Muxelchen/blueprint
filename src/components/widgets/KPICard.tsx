@@ -98,7 +98,11 @@ interface KPICardProps {
   showTrend?: boolean;
   showTarget?: boolean;
   animate?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large' | 'auto';
+  compact?: boolean;
+  height?: number;
+  showChart?: boolean;
+  showInsights?: boolean;
 }
 
 const KPICard: React.FC<KPICardProps> = ({ 
@@ -106,7 +110,11 @@ const KPICard: React.FC<KPICardProps> = ({
   showTrend = true,
   showTarget = true,
   animate = true,
-  size = 'medium'
+  size = 'medium',
+  compact = false,
+  height,
+  showChart = true,
+  showInsights = true,
 }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -190,50 +198,103 @@ const KPICard: React.FC<KPICardProps> = ({
     }
   };
 
-  // Enhanced size classes with better responsive fitting
-  const sizeClasses = {
-    small: 'p-2 sm:p-3 min-h-[120px] max-h-[160px]',    // More compact for small widgets
-    medium: 'p-3 sm:p-4 min-h-[140px] max-h-[200px]',   // Better medium size
-    large: 'p-4 sm:p-6 min-h-[180px] max-h-[280px]'     // Larger but constrained
+  // Calculate adaptive dimensions based on content complexity
+  const getAdaptiveDimensions = () => {
+    const hasTarget = showTarget && kpi.target;
+    const hasChart = showChart;
+    const hasInsights = showInsights && size === 'large';
+    const hasDescription = kpi.description && size === 'large';
+    
+    // Count active features to determine space needs
+    const featureCount = [showTrend, hasTarget, hasChart, hasInsights, hasDescription].filter(Boolean).length;
+    
+    let cardHeight: number;
+    let cardPadding: string;
+    let iconDimensions: string;
+    let titleFontSize: string;
+    let valueFontSize: string;
+    let spacing: string;
+    
+    if (height) {
+      // Use provided height and scale elements accordingly
+      cardHeight = height;
+      const isLarge = height > 200;
+      const isSmall = height < 140;
+      
+      cardPadding = isSmall ? 'p-2' : isLarge ? 'p-6' : 'p-4';
+      iconDimensions = isSmall ? 'w-5 h-5' : isLarge ? 'w-10 h-10' : 'w-8 h-8';
+      titleFontSize = isSmall ? 'text-xs' : isLarge ? 'text-lg' : 'text-base';
+      valueFontSize = isSmall ? 'text-lg' : isLarge ? 'text-2xl' : 'text-xl';
+      spacing = isSmall ? 'space-x-1' : isLarge ? 'space-x-3' : 'space-x-2';
+    } else if (size === 'small' || compact) {
+      cardHeight = 120 + (featureCount * 15); // Base + feature space
+      cardPadding = compact ? 'p-2' : 'p-3';
+      iconDimensions = 'w-5 h-5';
+      titleFontSize = 'text-xs';
+      valueFontSize = 'text-base';
+      spacing = 'space-x-1';
+    } else if (size === 'large') {
+      cardHeight = 200 + (featureCount * 25); // More generous space
+      cardPadding = 'p-6';
+      iconDimensions = 'w-10 h-10';
+      titleFontSize = 'text-lg';
+      valueFontSize = 'text-2xl';
+      spacing = 'space-x-3';
+    } else if (size === 'medium') {
+      cardHeight = 160 + (featureCount * 20); // Balanced space
+      cardPadding = 'p-4';
+      iconDimensions = 'w-8 h-8';
+      titleFontSize = 'text-base';
+      valueFontSize = 'text-xl';
+      spacing = 'space-x-2';
+    } else {
+      // Auto sizing based on content complexity
+      const baseHeight = 140;
+      const featureBonus = featureCount * 18;
+      const valueComplexity = kpi.value.toString().length > 6 ? 10 : 0;
+      
+      cardHeight = baseHeight + featureBonus + valueComplexity;
+      cardPadding = cardHeight > 180 ? 'p-4' : 'p-3';
+      iconDimensions = cardHeight > 180 ? 'w-8 h-8' : 'w-6 h-6';
+      titleFontSize = cardHeight > 180 ? 'text-base' : 'text-sm';
+      valueFontSize = cardHeight > 180 ? 'text-xl' : 'text-lg';
+      spacing = cardHeight > 180 ? 'space-x-2' : 'space-x-1';
+    }
+    
+    return {
+      cardHeight: Math.max(cardHeight, compact ? 100 : 120),
+      cardPadding,
+      iconDimensions,
+      titleFontSize,
+      valueFontSize,
+      spacing,
+      showCompactMode: cardHeight < 140,
+      chartBars: cardHeight < 140 ? 3 : cardHeight > 200 ? 8 : 6,
+    };
   };
 
-  const iconSizes = {
-    small: 'w-5 h-5 sm:w-6 sm:h-6',   // Better scaling
-    medium: 'w-6 h-6 sm:w-8 sm:h-8',  // Responsive sizing
-    large: 'w-8 h-8 sm:w-10 sm:h-10'  // Appropriate large size
-  };
-
-  const titleSizes = {
-    small: 'text-xs sm:text-sm',    // Better mobile readability
-    medium: 'text-sm sm:text-base', // Improved scaling
-    large: 'text-base sm:text-lg'   // Better large sizing
-  };
-
-  const valueSizes = {
-    small: 'text-base sm:text-lg',    // More readable on mobile
-    medium: 'text-lg sm:text-xl',     // Better balance
-    large: 'text-xl sm:text-2xl'      // Improved scaling
-  };
+  const dimensions = getAdaptiveDimensions();
 
   const Icon = kpi.icon;
 
   return (
     <div 
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer ${sizeClasses[size]} flex flex-col h-full overflow-hidden`}
+      className={`bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer ${dimensions.cardPadding} flex flex-col h-full overflow-hidden`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      style={{ height: dimensions.cardHeight ? `${dimensions.cardHeight}px` : 'auto' }}
     >
       {/* Header - Optimized for space */}
       <div className="flex items-start justify-between mb-2 flex-shrink-0">
         <div className="flex items-center space-x-2 min-w-0 flex-1">
           <div 
-            className={`${iconSizes[size]} rounded-lg flex items-center justify-center text-white transition-colors duration-200 flex-shrink-0`}
+            className={`${dimensions.iconDimensions} rounded-lg flex items-center justify-center text-white transition-colors duration-200 flex-shrink-0`}
             style={{ backgroundColor: kpi.color }}
           >
             <Icon className={`${size === 'small' ? 'w-3 h-3' : size === 'medium' ? 'w-4 h-4' : 'w-5 h-5'}`} />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className={`font-semibold text-gray-900 ${titleSizes[size]} truncate leading-tight`}>{kpi.title}</h3>
+            <h3 className={`font-semibold text-gray-900 ${dimensions.titleFontSize} truncate leading-tight`}>{kpi.title}</h3>
             {kpi.description && size === 'large' && (
               <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{kpi.description}</p>
             )}
@@ -253,7 +314,7 @@ const KPICard: React.FC<KPICardProps> = ({
       {/* Main Value - Better space utilization */}
       <div className="mb-2 flex-grow flex flex-col justify-center">
         <div 
-          className={`font-bold text-gray-900 transition-colors duration-300 ${valueSizes[size]} leading-none`}
+          className={`font-bold text-gray-900 transition-colors duration-300 ${dimensions.valueFontSize} leading-none`}
           style={{ 
             color: isHovered ? kpi.color : undefined
           }}
@@ -293,32 +354,34 @@ const KPICard: React.FC<KPICardProps> = ({
       )}
 
       {/* Mini Trend Chart - Optimized for small spaces */}
-      <div className="mt-auto flex-shrink-0">
-        <div className="flex items-end space-x-0.5 h-4">
-          {Array.from({ length: size === 'small' ? 4 : size === 'medium' ? 6 : 8 }, (_, i) => {
-            const height = Math.max(4, 6 + Math.random() * 10);
-            const isLast = i === (size === 'small' ? 3 : size === 'medium' ? 5 : 7);
-            return (
-              <div
-                key={i}
-                className="flex-1 rounded-t transition-colors duration-200 hover:opacity-80 cursor-pointer"
-                style={{ 
-                  height: `${height}px`,
-                  backgroundColor: isLast ? kpi.color : `${kpi.color}66`
-                }}
-              ></div>
-            );
-          })}
-        </div>
-        {size !== 'small' && (
-          <div className="text-xs text-gray-500 text-center mt-0.5">
-            {size === 'medium' ? '6d' : '8d'} trend
+      {showChart && (
+        <div className="mt-auto flex-shrink-0">
+          <div className="flex items-end space-x-0.5 h-4">
+            {Array.from({ length: size === 'small' ? 4 : size === 'medium' ? 6 : 8 }, (_, i) => {
+              const height = Math.max(4, 6 + Math.random() * 10);
+              const isLast = i === (size === 'small' ? 3 : size === 'medium' ? 5 : 7);
+              return (
+                <div
+                  key={i}
+                  className="flex-1 rounded-t transition-colors duration-200 hover:opacity-80 cursor-pointer"
+                  style={{ 
+                    height: `${height}px`,
+                    backgroundColor: isLast ? kpi.color : `${kpi.color}66`
+                  }}
+                ></div>
+              );
+            })}
           </div>
-        )}
-      </div>
+          {size !== 'small' && (
+            <div className="text-xs text-gray-500 text-center mt-0.5">
+              {size === 'medium' ? '6d' : '8d'} trend
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Performance Insights - Compact hover display */}
-      {isHovered && size === 'large' && (
+      {isHovered && size === 'large' && showInsights && (
         <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200 animate-fade-in flex-shrink-0">
           <div className="text-xs text-blue-800 font-medium mb-1">Quick Stats</div>
           <div className="grid grid-cols-2 gap-2 text-xs text-blue-700">

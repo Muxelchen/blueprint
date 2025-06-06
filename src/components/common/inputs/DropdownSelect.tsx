@@ -33,9 +33,9 @@ export interface DropdownSelectProps {
   name?: string;
   id?: string;
   className?: string;
+  dropdownClassName?: string;
   optionClassName?: string;
   menuClassName?: string;
-  dropdownClassName?: string;
   noOptionsText?: string;
   searchPlaceholder?: string;
   onSearchChange?: (searchTerm: string) => void;
@@ -300,7 +300,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
 
   const sizeConfig = getSizeConfig();
   const variantConfig = getVariantConfig();
-  const selectId = id || name || `select-${Math.random().toString(36).substr(2, 9)}`;
+  const selectId = id || name || `select-${Math.random().toString(36).substring(2, 9)}`;
 
   const containerClasses = `
     relative w-full border rounded-md bg-white cursor-pointer

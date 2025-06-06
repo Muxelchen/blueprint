@@ -167,7 +167,7 @@ const AccessibilitySupport: React.FC<AccessibilityProps> = ({
   }, []);
 
   const setAriaDescription = useCallback((element: HTMLElement, description: string) => {
-    const descId = `desc-${Math.random().toString(36).substr(2, 9)}`;
+    const descId = `desc-${Math.random().toString(36).substring(2, 11)}`;
     const descElement = document.createElement('div');
     descElement.id = descId;
     descElement.className = 'sr-only';
@@ -374,7 +374,7 @@ export const AccessibleInput: React.FC<{
   className = ''
 }) => {
   const { announceMessage } = useAccessibility();
-  const inputId = `input-${Math.random().toString(36).substr(2, 9)}`;
+  const inputId = `input-${Math.random().toString(36).substring(2, 11)}`;
   const errorId = error ? `${inputId}-error` : undefined;
   const helpId = help ? `${inputId}-help` : undefined;
 

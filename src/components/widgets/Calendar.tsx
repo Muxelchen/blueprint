@@ -11,10 +11,20 @@ interface CalendarEvent {
 interface CalendarProps {
   events?: CalendarEvent[];
   title?: string;
+  size?: 'small' | 'medium' | 'large' | 'auto';
+  compact?: boolean;
+  height?: number;
+  showUpcoming?: boolean;
+  showStats?: boolean;
 }
 
 const Calendar: React.FC<CalendarProps> = ({
-  title = 'Calendar Widget'
+  title = 'Calendar Widget',
+  size = 'auto',
+  compact = false,
+  height,
+  showUpcoming = true,
+  showStats = true
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -105,10 +115,17 @@ const Calendar: React.FC<CalendarProps> = ({
     const daysInMonth = getDaysInMonth(currentDate);
     const firstDay = getFirstDayOfMonth(currentDate);
     const days = [];
+    const maxEventsToShow = compact ? 1 : Math.floor((dimensions.cellHeight - 30) / 20); // Calculate based on cell height
 
     // Empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-24 p-1"></div>);
+      days.push(
+        <div 
+          key={`empty-${i}`} 
+          className={`${compact ? 'p-0.5' : 'p-1'} border border-gray-200`}
+          style={{ height: `${dimensions.cellHeight}px` }}
+        ></div>
+      );
     }
 
     // Days of the month
@@ -122,28 +139,32 @@ const Calendar: React.FC<CalendarProps> = ({
       days.push(
         <div
           key={day}
-          className={`h-24 p-1 border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${todayClass} ${selectedClass}`}
+          className={`${compact ? 'p-0.5' : 'p-1'} border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${todayClass} ${selectedClass}`}
           onClick={() => setSelectedDate(date)}
+          style={{ height: `${dimensions.cellHeight}px` }}
         >
           <div className="flex flex-col h-full">
-            <span className={`text-sm font-medium ${isToday(date) ? 'text-blue-700' : 'text-gray-700'}`}>
+            <span className={`${compact ? 'text-xs' : 'text-sm'} font-medium ${isToday(date) ? 'text-blue-700' : 'text-gray-700'}`}>
               {day}
             </span>
             <div className="flex-1 overflow-hidden">
-              {dayEvents.slice(0, 2).map((event) => (
+              {dayEvents.slice(0, maxEventsToShow).map((event) => (
                 <div
                   key={event.id}
-                  className={`text-xs p-1 rounded truncate ${
+                  className={`${compact ? 'text-xs' : 'text-xs'} p-1 rounded truncate mb-1 ${
                     event.type === 'meeting' ? 'bg-blue-100 text-blue-800' :
                     event.type === 'deadline' ? 'bg-red-100 text-red-800' :
-                    'bg-green-100 text-green-800'
+                    event.type === 'event' ? 'bg-green-100 text-green-800' :
+                    'bg-yellow-100 text-yellow-800'
                   }`}
                 >
-                  {event.title}
+                  {compact ? event.title.slice(0, 8) + (event.title.length > 8 ? '...' : '') : event.title}
                 </div>
               ))}
-              {dayEvents.length > 2 && (
-                <div className="text-xs text-gray-500">+{dayEvents.length - 2} more</div>
+              {dayEvents.length > maxEventsToShow && (
+                <div className={`${compact ? 'text-xs' : 'text-xs'} text-gray-500`}>
+                  +{dayEvents.length - maxEventsToShow} more
+                </div>
               )}
             </div>
           </div>
@@ -169,44 +190,109 @@ const Calendar: React.FC<CalendarProps> = ({
     .sort((a, b) => a.date.getTime() - b.date.getTime())
     .slice(0, 5);
 
+  // Calculate adaptive dimensions based on content complexity
+  const getAdaptiveDimensions = () => {
+    const totalEvents = events.length;
+    const currentMonthEvents = events.filter(event => 
+      event.date.getMonth() === currentDate.getMonth() && 
+      event.date.getFullYear() === currentDate.getFullYear()
+    ).length;
+    
+    // Calculate event density per day
+    const daysInMonth = getDaysInMonth(currentDate);
+    const eventDensity = currentMonthEvents / daysInMonth;
+    
+    let cellHeight: number;
+    let containerMinHeight: number;
+    let upcomingEventsHeight: number;
+    
+    if (height) {
+      // Use provided height if specified
+      cellHeight = Math.max(60, Math.floor(height / 8)); // Account for headers
+      containerMinHeight = height;
+      upcomingEventsHeight = Math.min(160, height * 0.2);
+    } else if (size === 'small' || compact) {
+      cellHeight = Math.max(48, 48 + Math.floor(eventDensity * 20));
+      containerMinHeight = 400;
+      upcomingEventsHeight = 120;
+    } else if (size === 'large') {
+      cellHeight = Math.max(120, 120 + Math.floor(eventDensity * 40));
+      containerMinHeight = 800;
+      upcomingEventsHeight = 240;
+    } else if (size === 'medium') {
+      cellHeight = Math.max(80, 80 + Math.floor(eventDensity * 30));
+      containerMinHeight = 600;
+      upcomingEventsHeight = 180;
+    } else {
+      // Auto sizing based on event density
+      const baseHeight = 70;
+      const densityBonus = Math.min(eventDensity * 35, 50); // Max 50px bonus
+      const totalEventsBonus = Math.min(totalEvents * 2, 30); // Max 30px bonus
+      
+      cellHeight = baseHeight + densityBonus + totalEventsBonus;
+      containerMinHeight = (cellHeight * 6) + 200 + (showUpcoming ? 180 : 0) + (showStats ? 100 : 0);
+      upcomingEventsHeight = Math.max(120, Math.min(totalEvents * 25, 200));
+    }
+    
+    return {
+      cellHeight: Math.max(cellHeight, compact ? 40 : 60),
+      containerMinHeight: Math.max(containerMinHeight, compact ? 350 : 500),
+      upcomingEventsHeight: showUpcoming ? upcomingEventsHeight : 0,
+      calendarGridHeight: cellHeight * 6, // 6 rows max for month view
+    };
+  };
+
+  const dimensions = getAdaptiveDimensions();
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setViewMode(viewMode === 'month' ? 'week' : 'month')}
-            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-          >
-            {viewMode === 'month' ? 'Week' : 'Month'} View
-          </button>
-        </div>
+    <div 
+      className={`bg-white ${compact ? 'p-3' : 'p-6'} rounded-lg shadow-lg`} 
+      style={{ 
+        minHeight: `${dimensions.containerMinHeight}px`,
+        height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto'
+      }}
+    >
+      <div className={`flex justify-between items-center ${compact ? 'mb-3' : 'mb-6'}`}>
+        <h3 className={`${compact ? 'text-sm' : 'text-lg'} font-semibold`}>{title}</h3>
+        {!compact && (
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setViewMode(viewMode === 'month' ? 'week' : 'month')}
+              className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+            >
+              {viewMode === 'month' ? 'Week' : 'Month'} View
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Calendar Header */}
-      <div className="flex justify-between items-center mb-4">
+      <div className={`flex justify-between items-center ${compact ? 'mb-2' : 'mb-4'}`}>
         <button
           onClick={() => navigateMonth('prev')}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className={`${compact ? 'p-1' : 'p-2'} hover:bg-gray-100 rounded-full transition-colors`}
         >
           ←
         </button>
-        <h4 className="text-xl font-semibold">
-          {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+        <h4 className={`${compact ? 'text-base' : 'text-xl'} font-semibold`}>
+          {compact 
+            ? `${monthNames[currentDate.getMonth()].slice(0, 3)} ${currentDate.getFullYear()}`
+            : `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+          }
         </h4>
         <button
           onClick={() => navigateMonth('next')}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className={`${compact ? 'p-1' : 'p-2'} hover:bg-gray-100 rounded-full transition-colors`}
         >
           →
         </button>
       </div>
 
       {/* Day Headers */}
-      <div className="grid grid-cols-7 gap-0 mb-2">
+      <div className={`grid grid-cols-7 gap-0 ${compact ? 'mb-1' : 'mb-2'}`}>
         {dayNames.map(day => (
-          <div key={day} className="p-2 text-center text-sm font-medium text-gray-600 bg-gray-50">
-            {day}
+          <div key={day} className={`${compact ? 'p-1' : 'p-2'} text-center ${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-600 bg-gray-50`}>
+            {compact ? day.slice(0, 1) : day}
           </div>
         ))}
       </div>
@@ -217,7 +303,7 @@ const Calendar: React.FC<CalendarProps> = ({
       </div>
 
       {/* Event Details */}
-      {selectedDate && (
+      {selectedDate && !compact && (
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
           <h5 className="font-medium mb-3">
             Events for {selectedDate.toLocaleDateString()}
@@ -244,49 +330,53 @@ const Calendar: React.FC<CalendarProps> = ({
       )}
 
       {/* Upcoming Events */}
-      <div className="mt-6">
-        <h5 className="font-medium mb-3">Upcoming Events</h5>
-        <div className="space-y-2 max-h-40 overflow-y-auto">
-          {upcomingEvents.map(event => (
-            <div key={event.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded">
-              <div className={`w-2 h-2 rounded-full ${getEventTypeColor(event.type)}`}></div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{event.title}</p>
-                <p className="text-xs text-gray-600">{event.date.toLocaleDateString()}</p>
+      {showUpcoming && !compact && (
+        <div className="mt-6">
+          <h5 className="font-medium mb-3">Upcoming Events</h5>
+          <div className="space-y-2 max-h-40 overflow-y-auto" style={{ maxHeight: dimensions.upcomingEventsHeight }}>
+            {upcomingEvents.map(event => (
+              <div key={event.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded">
+                <div className={`w-2 h-2 rounded-full ${getEventTypeColor(event.type)}`}></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{event.title}</p>
+                  <p className="text-xs text-gray-600">{event.date.toLocaleDateString()}</p>
+                </div>
+                <span className="text-xs text-gray-500 capitalize">{event.type}</span>
               </div>
-              <span className="text-xs text-gray-500 capitalize">{event.type}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Quick Stats */}
-      <div className="mt-6 grid grid-cols-4 gap-4 text-center">
-        <div className="bg-blue-50 p-3 rounded-lg">
-          <div className="text-lg font-bold text-blue-900">
-            {events.filter(e => e.type === 'meeting').length}
+      {showStats && (
+        <div className={`${compact ? 'mt-3' : 'mt-6'} grid grid-cols-4 gap-${compact ? '2' : '4'} text-center`}>
+          <div className="bg-blue-50 p-3 rounded-lg">
+            <div className="text-lg font-bold text-blue-900">
+              {events.filter(e => e.type === 'meeting').length}
+            </div>
+            <div className="text-xs text-blue-600">Meetings</div>
           </div>
-          <div className="text-xs text-blue-600">Meetings</div>
-        </div>
-        <div className="bg-red-50 p-3 rounded-lg">
-          <div className="text-lg font-bold text-red-900">
-            {events.filter(e => e.type === 'deadline').length}
+          <div className="bg-red-50 p-3 rounded-lg">
+            <div className="text-lg font-bold text-red-900">
+              {events.filter(e => e.type === 'deadline').length}
+            </div>
+            <div className="text-xs text-red-600">Deadlines</div>
           </div>
-          <div className="text-xs text-red-600">Deadlines</div>
-        </div>
-        <div className="bg-green-50 p-3 rounded-lg">
-          <div className="text-lg font-bold text-green-900">
-            {events.filter(e => e.type === 'event').length}
+          <div className="bg-green-50 p-3 rounded-lg">
+            <div className="text-lg font-bold text-green-900">
+              {events.filter(e => e.type === 'event').length}
+            </div>
+            <div className="text-xs text-green-600">Events</div>
           </div>
-          <div className="text-xs text-green-600">Events</div>
-        </div>
-        <div className="bg-yellow-50 p-3 rounded-lg">
-          <div className="text-lg font-bold text-yellow-900">
-            {events.filter(e => e.type === 'reminder').length}
+          <div className="bg-yellow-50 p-3 rounded-lg">
+            <div className="text-lg font-bold text-yellow-900">
+              {events.filter(e => e.type === 'reminder').length}
+            </div>
+            <div className="text-xs text-yellow-600">Reminders</div>
           </div>
-          <div className="text-xs text-yellow-600">Reminders</div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

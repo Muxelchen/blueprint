@@ -2,9 +2,33 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, PieChart, TrendingUp, Filter, Download, Calendar } from 'lucide-react';
 import { Button } from '../components/common';
+import { LineChart, PieChart as PieChartWidget, DonutChart } from '../components/widgets';
 
 // Analytics-focused template with advanced charts and filters
 export const AnalyticsTemplate: React.FC = () => {
+  // Sample data for charts - corrected to match LineData interface
+  const lineChartData = [
+    { name: 'Jan', sales: 4000, revenue: 2400, profit: 1600, visitors: 12000 },
+    { name: 'Feb', sales: 3000, revenue: 1398, profit: 932, visitors: 9800 },
+    { name: 'Mar', sales: 2000, revenue: 9800, profit: 7840, visitors: 15600 },
+    { name: 'Apr', sales: 2780, revenue: 3908, profit: 2635, visitors: 11200 },
+    { name: 'May', sales: 1890, revenue: 4800, profit: 3840, visitors: 13400 },
+    { name: 'Jun', sales: 2390, revenue: 3800, profit: 3040, visitors: 10800 },
+  ];
+
+  const pieChartData = [
+    { name: 'Organic Search', value: 45, color: '#3B82F6' },
+    { name: 'Direct Traffic', value: 30, color: '#10B981' },
+    { name: 'Social Media', value: 15, color: '#F59E0B' },
+    { name: 'Email Campaign', value: 10, color: '#EF4444' },
+  ];
+
+  const donutChartData = [
+    { name: 'Desktop', value: 55, color: '#3B82F6' },
+    { name: 'Mobile', value: 35, color: '#10B981' },
+    { name: 'Tablet', value: 10, color: '#F59E0B' },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -31,14 +55,24 @@ export const AnalyticsTemplate: React.FC = () => {
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <ChartContainer title="Traffic Overview" icon={<BarChart3 />}>
-            <div className="h-80 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center">
-              <p className="text-gray-600">Advanced Line Chart Here</p>
+            <div className="h-80">
+              <LineChart 
+                data={lineChartData}
+                title="Visitor Trends"
+                height={320}
+                compact={false}
+              />
             </div>
           </ChartContainer>
 
           <ChartContainer title="Traffic Sources" icon={<PieChart />}>
-            <div className="h-80 bg-gradient-to-br from-green-50 to-green-100 rounded-lg flex items-center justify-center">
-              <p className="text-gray-600">Donut Chart Here</p>
+            <div className="h-80">
+              <PieChartWidget 
+                data={pieChartData}
+                title="Traffic Sources"
+                height={320}
+                showLegend={true}
+              />
             </div>
           </ChartContainer>
         </div>
@@ -47,13 +81,31 @@ export const AnalyticsTemplate: React.FC = () => {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <div className="xl:col-span-2">
             <ChartContainer title="Real-time Analytics" icon={<TrendingUp />}>
-              <div className="h-96 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg flex items-center justify-center">
-                <p className="text-gray-600">Real-time Chart Here</p>
+              <div className="h-96">
+                <LineChart 
+                  data={lineChartData}
+                  title="Real-time Traffic"
+                  height={384}
+                  compact={false}
+                />
               </div>
             </ChartContainer>
           </div>
 
           <div className="space-y-6">
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4">Device Usage</h3>
+              <div className="h-64">
+                <DonutChart 
+                  data={donutChartData}
+                  title="Device Distribution"
+                  centerText="Total Devices"
+                  size="small"
+                  compact={true}
+                />
+              </div>
+            </div>
+
             <div className="bg-white rounded-lg p-6 border border-gray-200">
               <h3 className="text-lg font-semibold mb-4">Top Pages</h3>
               <div className="space-y-3">

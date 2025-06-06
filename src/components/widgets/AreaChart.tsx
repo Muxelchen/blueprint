@@ -32,6 +32,7 @@ interface AreaChartProps {
   stackedMode?: boolean;
   compact?: boolean;
   height?: number;
+  size?: 'small' | 'medium' | 'large' | 'auto'; // New size prop for better control
 }
 
 const AreaChart: React.FC<AreaChartProps> = ({ 
@@ -40,7 +41,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
   showDots = true,
   stackedMode = false,
   compact = false,
-  height = 320
+  height,
+  size = 'auto'
 }) => {
   const { isDarkMode } = useDarkMode();
   const [activeArea, setActiveArea] = useState<string | null>(null);
@@ -208,10 +210,54 @@ const AreaChart: React.FC<AreaChartProps> = ({
     return value.toString();
   };
 
+  // Calculate adaptive dimensions based on content
+  const getAdaptiveDimensions = () => {
+    const dataPoints = data.length;
+    const visibleAreas = areas.filter(area => !hiddenAreas.has(area.dataKey)).length;
+    
+    // Base dimensions
+    let chartHeight: number;
+    let containerMinHeight: number;
+    
+    if (height) {
+      // Use provided height if specified
+      chartHeight = height;
+      containerMinHeight = height + 100; // Add space for controls
+    } else if (size === 'small' || compact) {
+      chartHeight = 200;
+      containerMinHeight = 280;
+    } else if (size === 'large') {
+      chartHeight = Math.max(400, dataPoints * 15 + visibleAreas * 20);
+      containerMinHeight = chartHeight + 150;
+    } else if (size === 'medium') {
+      chartHeight = Math.max(300, dataPoints * 10 + visibleAreas * 15);
+      containerMinHeight = chartHeight + 120;
+    } else {
+      // Auto sizing based on content complexity
+      const baseHeight = 280;
+      const dataComplexity = Math.min(dataPoints * 8, 80); // Max 80px for data
+      const areaComplexity = Math.min(visibleAreas * 25, 100); // Max 100px for areas
+      
+      chartHeight = baseHeight + dataComplexity + areaComplexity;
+      containerMinHeight = chartHeight + (compact ? 80 : 140);
+    }
+    
+    return {
+      chartHeight: Math.max(chartHeight, compact ? 180 : 250),
+      containerMinHeight: Math.max(containerMinHeight, compact ? 260 : 390),
+      chartWidth: '100%'
+    };
+  };
+
+  const dimensions = getAdaptiveDimensions();
+
   return (
-    <div className={`${compact ? 'p-2 sm:p-3' : 'p-4 sm:p-6'} rounded-lg shadow-sm border flex flex-col h-full ${
+    <div className={`${compact ? 'p-2 sm:p-3' : 'p-4 sm:p-6'} rounded-lg shadow-sm border flex flex-col ${
       isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    }`} style={{ minHeight: compact ? '240px' : `${height}px` }}>
+    }`} style={{ 
+      minHeight: `${dimensions.containerMinHeight}px`,
+      height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto'
+    }}>
       <div className="flex justify-between items-start mb-2 sm:mb-3 flex-shrink-0 gap-2">
         <h3 className={`${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-lg'} font-semibold flex-1 min-w-0 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
           {title}
@@ -240,8 +286,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
       </div>
 
       {/* Chart */}
-      <div className="flex-1 min-h-0 w-full" style={{ minHeight: compact ? '160px' : '200px' }}>
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="flex-1 min-h-0 w-full" style={{ height: `${dimensions.chartHeight}px` }}>
+        <ResponsiveContainer width={dimensions.chartWidth} height={dimensions.chartHeight}>
           <RechartsAreaChart
             data={data}
             margin={{ 

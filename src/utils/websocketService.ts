@@ -33,8 +33,8 @@ class WebSocketService {
   private url: string;
   private options: WebSocketOptions;
   private reconnectAttempts = 0;
-  private reconnectTimeout: NodeJS.Timeout | null = null;
-  private heartbeatInterval: NodeJS.Timeout | null = null;
+  private reconnectTimeout: number | null = null;
+  private heartbeatInterval: number | null = null;
   private messageListeners: Map<string, (message: WebSocketMessage) => void> = new Map();
   private userId?: string;
   private channels: Set<string> = new Set();
@@ -255,7 +255,7 @@ class WebSocketService {
       this.options.onReconnect(this.reconnectAttempts);
     }
     
-    this.reconnectTimeout = setTimeout(() => {
+    this.reconnectTimeout = window.setTimeout(() => {
       this.connect(this.userId);
     }, this.options.reconnectInterval);
   }
@@ -268,7 +268,7 @@ class WebSocketService {
     
     this.clearTimers();
     
-    this.heartbeatInterval = setInterval(() => {
+    this.heartbeatInterval = window.setInterval(() => {
       this.send('PING', { timestamp: Date.now() });
     }, this.options.heartbeatInterval);
   }

@@ -38,7 +38,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({
 }) => {
   const [internalLoading, setInternalLoading] = useState(isLoading);
   const [currentProgress, setCurrentProgress] = useState(progress);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<number>();
 
   // Mock loading with delay
   useEffect(() => {
@@ -57,7 +57,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   useEffect(() => {
     if (internalLoading && showProgress && progress === 0) {
       setCurrentProgress(0);
-      intervalRef.current = setInterval(() => {
+      intervalRef.current = window.setInterval(() => {
         setCurrentProgress(prev => {
           const increment = Math.random() * 15 + 5;
           const newProgress = Math.min(prev + increment, 90);

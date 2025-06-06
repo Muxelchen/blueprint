@@ -27,11 +27,25 @@ const mockData: LineData[] = [
 interface LineChartProps {
   data?: LineData[];
   title?: string;
+  size?: 'small' | 'medium' | 'large' | 'auto';
+  compact?: boolean;
+  height?: number;
+  showBrush?: boolean;
+  showStatistics?: boolean;
+  showToggles?: boolean;
+  showInstructions?: boolean;
 }
 
 const LineChart: React.FC<LineChartProps> = ({ 
   data = mockData, 
-  title = 'Annual Performance Trends' 
+  title = 'Annual Performance Trends',
+  size = 'auto',
+  compact = false,
+  height,
+  showBrush = true,
+  showStatistics = true,
+  showToggles = true,
+  showInstructions = true,
 }) => {
   const [activeLines, setActiveLines] = useState({
     sales: true,
@@ -118,54 +132,153 @@ const LineChart: React.FC<LineChartProps> = ({
     return { min, max, avg, trend };
   };
 
+  // Calculate adaptive dimensions based on content complexity
+  const getAdaptiveDimensions = () => {
+    const dataComplexity = Math.min(data.length / 12, 1); // Normalize data density (12 months = full complexity)
+    const activeLineCount = Object.values(activeLines).filter(Boolean).length;
+    const hasMultipleSections = showStatistics || showToggles || showBrush;
+    
+    let containerHeight: number;
+    let containerPadding: string;
+    let chartAreaHeight: string;
+    let titleSize: string;
+    let spacing: string;
+    let gridColumns: string;
+    
+    if (height) {
+      // Use provided height and calculate sections accordingly
+      containerHeight = height;
+      const availableChartHeight = height - (hasMultipleSections ? 200 : 80);
+      chartAreaHeight = `${Math.max(availableChartHeight, 200)}px`;
+      containerPadding = height > 500 ? 'p-6' : height > 300 ? 'p-4' : 'p-3';
+      titleSize = height > 400 ? 'text-lg' : 'text-base';
+      spacing = height > 400 ? 'space-x-3' : 'space-x-2';
+      gridColumns = height > 500 ? 'grid-cols-4' : 'grid-cols-2';
+    } else if (size === 'small' || compact) {
+      const baseHeight = 280;
+      const featureBonus = hasMultipleSections ? 120 : 60;
+      containerHeight = baseHeight + featureBonus;
+      chartAreaHeight = '200px';
+      containerPadding = 'p-3';
+      titleSize = 'text-sm';
+      spacing = 'space-x-1';
+      gridColumns = 'grid-cols-2';
+    } else if (size === 'large') {
+      const baseHeight = 500;
+      const complexityBonus = Math.floor(dataComplexity * 100);
+      const lineBonus = activeLineCount * 20;
+      containerHeight = baseHeight + complexityBonus + lineBonus;
+      chartAreaHeight = '400px';
+      containerPadding = 'p-6';
+      titleSize = 'text-xl';
+      spacing = 'space-x-3';
+      gridColumns = 'grid-cols-4';
+    } else if (size === 'medium') {
+      const baseHeight = 400;
+      const complexityBonus = Math.floor(dataComplexity * 60);
+      const lineBonus = activeLineCount * 15;
+      containerHeight = baseHeight + complexityBonus + lineBonus;
+      chartAreaHeight = '320px';
+      containerPadding = 'p-4';
+      titleSize = 'text-lg';
+      spacing = 'space-x-2';
+      gridColumns = 'grid-cols-3';
+    } else {
+      // Auto sizing based on content complexity
+      const baseHeight = 350;
+      const dataBonus = Math.floor(dataComplexity * 80);
+      const lineBonus = activeLineCount * 18;
+      const featureBonus = hasMultipleSections ? 150 : 80;
+      
+      containerHeight = baseHeight + dataBonus + lineBonus + featureBonus;
+      chartAreaHeight = `${Math.max(250 + dataBonus + lineBonus, 250)}px`;
+      containerPadding = containerHeight > 450 ? 'p-6' : 'p-4';
+      titleSize = containerHeight > 450 ? 'text-lg' : 'text-base';
+      spacing = containerHeight > 450 ? 'space-x-2' : 'space-x-1';
+      gridColumns = containerHeight > 500 ? 'grid-cols-4' : activeLineCount > 2 ? 'grid-cols-3' : 'grid-cols-2';
+    }
+    
+    return {
+      containerHeight: Math.max(containerHeight, compact ? 250 : 320),
+      containerPadding,
+      chartAreaHeight,
+      titleSize,
+      spacing,
+      gridColumns,
+      showCompactToggles: containerHeight < 350,
+      fontSize: containerHeight < 350 ? 'text-xs' : 'text-sm',
+      marginBottomChart: containerHeight < 400 ? 'mb-2' : 'mb-4',
+      showDetailedStats: containerHeight > 450 && activeLineCount <= 3,
+    };
+  };
+
+  const dimensions = getAdaptiveDimensions();
+
   return (
-    <div className="bg-white p-3 sm:p-6 rounded-lg shadow-lg h-full flex flex-col" style={{ minHeight: '400px' }}>
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 gap-2 flex-shrink-0">
-        <h3 className="text-sm sm:text-lg font-semibold truncate">{title}</h3>
-        <div className="flex items-center space-x-1 sm:space-x-2 justify-end">
-          {zoomDomain && (
+    <div 
+      className={`bg-white ${dimensions.containerPadding} rounded-lg shadow-lg h-full flex flex-col`}
+      style={{ height: `${dimensions.containerHeight}px` }}
+    >
+      <div className={`flex flex-col sm:flex-row sm:justify-between sm:items-center ${dimensions.marginBottomChart} gap-2 flex-shrink-0`}>
+        <div className="flex items-center ${dimensions.spacing}">
+          <h3 className={`${dimensions.titleSize} font-semibold truncate`}>{title}</h3>
+        </div>
+        <div className={`flex items-center ${dimensions.spacing} justify-end`}>
+          {zoomDomain && showBrush && (
             <button
               onClick={resetZoom}
-              className="px-2 sm:px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors"
+              className={`px-2 py-1 ${dimensions.fontSize} bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors`}
             >
               Reset Zoom
             </button>
           )}
-          <span className="text-xs text-gray-500 whitespace-nowrap">
+          <span className={`${dimensions.fontSize} text-gray-500 whitespace-nowrap`}>
             {zoomDomain ? `${displayData.length} of ${data.length} periods` : `${data.length} periods`}
           </span>
         </div>
       </div>
 
-      {/* Line toggles */}
-      <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4 p-2 sm:p-3 bg-gray-50 rounded-lg flex-shrink-0">
-        {Object.entries(activeLines).map(([key, isActive]) => (
-          <button
-            key={key}
-            onClick={() => toggleLine(key as keyof typeof activeLines)}
-            className={`px-2 sm:px-3 py-1 text-xs rounded transition-all ${
-              isActive 
-                ? 'bg-blue-100 text-blue-800 shadow-sm' 
-                : 'bg-white text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <span className={`inline-block w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2 ${
-              key === 'sales' ? 'bg-blue-500' :
-              key === 'revenue' ? 'bg-green-500' :
-              key === 'profit' ? 'bg-orange-500' :
-              'bg-purple-500'
-            }`}></span>
-            <span className="hidden sm:inline">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-            <span className="sm:hidden">{key.charAt(0).toUpperCase()}</span>
-          </button>
-        ))}
-      </div>
+      {/* Line toggles - Enhanced responsive design */}
+      {showToggles && (
+        <div className={`flex flex-wrap gap-1 ${dimensions.marginBottomChart} p-2 bg-gray-50 rounded-lg flex-shrink-0`}>
+          {Object.entries(activeLines).map(([key, isActive]) => (
+            <button
+              key={key}
+              onClick={() => toggleLine(key as keyof typeof activeLines)}
+              className={`px-2 py-1 ${dimensions.fontSize} rounded transition-all ${
+                isActive 
+                  ? 'bg-blue-100 text-blue-800 shadow-sm' 
+                  : 'bg-white text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <span className={`inline-block w-2 h-2 rounded-full mr-1 ${
+                key === 'sales' ? 'bg-blue-500' :
+                key === 'revenue' ? 'bg-green-500' :
+                key === 'profit' ? 'bg-orange-500' :
+                'bg-purple-500'
+              }`}></span>
+              <span className={dimensions.showCompactToggles ? 'hidden' : 'inline'}>
+                {key.charAt(0).toUpperCase() + key.slice(1)}
+              </span>
+              <span className={dimensions.showCompactToggles ? 'inline' : 'hidden'}>
+                {key.charAt(0).toUpperCase()}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
-      <div className="h-48 sm:h-64 lg:h-80 flex-1 min-h-0">
+      {/* Chart Area - Adaptive sizing */}
+      <div className="flex-1 min-h-0" style={{ height: dimensions.chartAreaHeight }}>
         <ResponsiveContainer width="100%" height="100%">
           <RechartsLineChart
             data={displayData}
-            margin={{ top: 5, right: 15, left: 10, bottom: 40 }}
+            margin={{ 
+              top: 5, 
+              right: compact ? 10 : 15, 
+              left: compact ? 5 : 10, 
+              bottom: showBrush ? 40 : 20 
+            }}
             onMouseMove={(e: any) => {
               if (e && e.activeLabel) {
                 setHoveredPoint(e.activeLabel);
@@ -177,32 +290,46 @@ const LineChart: React.FC<LineChartProps> = ({
             <XAxis 
               dataKey="name" 
               stroke="#666"
-              fontSize={10}
-              interval={0}
+              fontSize={compact ? 8 : 10}
+              interval={compact ? 1 : 0}
             />
             <YAxis 
+              yAxisId="left"
               stroke="#666"
-              fontSize={10}
-              width={40}
+              fontSize={compact ? 8 : 10}
+              width={compact ? 30 : 40}
               tickFormatter={(value) => 
-                activeLines.visitors && !activeLines.sales && !activeLines.revenue && !activeLines.profit
-                  ? value >= 1000 ? `${(value/1000).toFixed(0)}k` : value.toString()
-                  : value >= 1000 ? `$${(value/1000).toFixed(0)}k` : `$${value}`
+                value >= 1000 ? `$${(value/1000).toFixed(0)}k` : `$${value}`
               }
             />
+            {/* Add separate Y-axis for visitors when it's active */}
+            {activeLines.visitors && (
+              <YAxis 
+                yAxisId="right"
+                orientation="right"
+                stroke="#8B5CF6"
+                fontSize={compact ? 8 : 10}
+                width={compact ? 30 : 40}
+                tickFormatter={(value) => 
+                  value >= 1000 ? `${(value/1000).toFixed(0)}k` : value.toString()
+                }
+              />
+            )}
             <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: '11px' }} />
+            {!compact && <Legend wrapperStyle={{ fontSize: dimensions.fontSize === 'text-xs' ? '10px' : '11px' }} />}
             
+            {/* Render lines based on active state */}
             {activeLines.sales && (
               <Line 
                 type="monotone" 
                 dataKey="sales" 
                 stroke="#3B82F6"
-                strokeWidth={2}
+                strokeWidth={compact ? 1.5 : 2}
                 name="Sales"
-                dot={<CustomDot />}
-                activeDot={{ r: 4, stroke: '#3B82F6', strokeWidth: 2, fill: '#ffffff' }}
+                dot={compact ? false : <CustomDot />}
+                activeDot={{ r: compact ? 3 : 4, stroke: '#3B82F6', strokeWidth: 2, fill: '#ffffff' }}
                 animationDuration={1000}
+                yAxisId="left"
               />
             )}
             
@@ -211,11 +338,12 @@ const LineChart: React.FC<LineChartProps> = ({
                 type="monotone" 
                 dataKey="revenue" 
                 stroke="#10B981"
-                strokeWidth={2}
+                strokeWidth={compact ? 1.5 : 2}
                 name="Revenue"
-                dot={<CustomDot />}
-                activeDot={{ r: 4, stroke: '#10B981', strokeWidth: 2, fill: '#ffffff' }}
+                dot={compact ? false : <CustomDot />}
+                activeDot={{ r: compact ? 3 : 4, stroke: '#10B981', strokeWidth: 2, fill: '#ffffff' }}
                 animationDuration={1200}
+                yAxisId="left"
               />
             )}
             
@@ -224,11 +352,12 @@ const LineChart: React.FC<LineChartProps> = ({
                 type="monotone" 
                 dataKey="profit" 
                 stroke="#F59E0B"
-                strokeWidth={2}
+                strokeWidth={compact ? 1.5 : 2}
                 name="Profit"
-                dot={<CustomDot />}
-                activeDot={{ r: 4, stroke: '#F59E0B', strokeWidth: 2, fill: '#ffffff' }}
+                dot={compact ? false : <CustomDot />}
+                activeDot={{ r: compact ? 3 : 4, stroke: '#F59E0B', strokeWidth: 2, fill: '#ffffff' }}
                 animationDuration={1400}
+                yAxisId="left"
               />
             )}
             
@@ -237,82 +366,89 @@ const LineChart: React.FC<LineChartProps> = ({
                 type="monotone" 
                 dataKey="visitors" 
                 stroke="#8B5CF6"
-                strokeWidth={2}
+                strokeWidth={compact ? 1.5 : 2}
                 name="Visitors"
-                dot={<CustomDot />}
-                activeDot={{ r: 4, stroke: '#8B5CF6', strokeWidth: 2, fill: '#ffffff' }}
+                dot={compact ? false : <CustomDot />}
+                activeDot={{ r: compact ? 3 : 4, stroke: '#8B5CF6', strokeWidth: 2, fill: '#ffffff' }}
                 animationDuration={1600}
-                yAxisId="visitors"
+                yAxisId="right"
               />
             )}
 
-            {/* Brush for zooming */}
-            <Brush 
-              dataKey="name" 
-              height={25} 
-              stroke="#8884d8"
-              onChange={onBrushChange}
-            />
+            {/* Brush for zooming - Only show if enabled and not compact */}
+            {showBrush && !compact && (
+              <Brush 
+                dataKey="name" 
+                height={25} 
+                stroke="#8884d8"
+                onChange={onBrushChange}
+              />
+            )}
           </RechartsLineChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Statistics panel */}
-      <div className="mt-3 sm:mt-6 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 flex-shrink-0">
-        {Object.entries(activeLines)
-          .filter(([_, isActive]) => isActive)
-          .map(([key]) => {
-            const stats = getStatistics(key as keyof LineData);
-            const isVisitors = key === 'visitors';
-            
-            return (
-              <div key={key} className="bg-gray-50 p-2 sm:p-4 rounded-lg">
-                <div className="flex items-center mb-1 sm:mb-2">
-                  <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2 ${
-                    key === 'sales' ? 'bg-blue-500' :
-                    key === 'revenue' ? 'bg-green-500' :
-                    key === 'profit' ? 'bg-orange-500' :
-                    'bg-purple-500'
-                  }`}></div>
-                  <span className="font-medium text-xs sm:text-sm capitalize truncate">{key}</span>
+      {/* Statistics panel - Enhanced responsive layout */}
+      {showStatistics && (
+        <div className={`mt-3 grid ${dimensions.gridColumns} gap-2 flex-shrink-0`}>
+          {Object.entries(activeLines)
+            .filter(([_, isActive]) => isActive)
+            .map(([key]) => {
+              const stats = getStatistics(key as keyof LineData);
+              const isVisitors = key === 'visitors';
+              
+              return (
+                <div key={key} className="bg-gray-50 p-2 rounded-lg">
+                  <div className="flex items-center mb-1">
+                    <div className={`w-2 h-2 rounded-full mr-1 ${
+                      key === 'sales' ? 'bg-blue-500' :
+                      key === 'revenue' ? 'bg-green-500' :
+                      key === 'profit' ? 'bg-orange-500' :
+                      'bg-purple-500'
+                    }`}></div>
+                    <span className={`font-medium ${dimensions.fontSize} capitalize truncate`}>{key}</span>
+                  </div>
+                  
+                  <div className={`space-y-0.5 ${dimensions.fontSize}`}>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Max:</span>
+                      <span className="font-bold">
+                        {isVisitors ? 
+                          (stats.max >= 1000 ? `${(stats.max/1000).toFixed(0)}k` : stats.max.toLocaleString()) : 
+                          (stats.max >= 1000 ? `$${(stats.max/1000).toFixed(0)}k` : `$${stats.max.toLocaleString()}`)
+                        }
+                      </span>
+                    </div>
+                    {dimensions.showDetailedStats && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Avg:</span>
+                        <span className="font-bold">
+                          {isVisitors ? 
+                            (stats.avg >= 1000 ? `${(stats.avg/1000).toFixed(0)}k` : Math.round(stats.avg).toLocaleString()) : 
+                            (stats.avg >= 1000 ? `$${(stats.avg/1000).toFixed(0)}k` : `$${Math.round(stats.avg).toLocaleString()}`)
+                          }
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Trend:</span>
+                      <span className={`font-bold ${stats.trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {stats.trend >= 0 ? '↗' : '↘'} {Math.abs(stats.trend).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="space-y-0.5 sm:space-y-1 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Max:</span>
-                    <span className="font-bold">
-                      {isVisitors ? 
-                        (stats.max >= 1000 ? `${(stats.max/1000).toFixed(0)}k` : stats.max.toLocaleString()) : 
-                        (stats.max >= 1000 ? `$${(stats.max/1000).toFixed(0)}k` : `$${stats.max.toLocaleString()}`)
-                      }
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Avg:</span>
-                    <span className="font-bold">
-                      {isVisitors ? 
-                        (stats.avg >= 1000 ? `${(stats.avg/1000).toFixed(0)}k` : Math.round(stats.avg).toLocaleString()) : 
-                        (stats.avg >= 1000 ? `$${(stats.avg/1000).toFixed(0)}k` : `$${Math.round(stats.avg).toLocaleString()}`)
-                      }
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Trend:</span>
-                    <span className={`font-bold ${stats.trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {stats.trend >= 0 ? '↗' : '↘'} {Math.abs(stats.trend).toFixed(1)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-      </div>
+              );
+            })}
+        </div>
+      )}
 
-      {/* Instructions */}
-      <div className="mt-2 sm:mt-4 text-xs text-gray-500 text-center">
-        <span className="hidden sm:inline">Use brush at bottom to zoom • Toggle lines above • Hover for details • Click reset to zoom out</span>
-        <span className="sm:hidden">Tap toggles • Brush to zoom</span>
-      </div>
+      {/* Instructions - Only show if enabled and not compact */}
+      {showInstructions && !compact && (
+        <div className={`mt-2 ${dimensions.fontSize} text-gray-500 text-center`}>
+          {showBrush ? 'Use brush at bottom to zoom • ' : ''}Toggle lines above • Hover for details{showBrush ? ' • Click reset to zoom out' : ''}
+        </div>
+      )}
     </div>
   );
 };
