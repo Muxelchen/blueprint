@@ -267,7 +267,7 @@ npm run deploy:preview   # Deploy to preview environment
 
 ## 📈 Recent Improvements
 
-### Latest Updates (Dezember 2024)
+### Latest Updates (Juni 2025)
 - ✅ **Widget Layout Optimization**: Improved from 3-column to 2-column layout for better widget spacing and readability
 - ✅ **Widget Size Improvements**: Ongoing optimization of individual widget dimensions for better visual hierarchy
 - ✅ **Enhanced CLI System**: Streamlined app generation with intelligent templates
