@@ -181,7 +181,7 @@ const ComponentShowcase: React.FC = () => {
             <h2 className={`text-2xl font-bold mb-6 ${
               isDarkMode ? 'text-white' : 'text-gray-900'
             }`}>Chart & Widget Components</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-full">
               {[
                 { title: 'Area Chart', component: <AreaChart /> },
                 { title: 'Bar Chart', component: <BarChart /> },

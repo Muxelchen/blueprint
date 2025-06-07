@@ -6,7 +6,10 @@
 Die widgets sollen verbessert werden - alle haben Größenprobleme und verwenden die gleiche Größe obwohl sie unterschiedliche Größen benötigen.
 
 ### Layout Änderung
-Aus 3 Widgets pro Reihe sollen 2 Widgets pro Reihe werden, damit sie mehr Platz haben.
+✅ **ERLEDIGT**: Aus 3 Widgets pro Reihe sollen 2 Widgets pro Reihe werden, damit sie mehr Platz haben.
+- Geändert in App.tsx: `lg:grid-cols-3` → `md:grid-cols-2`
+- Jetzt zeigt das Layout maximal 2 Widgets nebeneinander
+- Donut Chart ist automatisch in die nächste Reihe gerutscht
 
 ### Detaillierter Prompt für Widget-Verbesserungen:
 
@@ -51,6 +54,10 @@ I love all the chart widgets. They are super great but there are a few problems 
 - [ ] Timeline.tsx
 - [ ] Treemap.tsx
 - [ ] WeatherWidget.tsx
+
+
+
+
 
 ## UI/UX Anpassungssystem - Schnelle Konfiguration
 
