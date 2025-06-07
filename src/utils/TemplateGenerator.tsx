@@ -5,7 +5,7 @@ import { TEMPLATE_REGISTRY, templateMetadata } from '../templates';
 // Template Generator - Dynamic template creation utility
 export class TemplateGenerator {
   private static instance: TemplateGenerator;
-  
+
   public static getInstance(): TemplateGenerator {
     if (!TemplateGenerator.instance) {
       TemplateGenerator.instance = new TemplateGenerator();
@@ -17,7 +17,7 @@ export class TemplateGenerator {
   generateTemplate(templateKey: string, customizations?: TemplateCustomizations): string {
     const template = TEMPLATE_REGISTRY[templateKey as keyof typeof TEMPLATE_REGISTRY];
     const metadata = templateMetadata[templateKey as keyof typeof templateMetadata];
-    
+
     if (!template || !metadata) {
       throw new Error(`Template "${templateKey}" not found`);
     }
@@ -27,15 +27,15 @@ export class TemplateGenerator {
 
   // Build template with customizations
   private buildTemplateCode(
-    templateKey: string, 
-    template: any, 
+    templateKey: string,
+    template: any,
     metadata: any,
     customizations?: TemplateCustomizations
   ): string {
     const imports = this.generateImports(metadata.dependencies);
     const componentName = `${this.capitalize(templateKey)}Template`;
     const features = customizations?.features || metadata.features;
-    
+
     return `
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -67,16 +67,15 @@ export default ${componentName};
   // Generate imports based on dependencies
   private generateImports(dependencies: string[]): string {
     const importMap: Record<string, string> = {
-      'recharts': "import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';",
+      recharts:
+        "import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';",
       'lucide-react': "import { BarChart3, Users, TrendingUp, Settings } from 'lucide-react';",
       'react-router-dom': "import { useNavigate, useLocation } from 'react-router-dom';",
-      'leaflet': "import L from 'leaflet';",
-      'chart.js': "import { Chart as ChartJS } from 'chart.js';"
+      leaflet: "import L from 'leaflet';",
+      'chart.js': "import { Chart as ChartJS } from 'chart.js';",
     };
 
-    return dependencies
-      .map(dep => importMap[dep] || `// Import ${dep}`)
-      .join('\n');
+    return dependencies.map(dep => importMap[dep] || `// Import ${dep}`).join('\n');
   }
 
   // Generate feature-based components
@@ -89,7 +88,7 @@ export default ${componentName};
           <KPICard title="Conversion" value="3.4%" change="+15%" />
           <KPICard title="Growth" value="23%" change="+5%" />
         </div>`,
-      'Charts': `
+      Charts: `
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <ChartContainer title="Analytics Overview">
             <div className="h-64 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -116,7 +115,7 @@ export default ${componentName};
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             Filter
           </button>
-        </div>`
+        </div>`,
     };
 
     return features
@@ -174,13 +173,13 @@ export const ${type.charAt(0).toUpperCase() + type.slice(1)}Template: React.FC =
             >
               <h3 className="text-xl font-semibold mb-2">{template.name}</h3>
               <p className="text-gray-600 mb-4">{template.description}</p>
-              
+
               {metadata && (
                 <>
                   <div className="mb-3">
                     <h4 className="font-medium text-sm text-gray-700 mb-1">Features:</h4>
                     {(metadata.features || []).map((feature: string) => (
-                      <span 
+                      <span
                         key={feature}
                         className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1 mb-1"
                       >
@@ -188,11 +187,11 @@ export const ${type.charAt(0).toUpperCase() + type.slice(1)}Template: React.FC =
                       </span>
                     ))}
                   </div>
-                  
+
                   <div className="mb-4">
                     <h4 className="font-medium text-sm text-gray-700 mb-1">Dependencies:</h4>
                     {(metadata.dependencies || []).map((dep: string) => (
-                      <span 
+                      <span
                         key={dep}
                         className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded mr-1 mb-1"
                       >
@@ -202,8 +201,8 @@ export const ${type.charAt(0).toUpperCase() + type.slice(1)}Template: React.FC =
                   </div>
                 </>
               )}
-              
-              <button 
+
+              <button
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
                 onClick={() => this.generateTemplate(key)}
               >
@@ -233,7 +232,7 @@ export const generateQuickTemplate = (type: string, name: string = type): string
 };
 
 export const generateCustomTemplate = (
-  type: string, 
+  type: string,
   customizations: TemplateCustomizations
 ): string => {
   const generator = TemplateGenerator.getInstance();
@@ -244,19 +243,19 @@ export const generateCustomTemplate = (
 export const generateTemplatePreview = (templateKey: string): React.FC => {
   const template = TEMPLATE_REGISTRY[templateKey as keyof typeof TEMPLATE_REGISTRY];
   const metadata = templateMetadata[templateKey as keyof typeof templateMetadata];
-  
+
   return () => (
     <div className="p-6 bg-white rounded-lg border border-gray-200 max-w-2xl">
       <h3 className="text-xl font-bold text-gray-900 mb-2">{template.name}</h3>
       <p className="text-gray-600 mb-4">{template.description}</p>
-      
+
       {metadata && (
         <div className="space-y-3">
           <div>
             <span className="text-sm font-medium text-gray-700">Features:</span>
             <div className="flex flex-wrap gap-2 mt-1">
               {(metadata.features || []).map((feature: string) => (
-                <span 
+                <span
                   key={feature}
                   className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
                 >
@@ -265,12 +264,12 @@ export const generateTemplatePreview = (templateKey: string): React.FC => {
               ))}
             </div>
           </div>
-          
+
           <div>
             <span className="text-sm font-medium text-gray-700">Dependencies:</span>
             <div className="flex flex-wrap gap-2 mt-1">
               {(metadata.dependencies || []).map((dep: string) => (
-                <span 
+                <span
                   key={dep}
                   className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full"
                 >

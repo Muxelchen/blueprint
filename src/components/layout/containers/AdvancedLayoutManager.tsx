@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { 
-  Grid, 
-  Maximize2, 
-  Minimize2, 
-  RotateCcw, 
+import {
+  Grid,
+  Maximize2,
+  Minimize2,
+  RotateCcw,
   Lock,
   Unlock,
   Copy,
   Trash2,
   Plus,
   Minus,
-  X
+  X,
 } from 'lucide-react';
 
 export interface LayoutWidget {
@@ -97,7 +97,7 @@ const sampleWidgets: LayoutWidget[] = [
     maxHeight: 6,
     category: 'Analytics',
     icon: <Grid className="w-4 h-4" />,
-    description: 'Interactive analytics chart widget'
+    description: 'Interactive analytics chart widget',
   },
   {
     id: 'kpi-card',
@@ -117,7 +117,7 @@ const sampleWidgets: LayoutWidget[] = [
     maxHeight: 3,
     category: 'Metrics',
     icon: <Grid className="w-4 h-4" />,
-    description: 'Key performance indicator card'
+    description: 'Key performance indicator card',
   },
   {
     id: 'data-table',
@@ -147,8 +147,8 @@ const sampleWidgets: LayoutWidget[] = [
     maxHeight: 8,
     category: 'Data',
     icon: <Grid className="w-4 h-4" />,
-    description: 'Sortable data table widget'
-  }
+    description: 'Sortable data table widget',
+  },
 ];
 
 const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
@@ -170,7 +170,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
   onWidgetAdd,
   onWidgetRemove,
   onSaveLayout,
-  className = ''
+  className = '',
 }) => {
   const [layout, setLayout] = useState<LayoutConfig>(
     initialLayout || {
@@ -183,7 +183,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
           x: 0,
           y: 0,
           width: 4,
-          height: 3
+          height: 3,
         },
         {
           id: 'item-2',
@@ -191,7 +191,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
           x: 4,
           y: 0,
           width: 2,
-          height: 2
+          height: 2,
         },
         {
           id: 'item-3',
@@ -199,15 +199,15 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
           x: 0,
           y: 3,
           width: 6,
-          height: 3
-        }
+          height: 3,
+        },
       ],
       gridSize,
       cols,
       rows,
       gap,
       created: new Date(),
-      modified: new Date()
+      modified: new Date(),
     }
   );
 
@@ -222,7 +222,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
     zoom: 1,
     savedLayouts: [] as LayoutConfig[],
     showSaveDialog: false,
-    layoutName: ''
+    layoutName: '',
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -234,7 +234,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
-      
+
       autoSaveTimeoutRef.current = setTimeout(() => {
         onLayoutChange(layout);
       }, autoSaveInterval);
@@ -247,122 +247,144 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
     };
   }, [layout, autoSave, autoSaveInterval, onLayoutChange]);
 
-  const snapToGridSize = useCallback((value: number) => {
-    if (!snapToGrid) return value;
-    return Math.round(value / gridSize) * gridSize;
-  }, [snapToGrid, gridSize]);
+  const snapToGridSize = useCallback(
+    (value: number) => {
+      if (!snapToGrid) return value;
+      return Math.round(value / gridSize) * gridSize;
+    },
+    [snapToGrid, gridSize]
+  );
 
-  const checkCollision = useCallback((item: LayoutItem, newX: number, newY: number, newWidth?: number, newHeight?: number): boolean => {
-    if (!enableCollisions) return false;
+  const checkCollision = useCallback(
+    (
+      item: LayoutItem,
+      newX: number,
+      newY: number,
+      newWidth?: number,
+      newHeight?: number
+    ): boolean => {
+      if (!enableCollisions) return false;
 
-    const itemWidth = newWidth || item.width;
-    const itemHeight = newHeight || item.height;
+      const itemWidth = newWidth || item.width;
+      const itemHeight = newHeight || item.height;
 
-    return layout.items.some(otherItem => {
-      if (otherItem.id === item.id) return false;
-      
-      return !(
-        newX >= otherItem.x + otherItem.width ||
-        newX + itemWidth <= otherItem.x ||
-        newY >= otherItem.y + otherItem.height ||
-        newY + itemHeight <= otherItem.y
-      );
-    });
-  }, [layout.items, enableCollisions]);
+      return layout.items.some(otherItem => {
+        if (otherItem.id === item.id) return false;
+
+        return !(
+          newX >= otherItem.x + otherItem.width ||
+          newX + itemWidth <= otherItem.x ||
+          newY >= otherItem.y + otherItem.height ||
+          newY + itemHeight <= otherItem.y
+        );
+      });
+    },
+    [layout.items, enableCollisions]
+  );
 
   const updateLayoutItem = useCallback((itemId: string, updates: Partial<LayoutItem>) => {
     setLayout(prev => ({
       ...prev,
-      items: prev.items.map(item =>
-        item.id === itemId ? { ...item, ...updates } : item
-      ),
-      modified: new Date()
+      items: prev.items.map(item => (item.id === itemId ? { ...item, ...updates } : item)),
+      modified: new Date(),
     }));
   }, []);
 
-  const addWidget = useCallback((widgetId: string, x?: number, y?: number) => {
-    const widget = widgets.find(w => w.id === widgetId);
-    if (!widget) return;
+  const addWidget = useCallback(
+    (widgetId: string, x?: number, y?: number) => {
+      const widget = widgets.find(w => w.id === widgetId);
+      if (!widget) return;
 
-    const newItem: LayoutItem = {
-      id: `item-${Date.now()}`,
-      widgetId,
-      x: x || 0,
-      y: y || 0,
-      width: widget.minWidth || 2,
-      height: widget.minHeight || 2
-    };
+      const newItem: LayoutItem = {
+        id: `item-${Date.now()}`,
+        widgetId,
+        x: x || 0,
+        y: y || 0,
+        width: widget.minWidth || 2,
+        height: widget.minHeight || 2,
+      };
 
-    // Find empty space if position not specified
-    if (x === undefined || y === undefined) {
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          if (!checkCollision(newItem, col, row)) {
-            newItem.x = col;
-            newItem.y = row;
-            break;
+      // Find empty space if position not specified
+      if (x === undefined || y === undefined) {
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            if (!checkCollision(newItem, col, row)) {
+              newItem.x = col;
+              newItem.y = row;
+              break;
+            }
           }
+          if (newItem.x !== undefined) break;
         }
-        if (newItem.x !== undefined) break;
       }
-    }
 
-    setLayout(prev => ({
-      ...prev,
-      items: [...prev.items, newItem],
-      modified: new Date()
-    }));
-
-    onWidgetAdd?.(widget);
-  }, [widgets, rows, cols, checkCollision, onWidgetAdd]);
-
-  const removeWidget = useCallback((itemId: string) => {
-    const item = layout.items.find(i => i.id === itemId);
-    if (item) {
       setLayout(prev => ({
         ...prev,
-        items: prev.items.filter(i => i.id !== itemId),
-        modified: new Date()
+        items: [...prev.items, newItem],
+        modified: new Date(),
       }));
-      onWidgetRemove?.(item.widgetId);
-    }
-  }, [layout.items, onWidgetRemove]);
 
-  const duplicateWidget = useCallback((itemId: string) => {
-    const item = layout.items.find(i => i.id === itemId);
-    if (!item) return;
+      onWidgetAdd?.(widget);
+    },
+    [widgets, rows, cols, checkCollision, onWidgetAdd]
+  );
 
-    const newItem: LayoutItem = {
-      ...item,
-      id: `item-${Date.now()}`,
-      x: Math.min(item.x + 1, cols - item.width),
-      y: Math.min(item.y + 1, rows - item.height)
-    };
+  const removeWidget = useCallback(
+    (itemId: string) => {
+      const item = layout.items.find(i => i.id === itemId);
+      if (item) {
+        setLayout(prev => ({
+          ...prev,
+          items: prev.items.filter(i => i.id !== itemId),
+          modified: new Date(),
+        }));
+        onWidgetRemove?.(item.widgetId);
+      }
+    },
+    [layout.items, onWidgetRemove]
+  );
 
-    setLayout(prev => ({
-      ...prev,
-      items: [...prev.items, newItem],
-      modified: new Date()
-    }));
-  }, [layout.items, cols, rows]);
+  const duplicateWidget = useCallback(
+    (itemId: string) => {
+      const item = layout.items.find(i => i.id === itemId);
+      if (!item) return;
 
-  const saveLayout = useCallback((name?: string) => {
-    const layoutToSave = {
-      ...layout,
-      id: `layout-${Date.now()}`,
-      name: name || state.layoutName || `Layout ${Date.now()}`,
-      modified: new Date()
-    };
+      const newItem: LayoutItem = {
+        ...item,
+        id: `item-${Date.now()}`,
+        x: Math.min(item.x + 1, cols - item.width),
+        y: Math.min(item.y + 1, rows - item.height),
+      };
 
-    setState(prev => ({
-      ...prev,
-      savedLayouts: [...prev.savedLayouts, layoutToSave],
-      showSaveDialog: false,
-      layoutName: ''
-    }));
+      setLayout(prev => ({
+        ...prev,
+        items: [...prev.items, newItem],
+        modified: new Date(),
+      }));
+    },
+    [layout.items, cols, rows]
+  );
 
-    onSaveLayout?.(layoutToSave);
-  }, [layout, state.layoutName, onSaveLayout]);
+  const saveLayout = useCallback(
+    (name?: string) => {
+      const layoutToSave = {
+        ...layout,
+        id: `layout-${Date.now()}`,
+        name: name || state.layoutName || `Layout ${Date.now()}`,
+        modified: new Date(),
+      };
+
+      setState(prev => ({
+        ...prev,
+        savedLayouts: [...prev.savedLayouts, layoutToSave],
+        showSaveDialog: false,
+        layoutName: '',
+      }));
+
+      onSaveLayout?.(layoutToSave);
+    },
+    [layout, state.layoutName, onSaveLayout]
+  );
 
   // Comment out unused loadLayout function
   // const loadLayout = useCallback((layoutId: string) => {
@@ -377,107 +399,119 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
     setLayout(prev => ({
       ...prev,
       items: [],
-      modified: new Date()
+      modified: new Date(),
     }));
   }, []);
 
   // Mouse event handlers
-  const handleMouseDown = useCallback((e: React.MouseEvent, itemId: string, action: 'drag' | 'resize', direction?: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent, itemId: string, action: 'drag' | 'resize', direction?: string) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
 
-    setState(prev => ({
-      ...prev,
-      selectedItem: itemId,
-      ...(action === 'drag' && {
-        draggedItem: itemId,
-        dragOffset: { x: offsetX, y: offsetY }
-      }),
-      ...(action === 'resize' && {
-        resizingItem: itemId,
-        resizeDirection: direction || ''
-      })
-    }));
-  }, []);
+      setState(prev => ({
+        ...prev,
+        selectedItem: itemId,
+        ...(action === 'drag' && {
+          draggedItem: itemId,
+          dragOffset: { x: offsetX, y: offsetY },
+        }),
+        ...(action === 'resize' && {
+          resizingItem: itemId,
+          resizeDirection: direction || '',
+        }),
+      }));
+    },
+    []
+  );
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!state.draggedItem && !state.resizingItem) return;
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!state.draggedItem && !state.resizingItem) return;
 
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
 
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
 
-    if (state.draggedItem) {
-      const item = layout.items.find(i => i.id === state.draggedItem);
-      if (!item) return;
+      if (state.draggedItem) {
+        const item = layout.items.find(i => i.id === state.draggedItem);
+        if (!item) return;
 
-      const newX = snapToGridSize(mouseX - state.dragOffset.x) / gridSize;
-      const newY = snapToGridSize(mouseY - state.dragOffset.y) / gridSize;
+        const newX = snapToGridSize(mouseX - state.dragOffset.x) / gridSize;
+        const newY = snapToGridSize(mouseY - state.dragOffset.y) / gridSize;
 
-      const boundedX = Math.max(0, Math.min(newX, cols - item.width));
-      const boundedY = Math.max(0, Math.min(newY, rows - item.height));
+        const boundedX = Math.max(0, Math.min(newX, cols - item.width));
+        const boundedY = Math.max(0, Math.min(newY, rows - item.height));
 
-      if (!checkCollision(item, boundedX, boundedY)) {
-        updateLayoutItem(state.draggedItem, {
-          x: boundedX,
-          y: boundedY
-        });
-      }
-    }
-
-    if (state.resizingItem) {
-      const item = layout.items.find(i => i.id === state.resizingItem);
-      if (!item) return;
-
-      const widget = widgets.find(w => w.id === item.widgetId);
-      const minWidth = widget?.minWidth || 1;
-      const minHeight = widget?.minHeight || 1;
-      const maxWidth = widget?.maxWidth || cols;
-      const maxHeight = widget?.maxHeight || rows;
-
-      let newWidth = item.width;
-      let newHeight = item.height;
-
-      if (state.resizeDirection.includes('right')) {
-        newWidth = Math.max(minWidth, Math.min(maxWidth, snapToGridSize(mouseX) / gridSize - item.x));
-      }
-      if (state.resizeDirection.includes('bottom')) {
-        newHeight = Math.max(minHeight, Math.min(maxHeight, snapToGridSize(mouseY) / gridSize - item.y));
+        if (!checkCollision(item, boundedX, boundedY)) {
+          updateLayoutItem(state.draggedItem, {
+            x: boundedX,
+            y: boundedY,
+          });
+        }
       }
 
-      // Ensure item doesn't go out of bounds
-      newWidth = Math.min(newWidth, cols - item.x);
-      newHeight = Math.min(newHeight, rows - item.y);
+      if (state.resizingItem) {
+        const item = layout.items.find(i => i.id === state.resizingItem);
+        if (!item) return;
 
-      if (!checkCollision(item, item.x, item.y, newWidth, newHeight)) {
-        updateLayoutItem(state.resizingItem, {
-          width: newWidth,
-          height: newHeight
-        });
+        const widget = widgets.find(w => w.id === item.widgetId);
+        const minWidth = widget?.minWidth || 1;
+        const minHeight = widget?.minHeight || 1;
+        const maxWidth = widget?.maxWidth || cols;
+        const maxHeight = widget?.maxHeight || rows;
+
+        let newWidth = item.width;
+        let newHeight = item.height;
+
+        if (state.resizeDirection.includes('right')) {
+          newWidth = Math.max(
+            minWidth,
+            Math.min(maxWidth, snapToGridSize(mouseX) / gridSize - item.x)
+          );
+        }
+        if (state.resizeDirection.includes('bottom')) {
+          newHeight = Math.max(
+            minHeight,
+            Math.min(maxHeight, snapToGridSize(mouseY) / gridSize - item.y)
+          );
+        }
+
+        // Ensure item doesn't go out of bounds
+        newWidth = Math.min(newWidth, cols - item.x);
+        newHeight = Math.min(newHeight, rows - item.y);
+
+        if (!checkCollision(item, item.x, item.y, newWidth, newHeight)) {
+          updateLayoutItem(state.resizingItem, {
+            width: newWidth,
+            height: newHeight,
+          });
+        }
       }
-    }
-  }, [
-    state.draggedItem,
-    state.resizingItem,
-    state.dragOffset,
-    state.resizeDirection,
-    layout.items,
-    snapToGridSize,
-    gridSize,
-    cols,
-    rows,
-    checkCollision,
-    updateLayoutItem,
-    widgets
-  ]);
+    },
+    [
+      state.draggedItem,
+      state.resizingItem,
+      state.dragOffset,
+      state.resizeDirection,
+      layout.items,
+      snapToGridSize,
+      gridSize,
+      cols,
+      rows,
+      checkCollision,
+      updateLayoutItem,
+      widgets,
+    ]
+  );
 
   const handleMouseUp = useCallback(() => {
     setState(prev => ({
@@ -485,7 +519,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
       draggedItem: null,
       resizingItem: null,
       resizeDirection: '',
-      dragOffset: { x: 0, y: 0 }
+      dragOffset: { x: 0, y: 0 },
     }));
   }, []);
 
@@ -501,7 +535,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
     // Enhanced sizing calculation with minimum viable dimensions
     const minGridWidth = Math.max(item.width, widget.minWidth || 1);
     const minGridHeight = Math.max(item.height, widget.minHeight || 1);
-    
+
     const style = {
       left: item.x * gridSize,
       top: item.y * gridSize,
@@ -510,7 +544,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
       minWidth: (widget.minWidth || 1) * gridSize - gap,
       minHeight: (widget.minHeight || 1) * gridSize - gap,
       zIndex: item.zIndex || 1,
-      transform: state.viewMode === 'preview' ? `scale(${state.zoom})` : undefined
+      transform: state.viewMode === 'preview' ? `scale(${state.zoom})` : undefined,
     };
 
     return (
@@ -525,7 +559,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
         onClick={() => setState(prev => ({ ...prev, selectedItem: item.id }))}
         onMouseDown={
           !isLocked && widget.movable !== false && state.viewMode === 'edit'
-            ? (e) => handleMouseDown(e, item.id, 'drag')
+            ? e => handleMouseDown(e, item.id, 'drag')
             : undefined
         }
       >
@@ -536,22 +570,28 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
               {widget.icon && <div>{widget.icon}</div>}
               <span className="font-medium">{widget.title}</span>
               {isLocked && <Lock className="w-3 h-3 text-gray-400" />}
-              <span className="text-gray-400">({minGridWidth}×{minGridHeight})</span>
+              <span className="text-gray-400">
+                ({minGridWidth}×{minGridHeight})
+              </span>
             </div>
             <div className="flex items-center space-x-1">
               {widget.collapsible && (
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     updateLayoutItem(item.id, { collapsed: !item.collapsed });
                   }}
                   className="p-1 hover:bg-gray-100 rounded"
                 >
-                  {item.collapsed ? <Maximize2 className="w-3 h-3" /> : <Minimize2 className="w-3 h-3" />}
+                  {item.collapsed ? (
+                    <Maximize2 className="w-3 h-3" />
+                  ) : (
+                    <Minimize2 className="w-3 h-3" />
+                  )}
                 </button>
               )}
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   duplicateWidget(item.id);
                 }}
@@ -561,7 +601,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
               </button>
               {widget.removable !== false && (
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     removeWidget(item.id);
                   }}
@@ -584,29 +624,33 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
         )}
 
         {/* Enhanced Resize Handles */}
-        {state.viewMode === 'edit' && !isLocked && widget.resizable !== false && isSelected && !item.collapsed && (
-          <>
-            {/* Corner resize handle */}
-            <div
-              className="absolute bottom-0 right-0 w-4 h-4 bg-blue-500 cursor-se-resize hover:bg-blue-600 transition-colors"
-              style={{
-                borderRadius: '0 0 4px 0',
-                clipPath: 'polygon(100% 0, 100% 100%, 0 100%)'
-              }}
-              onMouseDown={(e) => handleMouseDown(e, item.id, 'resize', 'bottom-right')}
-            />
-            
-            {/* Edge resize handles */}
-            <div
-              className="absolute bottom-0 right-4 left-4 h-2 bg-blue-300 cursor-s-resize opacity-0 hover:opacity-100 transition-opacity"
-              onMouseDown={(e) => handleMouseDown(e, item.id, 'resize', 'bottom')}
-            />
-            <div
-              className="absolute top-4 bottom-4 right-0 w-2 bg-blue-300 cursor-e-resize opacity-0 hover:opacity-100 transition-opacity"
-              onMouseDown={(e) => handleMouseDown(e, item.id, 'resize', 'right')}
-            />
-          </>
-        )}
+        {state.viewMode === 'edit' &&
+          !isLocked &&
+          widget.resizable !== false &&
+          isSelected &&
+          !item.collapsed && (
+            <>
+              {/* Corner resize handle */}
+              <div
+                className="absolute bottom-0 right-0 w-4 h-4 bg-blue-500 cursor-se-resize hover:bg-blue-600 transition-colors"
+                style={{
+                  borderRadius: '0 0 4px 0',
+                  clipPath: 'polygon(100% 0, 100% 100%, 0 100%)',
+                }}
+                onMouseDown={e => handleMouseDown(e, item.id, 'resize', 'bottom-right')}
+              />
+
+              {/* Edge resize handles */}
+              <div
+                className="absolute bottom-0 right-4 left-4 h-2 bg-blue-300 cursor-s-resize opacity-0 hover:opacity-100 transition-opacity"
+                onMouseDown={e => handleMouseDown(e, item.id, 'resize', 'bottom')}
+              />
+              <div
+                className="absolute top-4 bottom-4 right-0 w-2 bg-blue-300 cursor-e-resize opacity-0 hover:opacity-100 transition-opacity"
+                onMouseDown={e => handleMouseDown(e, item.id, 'resize', 'right')}
+              />
+            </>
+          )}
       </div>
     );
   };
@@ -619,7 +663,12 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => setState(prev => ({ ...prev, viewMode: prev.viewMode === 'edit' ? 'preview' : 'edit' }))}
+              onClick={() =>
+                setState(prev => ({
+                  ...prev,
+                  viewMode: prev.viewMode === 'edit' ? 'preview' : 'edit',
+                }))
+              }
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                 state.viewMode === 'edit'
                   ? 'bg-blue-100 text-blue-700'
@@ -672,7 +721,9 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
           {state.viewMode === 'preview' && (
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => setState(prev => ({ ...prev, zoom: Math.max(0.5, prev.zoom - 0.1) }))}
+                onClick={() =>
+                  setState(prev => ({ ...prev, zoom: Math.max(0.5, prev.zoom - 0.1) }))
+                }
                 className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
               >
                 <Minus className="w-4 h-4" />
@@ -753,7 +804,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
             type="text"
             placeholder="Layout name"
             value={state.layoutName}
-            onChange={(e) => setState(prev => ({ ...prev, layoutName: e.target.value }))}
+            onChange={e => setState(prev => ({ ...prev, layoutName: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
           />
           <div className="flex justify-end space-x-3">
@@ -778,7 +829,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
   return (
     <div className={`h-full flex flex-col bg-gray-50 ${className}`}>
       {renderToolbar()}
-      
+
       <div className="flex-1 relative overflow-hidden">
         <div
           ref={containerRef}
@@ -796,7 +847,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
                   linear-gradient(to right, #e5e7eb 1px, transparent 1px),
                   linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
                 `,
-                backgroundSize: `${gridSize}px ${gridSize}px`
+                backgroundSize: `${gridSize}px ${gridSize}px`,
               }}
             />
           )}
@@ -807,7 +858,7 @@ const AdvancedLayoutManager: React.FC<AdvancedLayoutManagerProps> = ({
             style={{
               width: cols * gridSize,
               height: rows * gridSize,
-              minHeight: '100%'
+              minHeight: '100%',
             }}
           >
             {layout.items.map(renderWidget)}

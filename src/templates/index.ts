@@ -11,29 +11,34 @@ export const templateMetadata = {
     description: 'General-purpose dashboard with KPIs, charts, and data tables',
     component: 'DashboardTemplate',
     dependencies: ['recharts', 'zustand'],
-    features: ['KPI Cards', 'Charts', 'Data Tables', 'Quick Actions']
+    features: ['KPI Cards', 'Charts', 'Data Tables', 'Quick Actions'],
   },
   analytics: {
     name: 'Analytics Template',
     description: 'Advanced analytics dashboard with real-time charts and metrics',
     component: 'AnalyticsTemplate',
     dependencies: ['recharts', 'chart.js', 'date-fns'],
-    features: ['Real-time Charts', 'Goal Tracking', 'Advanced Metrics', 'Heat Maps']
+    features: ['Real-time Charts', 'Goal Tracking', 'Advanced Metrics', 'Heat Maps'],
   },
   'data-table': {
     name: 'Data Table Template',
     description: 'Data management with CRUD operations, search, and filtering',
     component: 'DataTableTemplate',
     dependencies: ['react-router-dom'],
-    features: ['Advanced Tables', 'Search & Filter', 'CRUD Operations', 'Bulk Actions']
+    features: ['Advanced Tables', 'Search & Filter', 'CRUD Operations', 'Bulk Actions'],
   },
   map: {
     name: 'Map Dashboard Template',
     description: 'Location-based dashboard with interactive maps and geospatial data',
     component: 'MapDashboardTemplate',
     dependencies: ['leaflet', 'react-leaflet'],
-    features: ['Interactive Maps', 'Location Tracking', 'Route Optimization', 'Geospatial Analytics']
-  }
+    features: [
+      'Interactive Maps',
+      'Location Tracking',
+      'Route Optimization',
+      'Geospatial Analytics',
+    ],
+  },
 };
 
 // Template registry for component selection
@@ -42,24 +47,24 @@ export const TEMPLATE_REGISTRY = {
     name: 'Dashboard Template',
     component: 'DashboardTemplate',
     description: 'General-purpose dashboard with KPIs, charts, and data tables',
-    category: 'dashboard'
+    category: 'dashboard',
   },
   analytics: {
-    name: 'Analytics Template', 
+    name: 'Analytics Template',
     component: 'AnalyticsTemplate',
     description: 'Advanced analytics dashboard with real-time charts and metrics',
-    category: 'analytics'
+    category: 'analytics',
   },
   'data-table': {
     name: 'Data Table Template',
-    component: 'DataTableTemplate', 
+    component: 'DataTableTemplate',
     description: 'Data management with CRUD operations, search, and filtering',
-    category: 'data'
+    category: 'data',
   },
   map: {
     name: 'Map Dashboard Template',
     component: 'MapDashboardTemplate',
     description: 'Location-based dashboard with interactive maps and geospatial data',
-    category: 'maps'
-  }
+    category: 'maps',
+  },
 };

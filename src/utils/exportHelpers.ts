@@ -40,54 +40,63 @@ export const transformDataForExport = (data: any[], format: string): any => {
 
 export const convertToCSV = (data: any[], delimiter = ','): string => {
   if (!data || data.length === 0) return '';
-  
+
   const headers = Object.keys(data[0]);
   const csvContent = [
     headers.join(delimiter),
-    ...data.map(row => 
-      headers.map(header => {
-        const value = row[header];
-        const stringValue = value === null || value === undefined ? '' : String(value);
-        // Escape quotes and wrap in quotes if contains delimiter
-        if (stringValue.includes(delimiter) || stringValue.includes('"') || stringValue.includes('\n')) {
-          return `"${stringValue.replace(/"/g, '""')}"`;
-        }
-        return stringValue;
-      }).join(delimiter)
-    )
+    ...data.map(row =>
+      headers
+        .map(header => {
+          const value = row[header];
+          const stringValue = value === null || value === undefined ? '' : String(value);
+          // Escape quotes and wrap in quotes if contains delimiter
+          if (
+            stringValue.includes(delimiter) ||
+            stringValue.includes('"') ||
+            stringValue.includes('\n')
+          ) {
+            return `"${stringValue.replace(/"/g, '""')}"`;
+          }
+          return stringValue;
+        })
+        .join(delimiter)
+    ),
   ].join('\n');
-  
+
   return csvContent;
 };
 
-export const convertToWorkbook = async (data: any[], sheetName = 'Sheet1'): Promise<ExcelJS.Workbook> => {
+export const convertToWorkbook = async (
+  data: any[],
+  sheetName = 'Sheet1'
+): Promise<ExcelJS.Workbook> => {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet(sheetName);
-  
+
   if (data && data.length > 0) {
     const headers = Object.keys(data[0]);
     worksheet.addRow(headers);
-    
+
     data.forEach(row => {
       const values = headers.map(header => row[header]);
       worksheet.addRow(values);
     });
-    
+
     // Style the header row
     worksheet.getRow(1).font = { bold: true };
     worksheet.getRow(1).fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FFE6E6E6' }
+      fgColor: { argb: 'FFE6E6E6' },
     };
   }
-  
+
   return workbook;
 };
 
 // Advanced export functions
 export const exportChartAsPNG = async (
-  elementId: string, 
+  elementId: string,
   options: ChartExportOptions = { format: 'png' }
 ): Promise<void> => {
   const element = document.getElementById(elementId);
@@ -101,7 +110,7 @@ export const exportChartAsPNG = async (
       width: options.width,
       height: options.height,
       useCORS: true,
-      allowTaint: false
+      allowTaint: false,
     } as any);
 
     canvas.toBlob((blob: Blob | null) => {
@@ -115,7 +124,10 @@ export const exportChartAsPNG = async (
   }
 };
 
-export const exportChartAsSVG = (elementId: string, options: ChartExportOptions = { format: 'svg' }): void => {
+export const exportChartAsSVG = (
+  elementId: string,
+  options: ChartExportOptions = { format: 'svg' }
+): void => {
   const element = document.getElementById(elementId);
   if (!element) throw new Error(`Element with id ${elementId} not found`);
 
@@ -125,64 +137,74 @@ export const exportChartAsSVG = (elementId: string, options: ChartExportOptions 
   const svgElement = svgElements[0];
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgElement);
-  
+
   const blob = new Blob([svgString], { type: 'image/svg+xml' });
   saveAs(blob, `${options.filename || 'chart'}.svg`);
 };
 
-export const exportTableToExcel = async (data: any[], options: TableExportOptions = { format: 'xlsx' }): Promise<void> => {
+export const exportTableToExcel = async (
+  data: any[],
+  options: TableExportOptions = { format: 'xlsx' }
+): Promise<void> => {
   let processedData = data;
-  
+
   if (options.filterFunction) {
     processedData = data.filter(options.filterFunction);
   }
-  
+
   const workbook = await convertToWorkbook(processedData, options.sheetName);
   const buffer = await workbook.xlsx.writeBuffer();
-  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
   saveAs(blob, `${options.filename || 'export'}.xlsx`);
 };
 
-export const exportMultipleSheets = async (datasets: { name: string; data: any[] }[], filename = 'export'): Promise<void> => {
+export const exportMultipleSheets = async (
+  datasets: { name: string; data: any[] }[],
+  filename = 'export'
+): Promise<void> => {
   const workbook = new ExcelJS.Workbook();
-  
+
   for (const { name, data } of datasets) {
     const worksheet = workbook.addWorksheet(name);
-    
+
     if (data && data.length > 0) {
       const headers = Object.keys(data[0]);
       worksheet.addRow(headers);
-      
+
       data.forEach(row => {
         const values = headers.map(header => row[header]);
         worksheet.addRow(values);
       });
-      
+
       // Style the header row
       worksheet.getRow(1).font = { bold: true };
       worksheet.getRow(1).fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FFE6E6E6' }
+        fgColor: { argb: 'FFE6E6E6' },
       };
     }
   }
-  
+
   const buffer = await workbook.xlsx.writeBuffer();
-  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
   saveAs(blob, `${filename}.xlsx`);
 };
 
 // Utility functions for data processing
 export const flattenObject = (obj: any, prefix = ''): any => {
   const flattened: any = {};
-  
+
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const newKey = prefix ? `${prefix}.${key}` : key;
-      
+
       if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
         Object.assign(flattened, flattenObject(obj[key], newKey));
       } else {
@@ -190,13 +212,15 @@ export const flattenObject = (obj: any, prefix = ''): any => {
       }
     }
   }
-  
+
   return flattened;
 };
 
 export const generateFileName = (baseName: string, format: string, timestamp = true): string => {
   const cleanName = baseName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  const timeStr = timestamp ? `_${new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')}` : '';
+  const timeStr = timestamp
+    ? `_${new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')}`
+    : '';
   return `${cleanName}${timeStr}.${format}`;
 };
 
@@ -217,7 +241,7 @@ export const batchExport = async (
   }>
 ): Promise<void> => {
   const results = [];
-  
+
   for (const exportConfig of exports) {
     try {
       switch (exportConfig.format) {
@@ -226,28 +250,28 @@ export const batchExport = async (
           const csvBlob = new Blob([csvData], { type: 'text/csv' });
           saveAs(csvBlob, `${exportConfig.filename}.csv`);
           break;
-          
+
         case 'json':
           const jsonData = JSON.stringify(exportConfig.data, null, 2);
           const jsonBlob = new Blob([jsonData], { type: 'application/json' });
           saveAs(jsonBlob, `${exportConfig.filename}.json`);
           break;
-          
+
         case 'xlsx':
           exportTableToExcel(exportConfig.data, {
             ...exportConfig.options,
             filename: exportConfig.filename,
-            format: 'xlsx'
+            format: 'xlsx',
           } as TableExportOptions);
           break;
       }
-      
+
       results.push({ filename: exportConfig.filename, status: 'success' });
     } catch (error) {
       results.push({ filename: exportConfig.filename, status: 'error', error });
     }
   }
-  
+
   console.log('Batch export completed:', results);
 };
 

@@ -26,16 +26,22 @@ const IconButton: React.FC<IconButtonProps> = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed relative hover:transform hover:scale-110 active:scale-95';
-  
+  const baseClasses =
+    'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed relative hover:transform hover:scale-110 active:scale-95';
+
   const variants = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 shadow-sm hover:shadow-md',
-    secondary: 'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500 shadow-sm hover:shadow-md',
+    primary:
+      'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 shadow-sm hover:shadow-md',
+    secondary:
+      'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500 shadow-sm hover:shadow-md',
     danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500 shadow-sm hover:shadow-md',
-    success: 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500 shadow-sm hover:shadow-md',
-    warning: 'bg-yellow-600 hover:bg-yellow-700 text-white focus:ring-yellow-500 shadow-sm hover:shadow-md',
+    success:
+      'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500 shadow-sm hover:shadow-md',
+    warning:
+      'bg-yellow-600 hover:bg-yellow-700 text-white focus:ring-yellow-500 shadow-sm hover:shadow-md',
     ghost: 'bg-transparent hover:bg-gray-100 text-gray-700 focus:ring-gray-500',
-    outline: 'bg-transparent border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-700 focus:ring-gray-500'
+    outline:
+      'bg-transparent border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-700 focus:ring-gray-500',
   };
 
   const sizes = {
@@ -43,7 +49,7 @@ const IconButton: React.FC<IconButtonProps> = ({
     sm: 'w-8 h-8 p-1.5',
     md: 'w-10 h-10 p-2',
     lg: 'w-12 h-12 p-2.5',
-    xl: 'w-14 h-14 p-3'
+    xl: 'w-14 h-14 p-3',
   };
 
   const iconSizes = {
@@ -51,21 +57,23 @@ const IconButton: React.FC<IconButtonProps> = ({
     sm: 'w-4 h-4',
     md: 'w-5 h-5',
     lg: 'w-6 h-6',
-    xl: 'w-7 h-7'
+    xl: 'w-7 h-7',
   };
 
   const tooltipPositions = {
     top: 'bottom-full left-1/2 transform -translate-x-1/2 mb-2',
     bottom: 'top-full left-1/2 transform -translate-x-1/2 mt-2',
     left: 'right-full top-1/2 transform -translate-y-1/2 mr-2',
-    right: 'left-full top-1/2 transform -translate-y-1/2 ml-2'
+    right: 'left-full top-1/2 transform -translate-y-1/2 ml-2',
   };
 
   const arrowPositions = {
     top: 'top-full left-1/2 transform -translate-x-1/2 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800',
-    bottom: 'bottom-full left-1/2 transform -translate-x-1/2 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800',
+    bottom:
+      'bottom-full left-1/2 transform -translate-x-1/2 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800',
     left: 'left-full top-1/2 transform -translate-y-1/2 border-t-4 border-b-4 border-l-4 border-transparent border-l-gray-800',
-    right: 'right-full top-1/2 transform -translate-y-1/2 border-t-4 border-b-4 border-r-4 border-transparent border-r-gray-800'
+    right:
+      'right-full top-1/2 transform -translate-y-1/2 border-t-4 border-b-4 border-r-4 border-transparent border-r-gray-800',
   };
 
   const classes = [
@@ -73,8 +81,10 @@ const IconButton: React.FC<IconButtonProps> = ({
     variants[variant],
     sizes[size],
     rounded ? 'rounded-lg' : 'rounded-none',
-    className
-  ].filter(Boolean).join(' ');
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (tooltip) setShowTooltip(true);
@@ -101,7 +111,7 @@ const IconButton: React.FC<IconButtonProps> = ({
       ) : (
         <span className={iconSizes[size]}>{icon}</span>
       )}
-      
+
       {/* Tooltip */}
       {tooltip && showTooltip && (
         <div className={`absolute z-50 ${tooltipPositions[tooltipPosition]}`}>

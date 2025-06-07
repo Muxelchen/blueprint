@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Search, 
-  Bell, 
-  User, 
-  Menu, 
-  X, 
+import {
+  Search,
+  Bell,
+  User,
+  Menu,
+  X,
   ChevronDown,
   Settings,
   LogOut,
   HelpCircle,
-  Shield
+  Shield,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -57,13 +57,13 @@ const NavBar: React.FC<NavBarProps> = ({
   sticky = true,
   showSearch = true,
   showNotifications = true,
-  showUserMenu = true
+  showUserMenu = true,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState<Set<string>>(new Set());
-  
+
   const userMenuRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -71,7 +71,7 @@ const NavBar: React.FC<NavBarProps> = ({
   const defaultUser: UserData = {
     name: 'John Doe',
     email: 'john.doe@example.com',
-    role: 'Administrator'
+    role: 'Administrator',
   };
 
   const currentUser = user || defaultUser;
@@ -80,18 +80,18 @@ const NavBar: React.FC<NavBarProps> = ({
   const defaultItems: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', href: '/dashboard' },
     { id: 'analytics', label: 'Analytics', href: '/analytics', badge: 'New' },
-    { 
-      id: 'projects', 
-      label: 'Projects', 
+    {
+      id: 'projects',
+      label: 'Projects',
       href: '/projects',
       children: [
         { id: 'active', label: 'Active Projects', href: '/projects/active' },
         { id: 'archived', label: 'Archived', href: '/projects/archived' },
-        { id: 'templates', label: 'Templates', href: '/projects/templates' }
-      ]
+        { id: 'templates', label: 'Templates', href: '/projects/templates' },
+      ],
     },
     { id: 'team', label: 'Team', href: '/team' },
-    { id: 'settings', label: 'Settings', href: '/settings' }
+    { id: 'settings', label: 'Settings', href: '/settings' },
   ];
 
   const navItems = items.length > 0 ? items : defaultItems;
@@ -131,19 +131,19 @@ const NavBar: React.FC<NavBarProps> = ({
   const variants = {
     light: 'bg-white border-b border-gray-200 text-gray-900',
     dark: 'bg-gray-900 border-b border-gray-700 text-white',
-    glass: 'bg-white/10 backdrop-blur-md border-b border-white/20 text-white'
+    glass: 'bg-white/10 backdrop-blur-md border-b border-white/20 text-white',
   };
 
   const linkVariants = {
     light: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100',
     dark: 'text-gray-300 hover:text-white hover:bg-gray-800',
-    glass: 'text-white/80 hover:text-white hover:bg-white/10'
+    glass: 'text-white/80 hover:text-white hover:bg-white/10',
   };
 
   const buttonVariants = {
     light: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100',
     dark: 'text-gray-300 hover:text-white hover:bg-gray-800',
-    glass: 'text-white/80 hover:text-white hover:bg-white/10'
+    glass: 'text-white/80 hover:text-white hover:bg-white/10',
   };
 
   return (
@@ -164,7 +164,7 @@ const NavBar: React.FC<NavBarProps> = ({
             {/* Desktop Navigation */}
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                {navItems.map((item) => (
+                {navItems.map(item => (
                   <div key={item.id} className="relative">
                     {item.children ? (
                       <div className="relative">
@@ -173,18 +173,20 @@ const NavBar: React.FC<NavBarProps> = ({
                           className={`${linkVariants[variant]} px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors duration-200`}
                         >
                           <span>{item.label}</span>
-                          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openDropdowns.has(item.id) ? 'rotate-180' : ''}`} />
+                          <ChevronDown
+                            className={`w-4 h-4 transition-transform duration-200 ${openDropdowns.has(item.id) ? 'rotate-180' : ''}`}
+                          />
                           {item.badge && (
                             <span className="ml-2 px-2 py-0.5 text-xs bg-blue-600 text-white rounded-full">
                               {item.badge}
                             </span>
                           )}
                         </button>
-                        
+
                         {openDropdowns.has(item.id) && (
                           <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                             <div className="py-1">
-                              {item.children.map((child) => (
+                              {item.children.map(child => (
                                 <a
                                   key={child.id}
                                   href={child.href}
@@ -230,7 +232,7 @@ const NavBar: React.FC<NavBarProps> = ({
                     ref={searchInputRef}
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     placeholder="Search..."
                     className={`block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
                       variant === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : ''
@@ -264,13 +266,19 @@ const NavBar: React.FC<NavBarProps> = ({
                 >
                   <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                     {currentUser.avatar ? (
-                      <img src={currentUser.avatar} alt={currentUser.name} className="w-8 h-8 rounded-full" />
+                      <img
+                        src={currentUser.avatar}
+                        alt={currentUser.name}
+                        className="w-8 h-8 rounded-full"
+                      />
                     ) : (
                       <User className="h-4 w-4" />
                     )}
                   </div>
                   <span className="hidden lg:block">{currentUser.name}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
                 {isUserMenuOpen && (
@@ -283,19 +291,31 @@ const NavBar: React.FC<NavBarProps> = ({
                           <p className="text-xs text-blue-600 mt-1">{currentUser.role}</p>
                         )}
                       </div>
-                      <a href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <a
+                        href="/profile"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
                         <User className="h-4 w-4 mr-3" />
                         Profile
                       </a>
-                      <a href="/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <a
+                        href="/settings"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
                         <Settings className="h-4 w-4 mr-3" />
                         Settings
                       </a>
-                      <a href="/help" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <a
+                        href="/help"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
                         <HelpCircle className="h-4 w-4 mr-3" />
                         Help & Support
                       </a>
-                      <a href="/admin" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <a
+                        href="/admin"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
                         <Shield className="h-4 w-4 mr-3" />
                         Admin Panel
                       </a>
@@ -337,7 +357,7 @@ const NavBar: React.FC<NavBarProps> = ({
                     <input
                       type="text"
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={e => setSearchQuery(e.target.value)}
                       placeholder="Search..."
                       className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm"
                     />
@@ -346,7 +366,7 @@ const NavBar: React.FC<NavBarProps> = ({
               )}
 
               {/* Mobile navigation items */}
-              {navItems.map((item) => (
+              {navItems.map(item => (
                 <div key={item.id}>
                   {item.children ? (
                     <div>
@@ -355,11 +375,13 @@ const NavBar: React.FC<NavBarProps> = ({
                         className={`${linkVariants[variant]} w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center justify-between transition-colors duration-200`}
                       >
                         <span>{item.label}</span>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openDropdowns.has(item.id) ? 'rotate-180' : ''}`} />
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform duration-200 ${openDropdowns.has(item.id) ? 'rotate-180' : ''}`}
+                        />
                       </button>
                       {openDropdowns.has(item.id) && (
                         <div className="ml-4 space-y-1">
-                          {item.children.map((child) => (
+                          {item.children.map(child => (
                             <a
                               key={child.id}
                               href={child.href}

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { 
-  Grid, 
-  Maximize2, 
-  Minimize2, 
-  RotateCcw, 
+import {
+  Grid,
+  Maximize2,
+  Minimize2,
+  RotateCcw,
   Lock,
   Unlock,
   Copy,
@@ -13,22 +13,22 @@ import {
   X,
   Monitor,
   Tablet,
-  Smartphone
+  Smartphone,
 } from 'lucide-react';
 
 // Enhanced responsive breakpoint system
 export interface ResponsiveBreakpoints {
-  xs: number;    // 0-575px
-  sm: number;    // 576-767px  
-  md: number;    // 768-991px
-  lg: number;    // 992-1199px
-  xl: number;    // 1200-1399px
-  xxl: number;   // 1400px+
+  xs: number; // 0-575px
+  sm: number; // 576-767px
+  md: number; // 768-991px
+  lg: number; // 992-1199px
+  xl: number; // 1200-1399px
+  xxl: number; // 1400px+
 }
 
 export interface ResponsiveLayoutConfig {
   xs?: LayoutConfig;
-  sm?: LayoutConfig; 
+  sm?: LayoutConfig;
   md?: LayoutConfig;
   lg?: LayoutConfig;
   xl?: LayoutConfig;
@@ -131,7 +131,7 @@ const defaultBreakpoints: ResponsiveBreakpoints = {
   md: 768,
   lg: 992,
   xl: 1200,
-  xxl: 1400
+  xxl: 1400,
 };
 
 // Enhanced sample widgets with responsive constraints
@@ -151,21 +151,25 @@ const responsiveSampleWidgets: LayoutWidget[] = [
       md: { minW: 3, minH: 3, maxW: 8, maxH: 6 },
       lg: { minW: 4, minH: 3, maxW: 10, maxH: 7 },
       xl: { minW: 4, minH: 3, maxW: 12, maxH: 8 },
-      xxl: { minW: 4, minH: 3, maxW: 12, maxH: 8 }
+      xxl: { minW: 4, minH: 3, maxW: 12, maxH: 8 },
     },
     category: 'Analytics',
     icon: <Grid className="w-4 h-4" />,
     description: 'Responsive analytics chart widget',
-    priority: 1
+    priority: 1,
   },
   {
     id: 'kpi-card',
     title: 'KPI Card',
     component: ({ title }: { title: string }) => (
       <div className="h-full w-full bg-gradient-to-br from-green-50 to-green-100 p-2 sm:p-4 rounded-lg flex flex-col overflow-hidden">
-        <h3 className="font-semibold text-green-900 mb-1 sm:mb-2 text-xs sm:text-sm truncate">{title}</h3>
+        <h3 className="font-semibold text-green-900 mb-1 sm:mb-2 text-xs sm:text-sm truncate">
+          {title}
+        </h3>
         <div className="flex-1 flex flex-col justify-center min-h-0">
-          <div className="text-lg sm:text-2xl lg:text-3xl font-bold text-green-700 mb-1 truncate">$12,345</div>
+          <div className="text-lg sm:text-2xl lg:text-3xl font-bold text-green-700 mb-1 truncate">
+            $12,345
+          </div>
           <div className="text-xs sm:text-sm text-green-600 truncate">+12% from last month</div>
         </div>
       </div>
@@ -176,12 +180,12 @@ const responsiveSampleWidgets: LayoutWidget[] = [
       md: { minW: 2, minH: 2, maxW: 4, maxH: 3 },
       lg: { minW: 2, minH: 2, maxW: 4, maxH: 3 },
       xl: { minW: 2, minH: 2, maxW: 4, maxH: 3 },
-      xxl: { minW: 2, minH: 2, maxW: 4, maxH: 3 }
+      xxl: { minW: 2, minH: 2, maxW: 4, maxH: 3 },
     },
     category: 'Metrics',
     icon: <Grid className="w-4 h-4" />,
     description: 'Key performance indicator card',
-    priority: 2
+    priority: 2,
   },
   {
     id: 'data-table',
@@ -194,7 +198,10 @@ const responsiveSampleWidgets: LayoutWidget[] = [
         <div className="flex-1 p-2 sm:p-4 overflow-auto min-h-0">
           <div className="space-y-1 sm:space-y-2">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="flex space-x-2 sm:space-x-4 py-1 sm:py-2 border-b border-gray-100">
+              <div
+                key={i}
+                className="flex space-x-2 sm:space-x-4 py-1 sm:py-2 border-b border-gray-100"
+              >
                 <div className="w-12 sm:w-16 h-3 sm:h-4 bg-gray-200 rounded animate-pulse flex-shrink-0"></div>
                 <div className="w-16 sm:w-24 h-3 sm:h-4 bg-gray-200 rounded animate-pulse flex-shrink-0"></div>
                 <div className="flex-1 h-3 sm:h-4 bg-gray-200 rounded animate-pulse min-w-0"></div>
@@ -210,13 +217,13 @@ const responsiveSampleWidgets: LayoutWidget[] = [
       md: { minW: 4, minH: 3, maxW: 8, maxH: 8 },
       lg: { minW: 4, minH: 3, maxW: 12, maxH: 8 },
       xl: { minW: 4, minH: 3, maxW: 12, maxH: 8 },
-      xxl: { minW: 4, minH: 3, maxW: 12, maxH: 8 }
+      xxl: { minW: 4, minH: 3, maxW: 12, maxH: 8 },
     },
     category: 'Data',
     icon: <Grid className="w-4 h-4" />,
     description: 'Responsive data table widget',
-    priority: 3
-  }
+    priority: 3,
+  },
 ];
 
 // Custom hook for responsive breakpoints
@@ -228,7 +235,7 @@ const useResponsiveBreakpoint = (breakpoints: ResponsiveBreakpoints) => {
     const updateBreakpoint = () => {
       const width = window.innerWidth;
       setContainerWidth(width);
-      
+
       if (width >= breakpoints.xxl) setCurrentBreakpoint('xxl');
       else if (width >= breakpoints.xl) setCurrentBreakpoint('xl');
       else if (width >= breakpoints.lg) setCurrentBreakpoint('lg');
@@ -262,10 +269,10 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
   onWidgetAdd,
   onWidgetRemove,
   onSaveLayout,
-  className = ''
+  className = '',
 }) => {
   const { currentBreakpoint, containerWidth } = useResponsiveBreakpoint(breakpoints);
-  
+
   // Default responsive layout configuration
   const defaultLayout: ResponsiveLayoutConfig = {
     xs: {
@@ -275,87 +282,177 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
         {
           id: 'item-1',
           widgetId: 'kpi-card',
-          position: { xs: { x: 0, y: 0, w: 2, h: 2 } }
+          position: { xs: { x: 0, y: 0, w: 2, h: 2 } },
         },
         {
-          id: 'item-2', 
+          id: 'item-2',
           widgetId: 'analytics-chart',
-          position: { xs: { x: 0, y: 2, w: 4, h: 4 } }
-        }
+          position: { xs: { x: 0, y: 2, w: 4, h: 4 } },
+        },
       ],
-      grid: { 
-        xs: { cols: 4, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 4), gap: 8 },
-        sm: { cols: 6, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 6), gap: 10 },
-        md: { cols: 8, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 8), gap: 12 },
-        lg: { cols: 12, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 12), gap: 16 },
-        xl: { cols: 12, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 12), gap: 16 },
-        xxl: { cols: 12, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 12), gap: 16 }
+      grid: {
+        xs: {
+          cols: 4,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 4),
+          gap: 8,
+        },
+        sm: {
+          cols: 6,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 6),
+          gap: 10,
+        },
+        md: {
+          cols: 8,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 8),
+          gap: 12,
+        },
+        lg: {
+          cols: 12,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 12),
+          gap: 16,
+        },
+        xl: {
+          cols: 12,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 12),
+          gap: 16,
+        },
+        xxl: {
+          cols: 12,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 12),
+          gap: 16,
+        },
       },
       created: new Date(),
-      modified: new Date()
+      modified: new Date(),
     },
     md: {
       id: 'default-md',
-      name: 'Tablet Layout', 
+      name: 'Tablet Layout',
       items: [
         {
           id: 'item-1',
           widgetId: 'analytics-chart',
-          position: { md: { x: 0, y: 0, w: 4, h: 3 } }
+          position: { md: { x: 0, y: 0, w: 4, h: 3 } },
         },
         {
           id: 'item-2',
-          widgetId: 'kpi-card', 
-          position: { md: { x: 4, y: 0, w: 2, h: 2 } }
+          widgetId: 'kpi-card',
+          position: { md: { x: 4, y: 0, w: 2, h: 2 } },
         },
         {
           id: 'item-3',
           widgetId: 'data-table',
-          position: { md: { x: 0, y: 3, w: 6, h: 3 } }
-        }
+          position: { md: { x: 0, y: 3, w: 6, h: 3 } },
+        },
       ],
       grid: {
-        xs: { cols: 4, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 4), gap: 8 },
-        sm: { cols: 6, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 6), gap: 10 },
-        md: { cols: 8, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 8), gap: 12 },
-        lg: { cols: 12, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 12), gap: 16 },
-        xl: { cols: 12, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 12), gap: 16 },
-        xxl: { cols: 12, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 12), gap: 16 }
+        xs: {
+          cols: 4,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 4),
+          gap: 8,
+        },
+        sm: {
+          cols: 6,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 6),
+          gap: 10,
+        },
+        md: {
+          cols: 8,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 8),
+          gap: 12,
+        },
+        lg: {
+          cols: 12,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 12),
+          gap: 16,
+        },
+        xl: {
+          cols: 12,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 12),
+          gap: 16,
+        },
+        xxl: {
+          cols: 12,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 12),
+          gap: 16,
+        },
       },
       created: new Date(),
-      modified: new Date()
+      modified: new Date(),
     },
     lg: {
-      id: 'default-lg', 
+      id: 'default-lg',
       name: 'Desktop Layout',
       items: [
         {
           id: 'item-1',
           widgetId: 'analytics-chart',
-          position: { lg: { x: 0, y: 0, w: 4, h: 3 } }
+          position: { lg: { x: 0, y: 0, w: 4, h: 3 } },
         },
         {
           id: 'item-2',
           widgetId: 'kpi-card',
-          position: { lg: { x: 4, y: 0, w: 2, h: 2 } }
+          position: { lg: { x: 4, y: 0, w: 2, h: 2 } },
         },
         {
           id: 'item-3',
-          widgetId: 'data-table', 
-          position: { lg: { x: 0, y: 3, w: 6, h: 3 } }
-        }
+          widgetId: 'data-table',
+          position: { lg: { x: 0, y: 3, w: 6, h: 3 } },
+        },
       ],
       grid: {
-        xs: { cols: 4, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 4), gap: 8 },
-        sm: { cols: 6, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 6), gap: 10 },
-        md: { cols: 8, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 8), gap: 12 },
-        lg: { cols: 12, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 12), gap: 16 },
-        xl: { cols: 12, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 12), gap: 16 },
-        xxl: { cols: 12, rows: 8, size: Math.floor((containerWidth - containerPadding * 2) / 12), gap: 16 }
+        xs: {
+          cols: 4,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 4),
+          gap: 8,
+        },
+        sm: {
+          cols: 6,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 6),
+          gap: 10,
+        },
+        md: {
+          cols: 8,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 8),
+          gap: 12,
+        },
+        lg: {
+          cols: 12,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 12),
+          gap: 16,
+        },
+        xl: {
+          cols: 12,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 12),
+          gap: 16,
+        },
+        xxl: {
+          cols: 12,
+          rows: 8,
+          size: Math.floor((containerWidth - containerPadding * 2) / 12),
+          gap: 16,
+        },
       },
       created: new Date(),
-      modified: new Date()
-    }
+      modified: new Date(),
+    },
   };
 
   const [layout, setLayout] = useState<ResponsiveLayoutConfig>(initialLayout || defaultLayout);
@@ -371,7 +468,7 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
     savedLayouts: [] as ResponsiveLayoutConfig[],
     showSaveDialog: false,
     layoutName: '',
-    previewBreakpoint: currentBreakpoint
+    previewBreakpoint: currentBreakpoint,
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -386,7 +483,10 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
   // Get current grid config
   const currentGrid = useMemo(() => {
     const bp = state.viewMode === 'preview' ? state.previewBreakpoint : currentBreakpoint;
-    return currentLayout?.grid?.[bp] || currentLayout?.grid?.lg || { cols: 12, rows: 8, size: 50, gap: 16 };
+    return (
+      currentLayout?.grid?.[bp] ||
+      currentLayout?.grid?.lg || { cols: 12, rows: 8, size: 50, gap: 16 }
+    );
   }, [currentLayout, currentBreakpoint, state.viewMode, state.previewBreakpoint]);
 
   // Auto-save functionality
@@ -395,7 +495,7 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
-      
+
       autoSaveTimeoutRef.current = setTimeout(() => {
         onLayoutChange(layout);
       }, autoSaveInterval);
@@ -421,44 +521,57 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
               ...currentLayout.grid,
               [currentBreakpoint]: {
                 ...currentGrid,
-                size: newSize
-              }
-            }
-          }
+                size: newSize,
+              },
+            },
+          },
         }));
       }
     }
-  }, [containerWidth, currentGrid.cols, containerPadding, currentBreakpoint, currentLayout, currentGrid.size]); // Fixed: added missing dependencies
+  }, [
+    containerWidth,
+    currentGrid.cols,
+    containerPadding,
+    currentBreakpoint,
+    currentLayout,
+    currentGrid.size,
+  ]); // Fixed: added missing dependencies
 
-  const snapToGridSize = useCallback((value: number) => {
-    if (!snapToGrid) return value;
-    return Math.round(value / currentGrid.size) * currentGrid.size;
-  }, [snapToGrid, currentGrid.size]);
+  const snapToGridSize = useCallback(
+    (value: number) => {
+      if (!snapToGrid) return value;
+      return Math.round(value / currentGrid.size) * currentGrid.size;
+    },
+    [snapToGrid, currentGrid.size]
+  );
 
-  const checkCollision = useCallback((item: LayoutItem, newX: number, newY: number, newW?: number, newH?: number): boolean => {
-    if (!enableCollisions || !currentLayout) return false;
+  const checkCollision = useCallback(
+    (item: LayoutItem, newX: number, newY: number, newW?: number, newH?: number): boolean => {
+      if (!enableCollisions || !currentLayout) return false;
 
-    const bp = state.viewMode === 'preview' ? state.previewBreakpoint : currentBreakpoint;
-    const itemPos = item.position[bp];
-    if (!itemPos) return false;
+      const bp = state.viewMode === 'preview' ? state.previewBreakpoint : currentBreakpoint;
+      const itemPos = item.position[bp];
+      if (!itemPos) return false;
 
-    const itemWidth = newW || itemPos.w;
-    const itemHeight = newH || itemPos.h;
+      const itemWidth = newW || itemPos.w;
+      const itemHeight = newH || itemPos.h;
 
-    return currentLayout.items.some((otherItem: LayoutItem) => {
-      if (otherItem.id === item.id) return false;
-      
-      const otherPos = otherItem.position[bp];
-      if (!otherPos) return false;
-      
-      return !(
-        newX >= otherPos.x + otherPos.w ||
-        newX + itemWidth <= otherPos.x ||
-        newY >= otherPos.y + otherPos.h ||
-        newY + itemHeight <= otherPos.y
-      );
-    });
-  }, [currentLayout, enableCollisions, currentBreakpoint, state.viewMode, state.previewBreakpoint]);
+      return currentLayout.items.some((otherItem: LayoutItem) => {
+        if (otherItem.id === item.id) return false;
+
+        const otherPos = otherItem.position[bp];
+        if (!otherPos) return false;
+
+        return !(
+          newX >= otherPos.x + otherPos.w ||
+          newX + itemWidth <= otherPos.x ||
+          newY >= otherPos.y + otherPos.h ||
+          newY + itemHeight <= otherPos.y
+        );
+      });
+    },
+    [currentLayout, enableCollisions, currentBreakpoint, state.viewMode, state.previewBreakpoint]
+  );
 
   // Enhanced responsive grid calculation with better widget fitting
   const getResponsiveContainerStyle = useCallback(() => {
@@ -466,17 +579,17 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
     const minColumnWidth = 80; // Increased from 60px for better widget content fit
     const actualCols = Math.min(currentGrid.cols, Math.floor(availableWidth / minColumnWidth));
     const actualSize = Math.floor(availableWidth / actualCols);
-    
+
     // Ensure minimum viable widget sizes
     const adjustedSize = Math.max(actualSize, 120); // Minimum 120px per grid unit
     const adjustedCols = Math.floor(availableWidth / adjustedSize);
-    
+
     return {
       width: adjustedCols * adjustedSize,
       height: Math.max(currentGrid.rows * adjustedSize, 600), // Minimum container height
       gridSize: adjustedSize,
       cols: adjustedCols,
-      gap: Math.max(currentGrid.gap, 12) // Minimum gap for better spacing
+      gap: Math.max(currentGrid.gap, 12), // Minimum gap for better spacing
     };
   }, [containerWidth, containerPadding, currentGrid]);
 
@@ -490,7 +603,12 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setState(prev => ({ ...prev, viewMode: prev.viewMode === 'edit' ? 'preview' : 'edit' }))}
+              onClick={() =>
+                setState(prev => ({
+                  ...prev,
+                  viewMode: prev.viewMode === 'edit' ? 'preview' : 'edit',
+                }))
+              }
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                 state.viewMode === 'edit'
                   ? 'bg-blue-100 text-blue-700'
@@ -499,10 +617,10 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
             >
               {state.viewMode === 'edit' ? 'Edit Mode' : 'Preview Mode'}
             </button>
-            
+
             {state.viewMode === 'preview' && (
               <div className="flex items-center gap-1 bg-gray-100 rounded p-1">
-                {(['xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const).map((bp) => (
+                {(['xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const).map(bp => (
                   <button
                     key={bp}
                     onClick={() => setState(prev => ({ ...prev, previewBreakpoint: bp }))}
@@ -515,7 +633,9 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
                   >
                     {bp === 'xs' && <Smartphone className="w-3 h-3" />}
                     {(bp === 'sm' || bp === 'md') && <Tablet className="w-3 h-3" />}
-                    {(bp === 'lg' || bp === 'xl' || bp === 'xxl') && <Monitor className="w-3 h-3" />}
+                    {(bp === 'lg' || bp === 'xl' || bp === 'xxl') && (
+                      <Monitor className="w-3 h-3" />
+                    )}
                   </button>
                 ))}
               </div>
@@ -523,7 +643,8 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
           </div>
 
           <div className="text-xs text-gray-500 px-2 py-1 bg-gray-50 rounded">
-            {currentBreakpoint.toUpperCase()} • {containerWidth}px • {containerStyle.cols}×{currentGrid.rows}
+            {currentBreakpoint.toUpperCase()} • {containerWidth}px • {containerStyle.cols}×
+            {currentGrid.rows}
           </div>
         </div>
 
@@ -536,7 +657,7 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
               Save Layout
             </button>
           )}
-          
+
           <button
             onClick={() => setLayout(defaultLayout)}
             className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
@@ -570,7 +691,7 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
       width: itemPos.w * containerStyle.gridSize - containerStyle.gap,
       height: itemPos.h * containerStyle.gridSize - containerStyle.gap,
       zIndex: item.zIndex || 1,
-      transform: state.viewMode === 'preview' ? `scale(${state.zoom})` : undefined
+      transform: state.viewMode === 'preview' ? `scale(${state.zoom})` : undefined,
     };
 
     return (
@@ -591,7 +712,9 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
               {widget.icon && <div>{widget.icon}</div>}
               <span className="font-medium truncate">{widget.title}</span>
               {isLocked && <Lock className="w-3 h-3 text-gray-400" />}
-              <span className="text-gray-400">({itemPos.w}×{itemPos.h})</span>
+              <span className="text-gray-400">
+                ({itemPos.w}×{itemPos.h})
+              </span>
             </div>
           </div>
         )}
@@ -604,18 +727,22 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
         )}
 
         {/* Resize Handles (Edit Mode) */}
-        {state.viewMode === 'edit' && !isLocked && widget.resizable !== false && isSelected && !item.collapsed && (
-          <>
-            <div
-              className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 cursor-se-resize z-20"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                // Handle resize start
-              }}
-            />
-          </>
-        )}
+        {state.viewMode === 'edit' &&
+          !isLocked &&
+          widget.resizable !== false &&
+          isSelected &&
+          !item.collapsed && (
+            <>
+              <div
+                className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 cursor-se-resize z-20"
+                onMouseDown={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // Handle resize start
+                }}
+              />
+            </>
+          )}
       </div>
     );
   };
@@ -623,7 +750,7 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
   return (
     <div className={`h-full flex flex-col bg-gray-50 ${className}`}>
       {renderResponsiveToolbar()}
-      
+
       <div className="flex-1 relative overflow-hidden" style={{ padding: containerPadding }}>
         <div
           ref={containerRef}
@@ -641,7 +768,7 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
                 `,
                 backgroundSize: `${containerStyle.gridSize}px ${containerStyle.gridSize}px`,
                 width: containerStyle.width,
-                height: containerStyle.height
+                height: containerStyle.height,
               }}
             />
           )}
@@ -652,7 +779,7 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
             style={{
               width: containerStyle.width,
               height: containerStyle.height,
-              minHeight: '100%'
+              minHeight: '100%',
             }}
           >
             {currentLayout?.items.map(renderResponsiveWidget)}
@@ -669,12 +796,14 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
               type="text"
               placeholder="Layout name"
               value={state.layoutName}
-              onChange={(e) => setState(prev => ({ ...prev, layoutName: e.target.value }))}
+              onChange={e => setState(prev => ({ ...prev, layoutName: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
             />
             <div className="flex justify-end space-x-3">
               <button
-                onClick={() => setState(prev => ({ ...prev, showSaveDialog: false, layoutName: '' }))}
+                onClick={() =>
+                  setState(prev => ({ ...prev, showSaveDialog: false, layoutName: '' }))
+                }
                 className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
               >
                 Cancel
@@ -684,7 +813,7 @@ const ResponsiveLayoutManager: React.FC<ResponsiveLayoutManagerProps> = ({
                   const layoutToSave = {
                     ...layout,
                     id: `layout-${Date.now()}`,
-                    name: state.layoutName || `Layout ${Date.now()}`
+                    name: state.layoutName || `Layout ${Date.now()}`,
                   };
                   onSaveLayout?.(layoutToSave);
                   setState(prev => ({ ...prev, showSaveDialog: false, layoutName: '' }));

@@ -11,20 +11,20 @@ export { default as BreadcrumbNav } from './BreadcrumbNav';
 export { default as SearchBar } from './SearchBar';
 
 // Container components - advanced layout managers
-export { 
+export {
   AdvancedDashboardLayout,
   DragDropLayoutManager,
   IntelligentLayoutManager,
   ResponsiveLayoutManager,
   VirtualizedLayoutManager,
   WidgetManager,
-  ResizableWidget
+  ResizableWidget,
 } from './containers';
 
 // Re-export container types for convenience
-export type { 
+export type {
   DraggableWidget,
   ResponsiveBreakpoints,
   VirtualizedWidget,
-  LayoutAlgorithm 
+  LayoutAlgorithm,
 } from './containers';

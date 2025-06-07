@@ -33,7 +33,7 @@ const Dialog: React.FC<DialogProps> = ({
   size = 'sm',
   className = '',
   closeOnOverlayClick = true,
-  closeOnEscape = true
+  closeOnEscape = true,
 }) => {
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -57,35 +57,35 @@ const Dialog: React.FC<DialogProps> = ({
   const sizeClasses = {
     sm: 'max-w-sm',
     md: 'max-w-md',
-    lg: 'max-w-lg'
+    lg: 'max-w-lg',
   };
 
   const variantClasses = {
     info: {
       icon: 'text-blue-600',
       title: 'text-blue-900',
-      description: 'text-blue-700'
+      description: 'text-blue-700',
     },
     warning: {
       icon: 'text-yellow-600',
       title: 'text-yellow-900',
-      description: 'text-yellow-700'
+      description: 'text-yellow-700',
     },
     danger: {
       icon: 'text-red-600',
       title: 'text-red-900',
-      description: 'text-red-700'
+      description: 'text-red-700',
     },
     success: {
       icon: 'text-green-600',
       title: 'text-green-900',
-      description: 'text-green-700'
+      description: 'text-green-700',
     },
     confirm: {
       icon: 'text-blue-600',
       title: 'text-blue-900',
-      description: 'text-blue-700'
-    }
+      description: 'text-blue-700',
+    },
   };
 
   const getDefaultIcon = () => {
@@ -111,7 +111,7 @@ const Dialog: React.FC<DialogProps> = ({
       warning: 'warning',
       danger: 'danger',
       success: 'success',
-      confirm: 'primary'
+      confirm: 'primary',
     } as const;
     return variants[type];
   };
@@ -141,11 +141,9 @@ const Dialog: React.FC<DialogProps> = ({
         {/* Content */}
         <div className="text-center space-y-4">
           {/* Icon */}
-          {(getDefaultIcon()) && (
+          {getDefaultIcon() && (
             <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-gray-100">
-              <span className={variantClasses[type].icon}>
-                {getDefaultIcon()}
-              </span>
+              <span className={variantClasses[type].icon}>{getDefaultIcon()}</span>
             </div>
           )}
 
@@ -165,19 +163,11 @@ const Dialog: React.FC<DialogProps> = ({
         {/* Actions */}
         <div className="mt-6 flex justify-center space-x-3">
           {showCancel && (
-            <Button
-              variant="ghost"
-              onClick={onClose}
-              disabled={isLoading}
-            >
+            <Button variant="ghost" onClick={onClose} disabled={isLoading}>
               {cancelText}
             </Button>
           )}
-          <Button
-            variant={getButtonVariant()}
-            onClick={onConfirm || onClose}
-            isLoading={isLoading}
-          >
+          <Button variant={getButtonVariant()} onClick={onConfirm || onClose} isLoading={isLoading}>
             {confirmText}
           </Button>
         </div>
@@ -201,7 +191,7 @@ export const useDialog = () => {
   }>({
     isOpen: false,
     title: '',
-    type: 'info'
+    type: 'info',
   });
 
   const showDialog = (config: {
@@ -219,7 +209,7 @@ export const useDialog = () => {
       showCancel: true,
       confirmText: 'OK',
       cancelText: 'Cancel',
-      ...config
+      ...config,
     });
   };
 
@@ -251,7 +241,7 @@ export const useDialog = () => {
     showDialog,
     closeDialog,
     handleConfirm,
-    setLoading
+    setLoading,
   };
 };
 
@@ -263,10 +253,11 @@ export const ExampleDialogs: React.FC = () => {
   const showInfoDialog = () => {
     dialog.showDialog({
       title: 'Information',
-      description: 'This is an informational message. Please take note of this important information.',
+      description:
+        'This is an informational message. Please take note of this important information.',
       type: 'info',
       showCancel: false,
-      confirmText: 'Got it'
+      confirmText: 'Got it',
     });
   };
 
@@ -278,7 +269,7 @@ export const ExampleDialogs: React.FC = () => {
       confirmText: 'Proceed',
       onConfirm: () => {
         setResult('Warning acknowledged');
-      }
+      },
     });
   };
 
@@ -292,7 +283,7 @@ export const ExampleDialogs: React.FC = () => {
         // Simulate async operation
         await new Promise(resolve => setTimeout(resolve, 2000));
         setResult('Item deleted successfully');
-      }
+      },
     });
   };
 
@@ -302,7 +293,7 @@ export const ExampleDialogs: React.FC = () => {
       description: 'Your operation has been completed successfully.',
       type: 'success',
       showCancel: false,
-      confirmText: 'Great!'
+      confirmText: 'Great!',
     });
   };
 
@@ -312,10 +303,10 @@ export const ExampleDialogs: React.FC = () => {
       description: 'Do you want to save your changes before continuing?',
       type: 'confirm',
       confirmText: 'Save',
-      cancelText: 'Don\'t Save',
+      cancelText: "Don't Save",
       onConfirm: () => {
         setResult('Changes saved');
-      }
+      },
     });
   };
 
@@ -329,7 +320,7 @@ export const ExampleDialogs: React.FC = () => {
         // Simulate long-running operation
         await new Promise(resolve => setTimeout(resolve, 3000));
         setResult('Data processed successfully');
-      }
+      },
     });
   };
 
@@ -339,23 +330,23 @@ export const ExampleDialogs: React.FC = () => {
         <Button onClick={showInfoDialog} variant="primary">
           Info Dialog
         </Button>
-        
+
         <Button onClick={showWarningDialog} variant="warning">
           Warning Dialog
         </Button>
-        
+
         <Button onClick={showDangerDialog} variant="danger">
           Danger Dialog
         </Button>
-        
+
         <Button onClick={showSuccessDialog} variant="success">
           Success Dialog
         </Button>
-        
+
         <Button onClick={showConfirmDialog} variant="secondary">
           Confirm Dialog
         </Button>
-        
+
         <Button onClick={showAsyncDialog} variant="primary">
           Async Dialog
         </Button>

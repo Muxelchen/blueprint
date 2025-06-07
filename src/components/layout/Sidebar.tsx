@@ -1,113 +1,113 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Home, 
-  BarChart3, 
-  Map, 
-  Settings, 
-  User, 
-  Calendar, 
-  FileText, 
-  Archive, 
-  Layers, 
-  Activity, 
-  MessageSquare, 
-  HelpCircle, 
-  Shield, 
-  Database, 
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Home,
+  BarChart3,
+  Map,
+  Settings,
+  User,
+  Calendar,
+  FileText,
+  Archive,
+  Layers,
+  Activity,
+  MessageSquare,
+  HelpCircle,
+  Shield,
+  Database,
   Bookmark,
   ChevronDown,
   ChevronRight,
-  Star
-} from 'lucide-react'
+  Star,
+} from 'lucide-react';
 
 interface SidebarProps {
-  isOpen: boolean
-  onToggle: () => void
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
-  const location = useLocation()
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const location = useLocation();
 
   // Main navigation items
   const mainNavigation = [
-    { 
-      name: 'Dashboard', 
-      href: '/', 
-      icon: Home, 
+    {
+      name: 'Dashboard',
+      href: '/',
+      icon: Home,
       badge: null,
       submenu: [
         { name: 'Overview', href: '/' },
         { name: 'Analytics', href: '/analytics' },
-        { name: 'Reports', href: '/reports' }
-      ]
+        { name: 'Reports', href: '/reports' },
+      ],
     },
-    { 
-      name: 'Analytics', 
-      href: '/analytics', 
-      icon: BarChart3, 
+    {
+      name: 'Analytics',
+      href: '/analytics',
+      icon: BarChart3,
       badge: 'New',
       submenu: [
         { name: 'Traffic', href: '/analytics/traffic' },
         { name: 'Conversions', href: '/analytics/conversions' },
-        { name: 'Revenue', href: '/analytics/revenue' }
-      ]
+        { name: 'Revenue', href: '/analytics/revenue' },
+      ],
     },
-    { 
-      name: 'Maps', 
-      href: '/map', 
-      icon: Map, 
+    {
+      name: 'Maps',
+      href: '/map',
+      icon: Map,
       badge: null,
       submenu: [
         { name: 'Interactive Map', href: '/map' },
         { name: 'Heat Maps', href: '/map/heat' },
-        { name: 'Locations', href: '/map/locations' }
-      ]
+        { name: 'Locations', href: '/map/locations' },
+      ],
     },
-    { 
-      name: 'Activity', 
-      href: '/activity', 
-      icon: Activity, 
+    {
+      name: 'Activity',
+      href: '/activity',
+      icon: Activity,
       badge: '12',
       submenu: [
         { name: 'Recent Activity', href: '/activity' },
         { name: 'User Actions', href: '/activity/users' },
-        { name: 'System Logs', href: '/activity/logs' }
-      ]
+        { name: 'System Logs', href: '/activity/logs' },
+      ],
     },
-    { 
-      name: 'Projects', 
-      href: '/projects', 
-      icon: Layers, 
+    {
+      name: 'Projects',
+      href: '/projects',
+      icon: Layers,
       badge: null,
       submenu: [
         { name: 'All Projects', href: '/projects' },
         { name: 'Active', href: '/projects/active' },
-        { name: 'Archived', href: '/projects/archived' }
-      ]
+        { name: 'Archived', href: '/projects/archived' },
+      ],
     },
-    { 
-      name: 'Calendar', 
-      href: '/calendar', 
-      icon: Calendar, 
+    {
+      name: 'Calendar',
+      href: '/calendar',
+      icon: Calendar,
       badge: null,
-      submenu: []
+      submenu: [],
     },
-    { 
-      name: 'Messages', 
-      href: '/messages', 
-      icon: MessageSquare, 
+    {
+      name: 'Messages',
+      href: '/messages',
+      icon: MessageSquare,
       badge: '5',
       submenu: [
         { name: 'Inbox', href: '/messages' },
         { name: 'Sent', href: '/messages/sent' },
-        { name: 'Drafts', href: '/messages/drafts' }
-      ]
-    }
-  ]
+        { name: 'Drafts', href: '/messages/drafts' },
+      ],
+    },
+  ];
 
   // Secondary navigation items
   const secondaryNavigation = [
@@ -115,53 +115,49 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     { name: 'Database', href: '/database', icon: Database, badge: null },
     { name: 'Security', href: '/security', icon: Shield, badge: 'Alert' },
     { name: 'Bookmarks', href: '/bookmarks', icon: Bookmark, badge: null },
-    { name: 'Archive', href: '/archive', icon: Archive, badge: null }
-  ]
+    { name: 'Archive', href: '/archive', icon: Archive, badge: null },
+  ];
 
   // Bottom navigation items
   const bottomNavigation = [
     { name: 'Settings', href: '/settings', icon: Settings, badge: null },
     { name: 'Help & Support', href: '/help', icon: HelpCircle, badge: null },
-    { name: 'Profile', href: '/profile', icon: User, badge: null }
-  ]
+    { name: 'Profile', href: '/profile', icon: User, badge: null },
+  ];
 
   // Handle responsive behavior
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) {
-        setIsCollapsed(false)
+        setIsCollapsed(false);
       }
-    }
+    };
 
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed)
-    setActiveSubmenu(null)
-  }
+    setIsCollapsed(!isCollapsed);
+    setActiveSubmenu(null);
+  };
 
   const toggleSubmenu = (itemName: string) => {
-    if (isCollapsed) return
-    setActiveSubmenu(activeSubmenu === itemName ? null : itemName)
-  }
+    if (isCollapsed) return;
+    setActiveSubmenu(activeSubmenu === itemName ? null : itemName);
+  };
 
-  const isActive = (href: string) => location.pathname === href
+  const isActive = (href: string) => location.pathname === href;
 
   // Render navigation item
   const renderNavItem = (item: any) => {
-    const hasSubmenu = item.submenu && item.submenu.length > 0
-    const isSubmenuOpen = activeSubmenu === item.name
-    const itemIsActive = isActive(item.href)
+    const hasSubmenu = item.submenu && item.submenu.length > 0;
+    const isSubmenuOpen = activeSubmenu === item.name;
+    const itemIsActive = isActive(item.href);
 
     return (
       <div key={item.name}>
-        <div
-          className={`group relative flex items-center ${
-            hasSubmenu ? 'cursor-pointer' : ''
-          }`}
-        >
+        <div className={`group relative flex items-center ${hasSubmenu ? 'cursor-pointer' : ''}`}>
           {hasSubmenu ? (
             <button
               onClick={() => toggleSubmenu(item.name)}
@@ -176,18 +172,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                 <>
                   <span className="flex-1 text-left">{item.name}</span>
                   {item.badge && (
-                    <span className={`ml-2 px-2 py-0.5 text-xs rounded-full font-medium ${
-                      item.badge === 'New' ? 'bg-success-100 text-success-700' :
-                      item.badge === 'Alert' ? 'bg-error-100 text-error-700' :
-                      'bg-secondary-200 text-secondary-700'
-                    }`}>
+                    <span
+                      className={`ml-2 px-2 py-0.5 text-xs rounded-full font-medium ${
+                        item.badge === 'New'
+                          ? 'bg-success-100 text-success-700'
+                          : item.badge === 'Alert'
+                            ? 'bg-error-100 text-error-700'
+                            : 'bg-secondary-200 text-secondary-700'
+                      }`}
+                    >
                       {item.badge}
                     </span>
                   )}
-                  <ChevronRight 
+                  <ChevronRight
                     className={`w-4 h-4 ml-2 transition-transform ${
                       isSubmenuOpen ? 'rotate-90' : ''
-                    }`} 
+                    }`}
                   />
                 </>
               )}
@@ -206,11 +206,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                 <>
                   <span className="flex-1">{item.name}</span>
                   {item.badge && (
-                    <span className={`ml-2 px-2 py-0.5 text-xs rounded-full font-medium ${
-                      item.badge === 'New' ? 'bg-success-100 text-success-700' :
-                      item.badge === 'Alert' ? 'bg-error-100 text-error-700' :
-                      'bg-secondary-200 text-secondary-700'
-                    }`}>
+                    <span
+                      className={`ml-2 px-2 py-0.5 text-xs rounded-full font-medium ${
+                        item.badge === 'New'
+                          ? 'bg-success-100 text-success-700'
+                          : item.badge === 'Alert'
+                            ? 'bg-error-100 text-error-700'
+                            : 'bg-secondary-200 text-secondary-700'
+                      }`}
+                    >
                       {item.badge}
                     </span>
                   )}
@@ -256,8 +260,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
           )}
         </AnimatePresence>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -277,9 +281,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
       {/* Sidebar */}
       <motion.aside
         initial={false}
-        animate={{ 
+        animate={{
           x: isOpen ? 0 : -280,
-          width: isCollapsed ? 80 : 280
+          width: isCollapsed ? 80 : 280,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-secondary-200 shadow-lg lg:relative lg:translate-x-0 ${
@@ -296,7 +300,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
               <span className="text-xl font-bold text-secondary-900">Blueprint</span>
             </Link>
           )}
-          
+
           {/* Desktop collapse button */}
           <button
             onClick={toggleCollapse}
@@ -321,7 +325,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   Main
                 </h3>
               )}
-              {mainNavigation.map((item) => renderNavItem(item))}
+              {mainNavigation.map(item => renderNavItem(item))}
             </div>
 
             {/* Divider */}
@@ -334,14 +338,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   Tools
                 </h3>
               )}
-              {secondaryNavigation.map((item) => renderNavItem(item))}
+              {secondaryNavigation.map(item => renderNavItem(item))}
             </div>
           </div>
         </div>
 
         {/* Bottom navigation */}
         <div className="border-t border-secondary-200 p-3 space-y-1">
-          {bottomNavigation.map((item) => renderNavItem(item))}
+          {bottomNavigation.map(item => renderNavItem(item))}
         </div>
 
         {/* Status indicator */}
@@ -355,7 +359,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         )}
       </motion.aside>
     </>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

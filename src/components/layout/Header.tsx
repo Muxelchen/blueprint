@@ -1,40 +1,40 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  User, 
-  Settings, 
-  Bell, 
-  LogOut, 
-  ChevronDown, 
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  User,
+  Settings,
+  Bell,
+  LogOut,
+  ChevronDown,
   Menu,
   X,
   Search,
   Home,
   BarChart3,
   Map,
-  Heart
-} from 'lucide-react'
+  Heart,
+} from 'lucide-react';
 
 interface HeaderProps {
-  onMenuToggle: () => void
-  isSidebarOpen: boolean
+  onMenuToggle: () => void;
+  isSidebarOpen: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false)
-  const userMenuRef = useRef<HTMLDivElement>(null)
-  const notificationRef = useRef<HTMLDivElement>(null)
-  const location = useLocation()
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
 
   // Mock user data
   const user = {
     name: 'John Doe',
     email: 'john@example.com',
     avatar: null,
-    role: 'Administrator'
-  }
+    role: 'Administrator',
+  };
 
   // Mock notifications
   const notifications = [
@@ -44,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
       message: 'You have received a new message from Sarah',
       time: '2 min ago',
       read: false,
-      type: 'message'
+      type: 'message',
     },
     {
       id: 2,
@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
       message: 'A new system update is ready to install',
       time: '1 hour ago',
       read: false,
-      type: 'system'
+      type: 'system',
     },
     {
       id: 3,
@@ -60,34 +60,34 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
       message: 'Your monthly analytics report is ready',
       time: '3 hours ago',
       read: true,
-      type: 'report'
-    }
-  ]
+      type: 'report',
+    },
+  ];
 
-  const unreadCount = notifications.filter(n => !n.read).length
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   // Navigation items for mobile
   const navigationItems = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Map', href: '/map', icon: Map },
-    { name: 'Settings', href: '/settings', icon: Settings }
-  ]
+    { name: 'Settings', href: '/settings', icon: Settings },
+  ];
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setIsUserMenuOpen(false)
+        setIsUserMenuOpen(false);
       }
       if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-        setIsNotificationOpen(false)
+        setIsNotificationOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header className="bg-white border-b border-secondary-200 shadow-sm sticky top-0 z-30">
@@ -100,10 +100,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
             className="lg:hidden p-2 rounded-lg hover:bg-secondary-100 transition-colors"
             aria-label="Toggle menu"
           >
-            <motion.div
-              animate={{ rotate: isSidebarOpen ? 90 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
+            <motion.div animate={{ rotate: isSidebarOpen ? 90 : 0 }} transition={{ duration: 0.2 }}>
               {isSidebarOpen ? (
                 <X className="w-5 h-5 text-secondary-600" />
               ) : (
@@ -117,15 +114,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="hidden sm:block text-xl font-bold text-secondary-900">
-              Blueprint
-            </span>
+            <span className="hidden sm:block text-xl font-bold text-secondary-900">Blueprint</span>
           </Link>
 
           {/* Desktop navigation */}
           <nav className="hidden lg:flex items-center space-x-1 ml-8">
-            {navigationItems.map((item) => {
-              const isActive = location.pathname === item.href
+            {navigationItems.map(item => {
+              const isActive = location.pathname === item.href;
               return (
                 <Link
                   key={item.name}
@@ -139,7 +134,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                   <item.icon className="w-4 h-4 mr-2" />
                   {item.name}
                 </Link>
-              )
+              );
             })}
           </nav>
         </div>
@@ -193,12 +188,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                   className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-secondary-200 py-2 z-50"
                 >
                   <div className="px-4 py-2 border-b border-secondary-200">
-                    <h3 className="text-sm font-semibold text-secondary-900">
-                      Notifications
-                    </h3>
+                    <h3 className="text-sm font-semibold text-secondary-900">Notifications</h3>
                   </div>
                   <div className="max-h-80 overflow-y-auto">
-                    {notifications.map((notification) => (
+                    {notifications.map(notification => (
                       <div
                         key={notification.id}
                         className={`px-4 py-3 hover:bg-secondary-50 cursor-pointer border-l-4 ${
@@ -215,9 +208,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                             <p className="text-sm text-secondary-600 mt-1">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-secondary-400 mt-2">
-                              {notification.time}
-                            </p>
+                            <p className="text-xs text-secondary-400 mt-2">{notification.time}</p>
                           </div>
                           {!notification.read && (
                             <div className="w-2 h-2 bg-primary-500 rounded-full mt-1 ml-2"></div>
@@ -250,10 +241,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                 <p className="text-sm font-medium text-secondary-900">{user.name}</p>
                 <p className="text-xs text-secondary-500">{user.role}</p>
               </div>
-              <ChevronDown 
+              <ChevronDown
                 className={`w-4 h-4 text-secondary-400 transition-transform ${
                   isUserMenuOpen ? 'rotate-180' : ''
-                }`} 
+                }`}
               />
             </button>
 
@@ -271,7 +262,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                     <p className="text-sm font-medium text-secondary-900">{user.name}</p>
                     <p className="text-sm text-secondary-500">{user.email}</p>
                   </div>
-                  
+
                   <div className="py-2">
                     <Link
                       to="/profile"
@@ -290,7 +281,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                       Settings
                     </Link>
                   </div>
-                  
+
                   <div className="border-t border-secondary-200 py-2">
                     <button className="flex items-center w-full px-4 py-2 text-sm text-error-600 hover:bg-error-50">
                       <LogOut className="w-4 h-4 mr-3" />
@@ -304,7 +295,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

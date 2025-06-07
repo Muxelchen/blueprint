@@ -2,15 +2,44 @@
 import { BaseComponent, ComponentSize } from './index';
 
 // Base form types
-export type FormFieldType = 
-  | 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search'
-  | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'switch' 
-  | 'slider' | 'range' | 'date' | 'time' | 'datetime' | 'file' | 'color' 
-  | 'rich-text' | 'autocomplete' | 'tags' | 'rating' | 'custom';
+export type FormFieldType =
+  | 'text'
+  | 'email'
+  | 'password'
+  | 'number'
+  | 'tel'
+  | 'url'
+  | 'search'
+  | 'textarea'
+  | 'select'
+  | 'multiselect'
+  | 'checkbox'
+  | 'radio'
+  | 'switch'
+  | 'slider'
+  | 'range'
+  | 'date'
+  | 'time'
+  | 'datetime'
+  | 'file'
+  | 'color'
+  | 'rich-text'
+  | 'autocomplete'
+  | 'tags'
+  | 'rating'
+  | 'custom';
 
-export type ValidationRule = 
-  | 'required' | 'email' | 'url' | 'phone' | 'min' | 'max' 
-  | 'minLength' | 'maxLength' | 'pattern' | 'custom';
+export type ValidationRule =
+  | 'required'
+  | 'email'
+  | 'url'
+  | 'phone'
+  | 'min'
+  | 'max'
+  | 'minLength'
+  | 'maxLength'
+  | 'pattern'
+  | 'custom';
 
 // Conditional configuration
 export interface ConditionalConfig {

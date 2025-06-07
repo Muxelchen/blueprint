@@ -8,27 +8,24 @@ export { default as WidgetManager } from './WidgetManager';
 export { default as ResizableWidget } from './ResizableWidget';
 
 // Re-export types
-export type { 
+export type {
   DraggableWidget,
   MagneticField,
   ResizeHandle,
-  DragDropLayoutManagerProps 
+  DragDropLayoutManagerProps,
 } from './DragDropLayoutManager';
 
 export type {
   LayoutAlgorithm,
   LayoutWidget as IntelligentLayoutWidget,
-  IntelligentLayoutManagerProps
+  IntelligentLayoutManagerProps,
 } from './IntelligentLayoutManager';
 
 export type {
   ResponsiveBreakpoints,
   ResponsiveLayoutConfig,
   LayoutWidget as ResponsiveLayoutWidget,
-  ResponsiveLayoutManagerProps
+  ResponsiveLayoutManagerProps,
 } from './ResponsiveLayoutManager';
 
-export type {
-  VirtualizedWidget,
-  VirtualizedLayoutManagerProps
-} from './VirtualizedLayoutManager';
+export type { VirtualizedWidget, VirtualizedLayoutManagerProps } from './VirtualizedLayoutManager';

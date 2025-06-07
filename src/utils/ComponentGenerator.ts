@@ -10,7 +10,7 @@ export class ComponentGenerator {
   }
 
   async generateComponent(
-    name: string, 
+    name: string,
     type: 'widget' | 'form' | 'layout' | 'data-viz' | 'input',
     options: {
       withState?: boolean;
@@ -25,25 +25,25 @@ export class ComponentGenerator {
       withProps = true,
       withAnimation = false,
       withTests = false,
-      responsive = true
+      responsive = true,
     } = options;
 
     const componentCode = this.generateComponentCode(name, type, {
       withState,
       withProps,
       withAnimation,
-      responsive
+      responsive,
     });
 
     const componentPath = path.join(this.componentsPath, `${name}.tsx`);
-    
+
     try {
       await fs.promises.writeFile(componentPath, componentCode);
-      
+
       if (withTests) {
         await this.generateTestFile(name);
       }
-      
+
       console.log(`✅ Generated ${name} component at ${componentPath}`);
       return componentPath;
     } catch (error) {
@@ -63,32 +63,40 @@ export class ComponentGenerator {
     }
   ): string {
     const { withState, withProps, withAnimation, responsive } = options;
-    
-    const imports = [
-      "import React" + (withState ? ", { useState, useEffect }" : "") + " from 'react';",
-      withAnimation ? "import { motion } from 'framer-motion';" : "",
-      "import { LucideIcon } from 'lucide-react';"
-    ].filter(Boolean).join('\n');
 
-    const propsInterface = withProps ? `
+    const imports = [
+      'import React' + (withState ? ', { useState, useEffect }' : '') + " from 'react';",
+      withAnimation ? "import { motion } from 'framer-motion';" : '',
+      "import { LucideIcon } from 'lucide-react';",
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    const propsInterface = withProps
+      ? `
 interface ${name}Props {
   className?: string;
   ${this.getPropsForType(type)}
-}` : '';
+}`
+      : '';
 
-    const stateLogic = withState ? `
+    const stateLogic = withState
+      ? `
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
 
   useEffect(() => {
     // Component initialization logic
-  }, []);` : '';
+  }, []);`
+      : '';
 
     const componentWrapper = withAnimation ? 'motion.div' : 'div';
-    const animationProps = withAnimation ? `
+    const animationProps = withAnimation
+      ? `
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3 }}` : '';
+    transition={{ duration: 0.3 }}`
+      : '';
 
     const responsiveClasses = responsive ? this.getResponsiveClasses(type) : '';
 
@@ -112,17 +120,17 @@ export default ${name};`;
 
   private getPropsForType(type: string): string {
     const typeProps: Record<string, string> = {
-      'widget': `
+      widget: `
   title?: string;
   data?: any[];
   loading?: boolean;
   onRefresh?: () => void;`,
-      'form': `
+      form: `
   onSubmit?: (data: any) => void;
   onCancel?: () => void;
   initialValues?: Record<string, any>;
   disabled?: boolean;`,
-      'layout': `
+      layout: `
   children: React.ReactNode;
   sidebar?: React.ReactNode;
   header?: React.ReactNode;`,
@@ -132,25 +140,29 @@ export default ${name};`;
   width?: number;
   height?: number;
   theme?: 'light' | 'dark';`,
-      'input': `
+      input: `
   value?: any;
   onChange?: (value: any) => void;
   placeholder?: string;
   disabled?: boolean;
-  error?: string;`
+  error?: string;`,
     };
 
-    return typeProps[type] || `
-  children?: React.ReactNode;`;
+    return (
+      typeProps[type] ||
+      `
+  children?: React.ReactNode;`
+    );
   }
 
   private getResponsiveClasses(type: string): string {
     const typeClasses: Record<string, string> = {
-      'widget': 'w-full bg-white rounded-lg border border-gray-200 p-4 md:p-6',
-      'form': 'w-full max-w-md mx-auto bg-white rounded-lg shadow-sm p-6',
-      'layout': 'min-h-screen bg-gray-50',
+      widget: 'w-full bg-white rounded-lg border border-gray-200 p-4 md:p-6',
+      form: 'w-full max-w-md mx-auto bg-white rounded-lg shadow-sm p-6',
+      layout: 'min-h-screen bg-gray-50',
       'data-viz': 'w-full bg-white rounded-lg border border-gray-200 p-4',
-      'input': 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+      input:
+        'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
     };
 
     return typeClasses[type] || 'w-full';
@@ -158,7 +170,7 @@ export default ${name};`;
 
   private getComponentContent(name: string, type: string): string {
     const typeContent: Record<string, string> = {
-      'widget': `
+      widget: `
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">
           {${name.includes('Props') ? 'props.title || ' : ''}${name}}
@@ -168,7 +180,7 @@ export default ${name};`;
         {/* Widget content goes here */}
         <p className="text-gray-600">Widget content placeholder</p>
       </div>`,
-      'form': `
+      form: `
       <form onSubmit={(e) => {
         e.preventDefault();
         // Handle form submission
@@ -200,7 +212,7 @@ export default ${name};`;
           </button>
         </div>
       </form>`,
-      'layout': `
+      layout: `
       <div className="flex flex-col lg:flex-row min-h-screen">
         <aside className="w-full lg:w-64 bg-white border-r border-gray-200">
           {/* Sidebar content */}
@@ -216,19 +228,22 @@ export default ${name};`;
           <p className="text-gray-500">Chart placeholder - integrate with your preferred charting library</p>
         </div>
       </div>`,
-      'input': `
+      input: `
       <input
         type="text"
         placeholder="Enter value..."
         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />`
+      />`,
     };
 
-    return typeContent[type] || `
+    return (
+      typeContent[type] ||
+      `
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-2">${name}</h2>
         <p className="text-gray-600">Component content goes here</p>
-      </div>`;
+      </div>`
+    );
   }
 
   private async generateTestFile(name: string): Promise<void> {
@@ -254,22 +269,22 @@ describe('${name}', () => {
 
   async generateFromTemplate(templateName: string, customizations: Record<string, any> = {}) {
     // Generate components based on predefined templates
-    const templates: Record<string, Array<{name: string; type: string; options: any}>> = {
+    const templates: Record<string, Array<{ name: string; type: string; options: any }>> = {
       'dashboard-kit': [
         { name: 'KPICard', type: 'widget', options: { withState: true, withAnimation: true } },
         { name: 'DataTable', type: 'widget', options: { withProps: true, responsive: true } },
-        { name: 'ChartWidget', type: 'data-viz', options: { withAnimation: true } }
+        { name: 'ChartWidget', type: 'data-viz', options: { withAnimation: true } },
       ],
       'form-kit': [
         { name: 'FormInput', type: 'input', options: { withProps: true } },
         { name: 'FormSelect', type: 'input', options: { withProps: true } },
-        { name: 'FormWrapper', type: 'form', options: { withState: true } }
+        { name: 'FormWrapper', type: 'form', options: { withState: true } },
       ],
       'layout-kit': [
         { name: 'AppLayout', type: 'layout', options: { withProps: true, responsive: true } },
         { name: 'Sidebar', type: 'layout', options: { withAnimation: true } },
-        { name: 'Header', type: 'layout', options: { responsive: true } }
-      ]
+        { name: 'Header', type: 'layout', options: { responsive: true } },
+      ],
     };
 
     const template = templates[templateName];
@@ -278,13 +293,12 @@ describe('${name}', () => {
     }
 
     console.log(`🚀 Generating ${templateName} components...`);
-    
+
     for (const component of template) {
-      await this.generateComponent(
-        component.name,
-        component.type as any,
-        { ...component.options, ...customizations }
-      );
+      await this.generateComponent(component.name, component.type as any, {
+        ...component.options,
+        ...customizations,
+      });
     }
 
     console.log(`✅ ${templateName} generated successfully!`);
@@ -292,11 +306,7 @@ describe('${name}', () => {
 }
 
 // CLI integration for component generation
-export async function generateComponentCLI(
-  name: string,
-  type: string,
-  options: any = {}
-) {
+export async function generateComponentCLI(name: string, type: string, options: any = {}) {
   const generator = new ComponentGenerator();
   await generator.generateComponent(name, type as any, options);
 }

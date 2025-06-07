@@ -36,9 +36,15 @@ export const AnalyticsTemplate: React.FC = () => {
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="font-bold text-xl text-gray-900">Analytics Dashboard</div>
           <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" leftIcon={<Filter />}>Filters</Button>
-            <Button variant="outline" size="sm" leftIcon={<Calendar />}>Date Range</Button>
-            <Button size="sm" leftIcon={<Download />}>Export Report</Button>
+            <Button variant="outline" size="sm" leftIcon={<Filter />}>
+              Filters
+            </Button>
+            <Button variant="outline" size="sm" leftIcon={<Calendar />}>
+              Date Range
+            </Button>
+            <Button size="sm" leftIcon={<Download />}>
+              Export Report
+            </Button>
           </div>
         </div>
       </div>
@@ -56,18 +62,13 @@ export const AnalyticsTemplate: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <ChartContainer title="Traffic Overview" icon={<BarChart3 />}>
             <div className="h-80">
-              <LineChart 
-                data={lineChartData}
-                title="Visitor Trends"
-                height={320}
-                compact={false}
-              />
+              <LineChart data={lineChartData} title="Visitor Trends" height={320} compact={false} />
             </div>
           </ChartContainer>
 
           <ChartContainer title="Traffic Sources" icon={<PieChart />}>
             <div className="h-80">
-              <PieChartWidget 
+              <PieChartWidget
                 data={pieChartData}
                 title="Traffic Sources"
                 height={320}
@@ -82,7 +83,7 @@ export const AnalyticsTemplate: React.FC = () => {
           <div className="xl:col-span-2">
             <ChartContainer title="Real-time Analytics" icon={<TrendingUp />}>
               <div className="h-96">
-                <LineChart 
+                <LineChart
                   data={lineChartData}
                   title="Real-time Traffic"
                   height={384}
@@ -96,7 +97,7 @@ export const AnalyticsTemplate: React.FC = () => {
             <div className="bg-white rounded-lg p-6 border border-gray-200">
               <h3 className="text-lg font-semibold mb-4">Device Usage</h3>
               <div className="h-64">
-                <DonutChart 
+                <DonutChart
                   data={donutChartData}
                   title="Device Distribution"
                   centerText="Total Devices"
@@ -146,9 +147,7 @@ const MetricCard: React.FC<{
   >
     <h4 className="text-sm font-medium text-gray-600 mb-2">{title}</h4>
     <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
-    <p className={`text-sm ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-      {change}
-    </p>
+    <p className={`text-sm ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>{change}</p>
   </motion.div>
 );
 
@@ -163,7 +162,9 @@ const ChartContainer: React.FC<{
         {icon}
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
       </div>
-      <Button variant="ghost" size="sm">⋯</Button>
+      <Button variant="ghost" size="sm">
+        ⋯
+      </Button>
     </div>
     <div className="p-6">{children}</div>
   </div>

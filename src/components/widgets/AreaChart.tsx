@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  AreaChart as RechartsAreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { useDarkMode } from '../../hooks/useDarkMode';
 
 interface AreaData {
@@ -35,14 +43,14 @@ interface AreaChartProps {
   size?: 'small' | 'medium' | 'large' | 'auto'; // New size prop for better control
 }
 
-const AreaChart: React.FC<AreaChartProps> = ({ 
-  data = mockData, 
+const AreaChart: React.FC<AreaChartProps> = ({
+  data = mockData,
   title = 'Website Analytics Trends',
   showDots = true,
   stackedMode = false,
   compact = false,
   height,
-  size = 'auto'
+  size = 'auto',
 }) => {
   const { isDarkMode } = useDarkMode();
   const [activeArea, setActiveArea] = useState<string | null>(null);
@@ -61,11 +69,13 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length > 0) {
       return (
-        <div className={`p-3 border rounded-lg shadow-lg ${compact ? 'text-xs' : 'text-sm'} ${
-          isDarkMode 
-            ? 'bg-gray-800 border-gray-600 text-white' 
-            : 'bg-white border-gray-200 text-gray-800'
-        }`}>
+        <div
+          className={`p-3 border rounded-lg shadow-lg ${compact ? 'text-xs' : 'text-sm'} ${
+            isDarkMode
+              ? 'bg-gray-800 border-gray-600 text-white'
+              : 'bg-white border-gray-200 text-gray-800'
+          }`}
+        >
           <p className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             {`${label}`}
           </p>
@@ -76,14 +86,16 @@ const AreaChart: React.FC<AreaChartProps> = ({
               .map((item: any, index: number) => (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div 
+                    <div
                       className="w-2 h-2 rounded-full mr-2"
                       style={{ backgroundColor: item.color }}
                     ></div>
-                    <span className="truncate">{compact ? item.name.split(' ')[0] : item.name}:</span>
+                    <span className="truncate">
+                      {compact ? item.name.split(' ')[0] : item.name}:
+                    </span>
                   </div>
                   <span className="font-bold ml-2">
-                    {compact && item.value >= 1000 
+                    {compact && item.value >= 1000
                       ? `${(item.value / 1000).toFixed(1)}k`
                       : item.value?.toLocaleString() || '0'}
                   </span>
@@ -122,22 +134,22 @@ const AreaChart: React.FC<AreaChartProps> = ({
     if (compact) {
       return (
         <div className="flex flex-wrap justify-center gap-1 mb-3">
-          {areas.slice(0, 3).map((area) => {
+          {areas.slice(0, 3).map(area => {
             const isHidden = hiddenAreas.has(area.dataKey);
-            
+
             return (
               <button
                 key={area.dataKey}
                 onClick={() => toggleArea(area.dataKey)}
                 className={`flex items-center px-2 py-1 rounded text-xs transition-all ${
-                  isHidden 
-                    ? 'opacity-50' 
+                  isHidden
+                    ? 'opacity-50'
                     : isDarkMode
                       ? 'bg-gray-700 hover:bg-gray-600'
                       : 'bg-gray-100 hover:bg-gray-200'
                 }`}
               >
-                <div 
+                <div
                   className="w-2 h-2 rounded-full mr-1"
                   style={{ backgroundColor: area.color }}
                 ></div>
@@ -148,13 +160,13 @@ const AreaChart: React.FC<AreaChartProps> = ({
         </div>
       );
     }
-    
+
     return (
       <div className="flex flex-wrap justify-center gap-3 mb-4">
-        {areas.map((area) => {
+        {areas.map(area => {
           const isHidden = hiddenAreas.has(area.dataKey);
           const isActive = activeArea === area.dataKey;
-          
+
           return (
             <button
               key={area.dataKey}
@@ -162,28 +174,32 @@ const AreaChart: React.FC<AreaChartProps> = ({
               onMouseEnter={() => setActiveArea(area.dataKey)}
               onMouseLeave={() => setActiveArea(null)}
               className={`flex items-center px-3 py-2 rounded-lg border transition-all ${
-                isHidden 
-                  ? isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 opacity-50' 
+                isHidden
+                  ? isDarkMode
+                    ? 'bg-gray-700 border-gray-600 opacity-50'
                     : 'bg-gray-100 border-gray-300 opacity-50'
                   : isActive
-                    ? isDarkMode 
-                      ? 'bg-blue-900 border-blue-700 shadow-md' 
+                    ? isDarkMode
+                      ? 'bg-blue-900 border-blue-700 shadow-md'
                       : 'bg-blue-50 border-blue-300 shadow-md'
                     : isDarkMode
                       ? 'bg-gray-800 border-gray-600 hover:bg-gray-700'
                       : 'bg-white border-gray-200 hover:bg-gray-50'
               }`}
             >
-              <div 
+              <div
                 className={`w-3 h-3 rounded-full mr-2 ${isHidden ? 'opacity-30' : ''}`}
                 style={{ backgroundColor: area.color }}
               ></div>
-              <span className={`text-sm ${
-                isHidden 
-                  ? isDarkMode ? 'line-through text-gray-500' : 'line-through text-gray-400'
-                  : 'font-medium'
-              }`}>
+              <span
+                className={`text-sm ${
+                  isHidden
+                    ? isDarkMode
+                      ? 'line-through text-gray-500'
+                      : 'line-through text-gray-400'
+                    : 'font-medium'
+                }`}
+              >
                 {area.name}
               </span>
             </button>
@@ -214,11 +230,11 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const getAdaptiveDimensions = () => {
     const dataPoints = data.length;
     const visibleAreas = areas.filter(area => !hiddenAreas.has(area.dataKey)).length;
-    
+
     // Base dimensions
     let chartHeight: number;
     let containerMinHeight: number;
-    
+
     if (height) {
       // Use provided height if specified
       chartHeight = height;
@@ -237,29 +253,34 @@ const AreaChart: React.FC<AreaChartProps> = ({
       const baseHeight = 280;
       const dataComplexity = Math.min(dataPoints * 8, 80); // Max 80px for data
       const areaComplexity = Math.min(visibleAreas * 25, 100); // Max 100px for areas
-      
+
       chartHeight = baseHeight + dataComplexity + areaComplexity;
       containerMinHeight = chartHeight + (compact ? 80 : 140);
     }
-    
+
     return {
       chartHeight: Math.max(chartHeight, compact ? 180 : 250),
       containerMinHeight: Math.max(containerMinHeight, compact ? 260 : 390),
-      chartWidth: '100%'
+      chartWidth: '100%',
     };
   };
 
   const dimensions = getAdaptiveDimensions();
 
   return (
-    <div className={`${compact ? 'p-2 sm:p-3' : 'p-4 sm:p-6'} rounded-lg shadow-sm border flex flex-col ${
-      isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    }`} style={{ 
-      minHeight: `${dimensions.containerMinHeight}px`,
-      height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto'
-    }}>
+    <div
+      className={`${compact ? 'p-2 sm:p-3' : 'p-4 sm:p-6'} rounded-lg shadow-sm border flex flex-col ${
+        isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+      }`}
+      style={{
+        minHeight: `${dimensions.containerMinHeight}px`,
+        height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto',
+      }}
+    >
       <div className="flex justify-between items-start mb-2 sm:mb-3 flex-shrink-0 gap-2">
-        <h3 className={`${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-lg'} font-semibold flex-1 min-w-0 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+        <h3
+          className={`${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-lg'} font-semibold flex-1 min-w-0 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+        >
           {title}
         </h3>
         {!compact && (
@@ -267,8 +288,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
             <button
               onClick={() => setLocalStackedMode(!localStackedMode)}
               className={`px-2 py-1 text-xs rounded border transition-colors ${
-                localStackedMode 
-                  ? 'bg-blue-100 text-blue-700 border-blue-300' 
+                localStackedMode
+                  ? 'bg-blue-100 text-blue-700 border-blue-300'
                   : isDarkMode
                     ? 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
                     : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
@@ -290,36 +311,40 @@ const AreaChart: React.FC<AreaChartProps> = ({
         <ResponsiveContainer width={dimensions.chartWidth} height={dimensions.chartHeight}>
           <RechartsAreaChart
             data={data}
-            margin={{ 
-              top: compact ? 5 : 10, 
-              right: compact ? 8 : 15, 
-              left: compact ? 5 : 10, 
-              bottom: compact ? 5 : 10 
+            margin={{
+              top: compact ? 5 : 10,
+              right: compact ? 8 : 15,
+              left: compact ? 5 : 10,
+              bottom: compact ? 5 : 10,
             }}
             onMouseEnter={onAreaMouseEnter}
             onMouseLeave={onAreaMouseLeave}
           >
             <defs>
-              {areas.map((area) => (
-                <linearGradient key={area.dataKey} id={`gradient${area.dataKey}`} x1="0" y1="0" x2="0" y2="1">
+              {areas.map(area => (
+                <linearGradient
+                  key={area.dataKey}
+                  id={`gradient${area.dataKey}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
                   <stop offset="5%" stopColor={area.color} stopOpacity={area.opacity} />
                   <stop offset="95%" stopColor={area.color} stopOpacity={0.1} />
                 </linearGradient>
               ))}
             </defs>
-            
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              stroke={isDarkMode ? '#374151' : '#f0f0f0'} 
-            />
-            <XAxis 
-              dataKey="month" 
+
+            <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#f0f0f0'} />
+            <XAxis
+              dataKey="month"
               stroke={isDarkMode ? '#9CA3AF' : '#666'}
               fontSize={compact ? 10 : 12}
               tick={{ fill: isDarkMode ? '#9CA3AF' : '#666' }}
               interval={compact ? 1 : 0}
             />
-            <YAxis 
+            <YAxis
               stroke={isDarkMode ? '#9CA3AF' : '#666'}
               fontSize={compact ? 10 : 12}
               tickFormatter={formatYAxisTick}
@@ -330,33 +355,41 @@ const AreaChart: React.FC<AreaChartProps> = ({
 
             {areas.map((area, index) => {
               if (hiddenAreas.has(area.dataKey)) return null;
-              
+
               const isActive = activeArea === area.dataKey;
-              
+
               return (
                 <Area
                   key={area.dataKey}
                   type="monotone"
                   dataKey={area.dataKey}
-                  stackId={localStackedMode ? "1" : area.dataKey}
+                  stackId={localStackedMode ? '1' : area.dataKey}
                   stroke={area.color}
                   strokeWidth={isActive ? 3 : compact ? 1.5 : 2}
                   fill={`url(#gradient${area.dataKey})`}
                   fillOpacity={isActive ? 1 : 0.8}
-                  dot={!compact && localShowDots ? { 
-                    fill: area.color, 
-                    strokeWidth: 2, 
-                    stroke: '#fff',
-                    r: isActive ? 5 : 3,
-                    filter: isActive ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' : 'none'
-                  } : false}
-                  activeDot={!compact && localShowDots ? { 
-                    r: 6, 
-                    fill: area.color,
-                    stroke: '#fff',
-                    strokeWidth: 3,
-                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))'
-                  } : undefined}
+                  dot={
+                    !compact && localShowDots
+                      ? {
+                          fill: area.color,
+                          strokeWidth: 2,
+                          stroke: '#fff',
+                          r: isActive ? 5 : 3,
+                          filter: isActive ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' : 'none',
+                        }
+                      : false
+                  }
+                  activeDot={
+                    !compact && localShowDots
+                      ? {
+                          r: 6,
+                          fill: area.color,
+                          stroke: '#fff',
+                          strokeWidth: 3,
+                          filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))',
+                        }
+                      : undefined
+                  }
                   animationDuration={compact ? 500 : 1000 + index * 200}
                   animationEasing="ease-out"
                 />
@@ -369,36 +402,44 @@ const AreaChart: React.FC<AreaChartProps> = ({
       {/* Statistics Summary - Conditional display */}
       {!compact && (
         <div className="mt-2 sm:mt-4 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 flex-shrink-0">
-          {areas.slice(0, 4).map((area) => {
+          {areas.slice(0, 4).map(area => {
             if (hiddenAreas.has(area.dataKey)) return null;
-            
+
             const values = data.map(d => d[area.dataKey as keyof AreaData] as number);
             const total = values.reduce((sum, val) => sum + val, 0);
             const average = total / values.length;
-            const growth = ((values[values.length - 1] - values[0]) / values[0] * 100);
-            
+            const growth = ((values[values.length - 1] - values[0]) / values[0]) * 100;
+
             return (
-              <div key={area.dataKey} className={`p-2 sm:p-3 rounded-lg ${
-                isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
-              }`}>
+              <div
+                key={area.dataKey}
+                className={`p-2 sm:p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}
+              >
                 <div className="flex items-center mb-1 sm:mb-2 gap-1">
-                  <div 
+                  <div
                     className="w-2 h-2 rounded-full flex-shrink-0"
                     style={{ backgroundColor: area.color }}
                   ></div>
-                  <h4 className={`text-xs font-medium truncate ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}>{area.name}</h4>
+                  <h4
+                    className={`text-xs font-medium truncate ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}
+                  >
+                    {area.name}
+                  </h4>
                 </div>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between items-center">
                     <span className="text-xs">Total:</span>
-                    <span className="font-bold text-xs">{(total/1000).toFixed(0)}k</span>
+                    <span className="font-bold text-xs">{(total / 1000).toFixed(0)}k</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs">Growth:</span>
-                    <span className={`font-bold text-xs ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {growth >= 0 ? '+' : ''}{growth.toFixed(0)}%
+                    <span
+                      className={`font-bold text-xs ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                    >
+                      {growth >= 0 ? '+' : ''}
+                      {growth.toFixed(0)}%
                     </span>
                   </div>
                 </div>
@@ -410,9 +451,11 @@ const AreaChart: React.FC<AreaChartProps> = ({
 
       {/* Controls hint - Only for non-compact mode */}
       {!compact && (
-        <div className={`mt-2 sm:mt-3 text-xs text-center ${
-          isDarkMode ? 'text-gray-400' : 'text-gray-500'
-        }`}>
+        <div
+          className={`mt-2 sm:mt-3 text-xs text-center ${
+            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          }`}
+        >
           Click legend items to toggle areas • Hover for details
         </div>
       )}

@@ -1,40 +1,40 @@
-import React from 'react'
-import { motion } from 'framer-motion'
+import React from 'react';
+import { motion } from 'framer-motion';
 
 interface MainContentProps {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }
 
 interface WidgetAreaProps {
-  title?: string
-  children: React.ReactNode
-  className?: string
-  size?: 'small' | 'medium' | 'large' | 'full'
-  variant?: 'default' | 'gradient' | 'bordered' | 'minimal'
+  title?: string;
+  children: React.ReactNode;
+  className?: string;
+  size?: 'small' | 'medium' | 'large' | 'full';
+  variant?: 'default' | 'gradient' | 'bordered' | 'minimal';
 }
 
 // Widget Area Component
-const WidgetArea: React.FC<WidgetAreaProps> = ({ 
-  title, 
-  children, 
-  className = '', 
+const WidgetArea: React.FC<WidgetAreaProps> = ({
+  title,
+  children,
+  className = '',
   size = 'medium',
-  variant = 'default'
+  variant = 'default',
 }) => {
   const sizeClasses = {
     small: 'col-span-1 min-h-[200px]',
     medium: 'col-span-1 md:col-span-2 min-h-[280px]',
     large: 'col-span-1 md:col-span-2 lg:col-span-3 min-h-[350px]',
-    full: 'col-span-full min-h-[400px]'
-  }
+    full: 'col-span-full min-h-[400px]',
+  };
 
   const variantClasses = {
     default: 'bg-white border border-secondary-200 shadow-sm',
     gradient: 'bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-200',
     bordered: 'bg-white border-2 border-primary-200',
-    minimal: 'bg-white'
-  }
+    minimal: 'bg-white',
+  };
 
   return (
     <motion.div
@@ -54,26 +54,24 @@ const WidgetArea: React.FC<WidgetAreaProps> = ({
           <h3 className="text-lg font-semibold text-secondary-900">{title}</h3>
         </div>
       )}
-      <div className="flex-1 min-h-0 overflow-hidden">
-        {children}
-      </div>
+      <div className="flex-1 min-h-0 overflow-hidden">{children}</div>
     </motion.div>
-  )
-}
+  );
+};
 
 // Stats Card Component
 const StatsCard: React.FC<{
-  title: string
-  value: string | number
-  change?: string
-  trend?: 'up' | 'down' | 'neutral'
-  icon?: React.ComponentType<any>
+  title: string;
+  value: string | number;
+  change?: string;
+  trend?: 'up' | 'down' | 'neutral';
+  icon?: React.ComponentType<any>;
 }> = ({ title, value, change, trend = 'neutral', icon: Icon }) => {
   const trendColors = {
     up: 'text-success-600',
     down: 'text-error-600',
-    neutral: 'text-secondary-600'
-  }
+    neutral: 'text-secondary-600',
+  };
 
   return (
     <div className="bg-white rounded-lg p-6 border border-secondary-200 hover:shadow-md transition-shadow">
@@ -87,15 +85,11 @@ const StatsCard: React.FC<{
       </div>
       <div className="space-y-2">
         <p className="text-2xl font-bold text-secondary-900">{value}</p>
-        {change && (
-          <p className={`text-sm ${trendColors[trend]}`}>
-            {change}
-          </p>
-        )}
+        {change && <p className={`text-sm ${trendColors[trend]}`}>{change}</p>}
       </div>
     </div>
-  )
-}
+  );
+};
 
 // Quick Actions Component
 const QuickActions: React.FC = () => {
@@ -103,8 +97,8 @@ const QuickActions: React.FC = () => {
     { label: 'New Project', color: 'bg-primary-500', onClick: () => {} },
     { label: 'Upload File', color: 'bg-accent-500', onClick: () => {} },
     { label: 'Create Report', color: 'bg-success-500', onClick: () => {} },
-    { label: 'Send Message', color: 'bg-warning-500', onClick: () => {} }
-  ]
+    { label: 'Send Message', color: 'bg-warning-500', onClick: () => {} },
+  ];
 
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -123,8 +117,8 @@ const QuickActions: React.FC = () => {
         </motion.button>
       ))}
     </div>
-  )
-}
+  );
+};
 
 // Activity Feed Component
 const ActivityFeed: React.FC = () => {
@@ -135,7 +129,7 @@ const ActivityFeed: React.FC = () => {
       action: 'created a new project',
       target: 'Website Redesign',
       time: '2 minutes ago',
-      avatar: 'JD'
+      avatar: 'JD',
     },
     {
       id: 2,
@@ -143,7 +137,7 @@ const ActivityFeed: React.FC = () => {
       action: 'uploaded a file to',
       target: 'Marketing Campaign',
       time: '15 minutes ago',
-      avatar: 'SW'
+      avatar: 'SW',
     },
     {
       id: 3,
@@ -151,13 +145,13 @@ const ActivityFeed: React.FC = () => {
       action: 'completed task',
       target: 'Database Migration',
       time: '1 hour ago',
-      avatar: 'MJ'
-    }
-  ]
+      avatar: 'MJ',
+    },
+  ];
 
   return (
     <div className="space-y-4">
-      {activities.map((activity) => (
+      {activities.map(activity => (
         <motion.div
           key={activity.id}
           initial={{ opacity: 0, x: -20 }}
@@ -169,10 +163,8 @@ const ActivityFeed: React.FC = () => {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm text-secondary-900">
-              <span className="font-medium">{activity.user}</span>
-              {' '}
-              <span className="text-secondary-600">{activity.action}</span>
-              {' '}
+              <span className="font-medium">{activity.user}</span>{' '}
+              <span className="text-secondary-600">{activity.action}</span>{' '}
               <span className="font-medium">{activity.target}</span>
             </p>
             <p className="text-xs text-secondary-500 mt-1">{activity.time}</p>
@@ -180,28 +172,40 @@ const ActivityFeed: React.FC = () => {
         </motion.div>
       ))}
     </div>
-  )
-}
+  );
+};
 
 // Chart Placeholder Component
-const ChartPlaceholder: React.FC<{ title: string; height?: string }> = ({ 
-  title, 
-  height = 'h-64' 
+const ChartPlaceholder: React.FC<{ title: string; height?: string }> = ({
+  title,
+  height = 'h-64',
 }) => {
   return (
-    <div className={`${height} bg-secondary-50 rounded-lg flex items-center justify-center border-2 border-dashed border-secondary-300`}>
+    <div
+      className={`${height} bg-secondary-50 rounded-lg flex items-center justify-center border-2 border-dashed border-secondary-300`}
+    >
       <div className="text-center">
         <div className="w-12 h-12 bg-secondary-200 rounded-lg mx-auto mb-3 flex items-center justify-center">
-          <svg className="w-6 h-6 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          <svg
+            className="w-6 h-6 text-secondary-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
           </svg>
         </div>
         <p className="text-sm font-medium text-secondary-600">{title}</p>
         <p className="text-xs text-secondary-500 mt-1">Chart component will render here</p>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // Main Content Component
 const MainContent: React.FC<MainContentProps> = ({ children, className = '' }) => {
@@ -214,8 +218,8 @@ const MainContent: React.FC<MainContentProps> = ({ children, className = '' }) =
         </div>
       </div>
     </main>
-  )
-}
+  );
+};
 
 // Dashboard Grid Component
 const DashboardGrid: React.FC = () => {
@@ -223,39 +227,19 @@ const DashboardGrid: React.FC = () => {
     <MainContent>
       {/* Stats Row */}
       <WidgetArea size="small" variant="default">
-        <StatsCard 
-          title="Total Users" 
-          value="12,345" 
-          change="+12% from last month"
-          trend="up"
-        />
+        <StatsCard title="Total Users" value="12,345" change="+12% from last month" trend="up" />
       </WidgetArea>
 
       <WidgetArea size="small" variant="default">
-        <StatsCard 
-          title="Revenue" 
-          value="$54,321" 
-          change="+8% from last month"
-          trend="up"
-        />
+        <StatsCard title="Revenue" value="$54,321" change="+8% from last month" trend="up" />
       </WidgetArea>
 
       <WidgetArea size="small" variant="default">
-        <StatsCard 
-          title="Orders" 
-          value="1,234" 
-          change="-3% from last month"
-          trend="down"
-        />
+        <StatsCard title="Orders" value="1,234" change="-3% from last month" trend="down" />
       </WidgetArea>
 
       <WidgetArea size="small" variant="default">
-        <StatsCard 
-          title="Conversion" 
-          value="3.2%" 
-          change="No change"
-          trend="neutral"
-        />
+        <StatsCard title="Conversion" value="3.2%" change="No change" trend="neutral" />
       </WidgetArea>
 
       {/* Charts Row */}
@@ -284,9 +268,9 @@ const DashboardGrid: React.FC = () => {
         </div>
       </WidgetArea>
     </MainContent>
-  )
-}
+  );
+};
 
 // Export components
-export default MainContent
-export { WidgetArea, StatsCard, QuickActions, ActivityFeed, ChartPlaceholder, DashboardGrid }
+export default MainContent;
+export { WidgetArea, StatsCard, QuickActions, ActivityFeed, ChartPlaceholder, DashboardGrid };

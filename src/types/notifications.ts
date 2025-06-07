@@ -3,9 +3,13 @@ import { BaseComponent, ComponentSize } from './index';
 
 // Base notification types
 export type NotificationType = 'success' | 'error' | 'warning' | 'info' | 'loading';
-export type NotificationPosition = 
-  | 'top-left' | 'top-center' | 'top-right'
-  | 'bottom-left' | 'bottom-center' | 'bottom-right'
+export type NotificationPosition =
+  | 'top-left'
+  | 'top-center'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-center'
+  | 'bottom-right'
   | 'center';
 
 // Core notification interface

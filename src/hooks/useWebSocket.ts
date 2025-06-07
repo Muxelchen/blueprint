@@ -23,7 +23,7 @@ interface UseWebSocketReturn {
 
 /**
  * A hook for using WebSocket connections in React components
- * 
+ *
  * @example
  * ```tsx
  * const { connected, messages, send, subscribe } = useWebSocket({
@@ -31,14 +31,14 @@ interface UseWebSocketReturn {
  *   autoConnect: true,
  *   userId: 'user-123',
  * });
- * 
+ *
  * // Subscribe to a channel
  * useEffect(() => {
  *   if (connected) {
  *     subscribe('notifications');
  *   }
  * }, [connected, subscribe]);
- * 
+ *
  * // Send a message
  * const handleClick = () => {
  *   send('CHAT_MESSAGE', { text: 'Hello!' });
@@ -56,7 +56,7 @@ export function useWebSocket({
   const [messages, setMessages] = useState<WebSocketMessage[]>([]);
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
   const [connectionAttempts, setConnectionAttempts] = useState(0);
-  
+
   const serviceRef = useRef<WebSocketService | null>(null);
 
   // Initialize the WebSocket service on mount
@@ -75,28 +75,28 @@ export function useWebSocket({
         setConnected(false);
         if (options.onClose) options.onClose();
       },
-      onError: (error) => {
+      onError: error => {
         setConnecting(false);
         if (options.onError) options.onError(error);
       },
-      onMessage: (message) => {
+      onMessage: message => {
         setMessages(prevMessages => [...prevMessages, message]);
         setLastMessage(message);
         if (options.onMessage) options.onMessage(message);
       },
-      onReconnect: (attempt) => {
+      onReconnect: attempt => {
         setConnectionAttempts(attempt);
         setConnecting(true);
         if (options.onReconnect) options.onReconnect(attempt);
-      }
+      },
     });
-    
+
     // Connect if autoConnect is true
     if (autoConnect) {
       setConnecting(true);
       serviceRef.current.connect(userId);
     }
-    
+
     // Clean up when component unmounts
     return () => {
       if (serviceRef.current) {
@@ -106,12 +106,15 @@ export function useWebSocket({
   }, [url]); // Only re-initialize if URL changes
 
   // Connect to the WebSocket
-  const connect = useCallback((newUserId?: string) => {
-    if (serviceRef.current) {
-      setConnecting(true);
-      serviceRef.current.connect(newUserId ?? userId);
-    }
-  }, [userId]);
+  const connect = useCallback(
+    (newUserId?: string) => {
+      if (serviceRef.current) {
+        setConnecting(true);
+        serviceRef.current.connect(newUserId ?? userId);
+      }
+    },
+    [userId]
+  );
 
   // Disconnect from the WebSocket
   const disconnect = useCallback(() => {
@@ -160,7 +163,7 @@ export function useWebSocket({
     connect,
     disconnect,
     clearMessages,
-    connectionAttempts
+    connectionAttempts,
   };
 }
 

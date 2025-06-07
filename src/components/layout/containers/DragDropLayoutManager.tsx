@@ -1,7 +1,20 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
-import { DndContext, DragEndEvent, DragStartEvent, DragOverEvent, useSensor, useSensors, PointerSensor, KeyboardSensor } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverEvent,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  KeyboardSensor,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -47,7 +60,15 @@ export interface MagneticField {
 }
 
 export interface ResizeHandle {
-  position: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  position:
+    | 'top'
+    | 'bottom'
+    | 'left'
+    | 'right'
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right';
   cursor?: string;
   size?: number;
 }
@@ -91,14 +112,14 @@ const SortableWidget: React.FC<{
   containerHeight,
   onSelect,
   onMove,
-  onResize
+  onResize,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [resizeHandle, setResizeHandle] = useState<string>('');
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [startSize, setStartSize] = useState({ width: 0, height: 0 });
-  
+
   const widgetRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -107,10 +128,10 @@ const SortableWidget: React.FC<{
     setNodeRef,
     transform,
     transition,
-    isDragging: sortableIsDragging
+    isDragging: sortableIsDragging,
   } = useSortable({
     id: widget.id,
-    disabled: widget.locked || !widget.dragConfig?.enabled
+    disabled: widget.locked || !widget.dragConfig?.enabled,
   });
 
   const style = {
@@ -122,51 +143,60 @@ const SortableWidget: React.FC<{
     zIndex: widget.position.z || (isSelected ? 1000 : 1),
     transform: CSS.Transform.toString(transform),
     transition,
-    cursor: isDragging ? 'grabbing' : 'grab'
+    cursor: isDragging ? 'grabbing' : 'grab',
   };
 
   // Snap to grid function
-  const snapToGridValue = useCallback((value: number) => {
-    if (!snapToGrid) return value;
-    return Math.round(value / gridSize) * gridSize;
-  }, [snapToGrid, gridSize]);
+  const snapToGridValue = useCallback(
+    (value: number) => {
+      if (!snapToGrid) return value;
+      return Math.round(value / gridSize) * gridSize;
+    },
+    [snapToGrid, gridSize]
+  );
 
   // Handle drag start
-  const handleDragStart = useCallback((e: React.MouseEvent) => {
-    if (widget.locked || !widget.dragConfig?.enabled) return;
-    
-    setIsDragging(true);
-    setStartPos({ x: e.clientX, y: e.clientY });
-    
-    // Select widget if not already selected
-    if (!isSelected) {
-      onSelect(widget.id, e.ctrlKey || e.metaKey);
-    }
-  }, [widget.locked, widget.dragConfig?.enabled, isSelected, onSelect, widget.id]);
+  const handleDragStart = useCallback(
+    (e: React.MouseEvent) => {
+      if (widget.locked || !widget.dragConfig?.enabled) return;
+
+      setIsDragging(true);
+      setStartPos({ x: e.clientX, y: e.clientY });
+
+      // Select widget if not already selected
+      if (!isSelected) {
+        onSelect(widget.id, e.ctrlKey || e.metaKey);
+      }
+    },
+    [widget.locked, widget.dragConfig?.enabled, isSelected, onSelect, widget.id]
+  );
 
   // Handle drag move
-  const handleDragMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
+  const handleDragMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging) return;
 
-    const deltaX = e.clientX - startPos.x;
-    const deltaY = e.clientY - startPos.y;
-    
-    const newX = snapToGridValue(widget.position.x + deltaX);
-    const newY = snapToGridValue(widget.position.y + deltaY);
+      const deltaX = e.clientX - startPos.x;
+      const deltaY = e.clientY - startPos.y;
 
-    // Check constraints
-    if (widget.constraints?.boundToContainer) {
-      const maxX = Math.max(0, containerWidth - widget.size.width);
-      const maxY = Math.max(0, containerHeight - widget.size.height);
-      
-      onMove(widget.id, {
-        x: Math.max(0, Math.min(newX, maxX)),
-        y: Math.max(0, Math.min(newY, maxY))
-      });
-    } else {
-      onMove(widget.id, { x: newX, y: newY });
-    }
-  }, [isDragging, startPos, widget, snapToGridValue, onMove]);
+      const newX = snapToGridValue(widget.position.x + deltaX);
+      const newY = snapToGridValue(widget.position.y + deltaY);
+
+      // Check constraints
+      if (widget.constraints?.boundToContainer) {
+        const maxX = Math.max(0, containerWidth - widget.size.width);
+        const maxY = Math.max(0, containerHeight - widget.size.height);
+
+        onMove(widget.id, {
+          x: Math.max(0, Math.min(newX, maxX)),
+          y: Math.max(0, Math.min(newY, maxY)),
+        });
+      } else {
+        onMove(widget.id, { x: newX, y: newY });
+      }
+    },
+    [isDragging, startPos, widget, snapToGridValue, onMove]
+  );
 
   // Handle drag end
   const handleDragEnd = useCallback(() => {
@@ -174,69 +204,75 @@ const SortableWidget: React.FC<{
   }, []);
 
   // Handle resize start
-  const handleResizeStart = useCallback((e: React.MouseEvent, handle: string) => {
-    if (widget.locked || !widget.resizeConfig?.enabled) return;
-    
-    e.preventDefault();
-    e.stopPropagation();
-    
-    setIsResizing(true);
-    setResizeHandle(handle);
-    setStartPos({ x: e.clientX, y: e.clientY });
-    setStartSize({ width: widget.size.width, height: widget.size.height });
-  }, [widget.locked, widget.resizeConfig?.enabled, widget.size]);
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent, handle: string) => {
+      if (widget.locked || !widget.resizeConfig?.enabled) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      setIsResizing(true);
+      setResizeHandle(handle);
+      setStartPos({ x: e.clientX, y: e.clientY });
+      setStartSize({ width: widget.size.width, height: widget.size.height });
+    },
+    [widget.locked, widget.resizeConfig?.enabled, widget.size]
+  );
 
   // Handle resize move
-  const handleResizeMove = useCallback((e: MouseEvent) => {
-    if (!isResizing) return;
+  const handleResizeMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing) return;
 
-    const deltaX = e.clientX - startPos.x;
-    const deltaY = e.clientY - startPos.y;
-    
-    let newWidth = startSize.width;
-    let newHeight = startSize.height;
+      const deltaX = e.clientX - startPos.x;
+      const deltaY = e.clientY - startPos.y;
 
-    // Calculate new size based on resize handle
-    if (resizeHandle.includes('right')) {
-      newWidth = startSize.width + deltaX;
-    }
-    if (resizeHandle.includes('left')) {
-      newWidth = startSize.width - deltaX;
-    }
-    if (resizeHandle.includes('bottom')) {
-      newHeight = startSize.height + deltaY;
-    }
-    if (resizeHandle.includes('top')) {
-      newHeight = startSize.height - deltaY;
-    }
+      let newWidth = startSize.width;
+      let newHeight = startSize.height;
 
-    // Apply constraints
-    const constraints = widget.constraints;
-    if (constraints) {
-      newWidth = Math.max(constraints.minWidth || 50, newWidth);
-      newWidth = Math.min(constraints.maxWidth || Infinity, newWidth);
-      newHeight = Math.max(constraints.minHeight || 50, newHeight);
-      newHeight = Math.min(constraints.maxHeight || Infinity, newHeight);
-    }
-
-    // Maintain aspect ratio if required
-    if (widget.resizeConfig?.maintainAspectRatio && widget.resizeConfig.aspectRatio) {
-      const ratio = widget.resizeConfig.aspectRatio;
-      if (resizeHandle.includes('right') || resizeHandle.includes('left')) {
-        newHeight = newWidth / ratio;
-      } else {
-        newWidth = newHeight * ratio;
+      // Calculate new size based on resize handle
+      if (resizeHandle.includes('right')) {
+        newWidth = startSize.width + deltaX;
       }
-    }
+      if (resizeHandle.includes('left')) {
+        newWidth = startSize.width - deltaX;
+      }
+      if (resizeHandle.includes('bottom')) {
+        newHeight = startSize.height + deltaY;
+      }
+      if (resizeHandle.includes('top')) {
+        newHeight = startSize.height - deltaY;
+      }
 
-    // Snap to grid
-    if (snapToGrid) {
-      newWidth = snapToGridValue(newWidth);
-      newHeight = snapToGridValue(newHeight);
-    }
+      // Apply constraints
+      const constraints = widget.constraints;
+      if (constraints) {
+        newWidth = Math.max(constraints.minWidth || 50, newWidth);
+        newWidth = Math.min(constraints.maxWidth || Infinity, newWidth);
+        newHeight = Math.max(constraints.minHeight || 50, newHeight);
+        newHeight = Math.min(constraints.maxHeight || Infinity, newHeight);
+      }
 
-    onResize(widget.id, { width: newWidth, height: newHeight });
-  }, [isResizing, startPos, startSize, resizeHandle, widget, snapToGrid, snapToGridValue, onResize]);
+      // Maintain aspect ratio if required
+      if (widget.resizeConfig?.maintainAspectRatio && widget.resizeConfig.aspectRatio) {
+        const ratio = widget.resizeConfig.aspectRatio;
+        if (resizeHandle.includes('right') || resizeHandle.includes('left')) {
+          newHeight = newWidth / ratio;
+        } else {
+          newWidth = newHeight * ratio;
+        }
+      }
+
+      // Snap to grid
+      if (snapToGrid) {
+        newWidth = snapToGridValue(newWidth);
+        newHeight = snapToGridValue(newHeight);
+      }
+
+      onResize(widget.id, { width: newWidth, height: newHeight });
+    },
+    [isResizing, startPos, startSize, resizeHandle, widget, snapToGrid, snapToGridValue, onResize]
+  );
 
   // Handle resize end
   const handleResizeEnd = useCallback(() => {
@@ -279,7 +315,7 @@ const SortableWidget: React.FC<{
       { position: 'top', cursor: 'n-resize' },
       { position: 'bottom', cursor: 's-resize' },
       { position: 'left', cursor: 'w-resize' },
-      { position: 'right', cursor: 'e-resize' }
+      { position: 'right', cursor: 'e-resize' },
     ];
 
     const handles = widget.resizeConfig.handles || defaultHandles;
@@ -287,42 +323,55 @@ const SortableWidget: React.FC<{
     return handles.map(handle => {
       const handleSize = handle.size || 8;
       const isCorner = handle.position.includes('-');
-      
+
       let positionStyle: React.CSSProperties = {
         position: 'absolute',
-        width: isCorner ? handleSize : handle.position === 'top' || handle.position === 'bottom' ? '100%' : handleSize,
-        height: isCorner ? handleSize : handle.position === 'left' || handle.position === 'right' ? '100%' : handleSize,
+        width: isCorner
+          ? handleSize
+          : handle.position === 'top' || handle.position === 'bottom'
+            ? '100%'
+            : handleSize,
+        height: isCorner
+          ? handleSize
+          : handle.position === 'left' || handle.position === 'right'
+            ? '100%'
+            : handleSize,
         cursor: handle.cursor || 'resize',
         backgroundColor: 'rgba(59, 130, 246, 0.8)',
         border: '1px solid #3b82f6',
-        borderRadius: isCorner ? '2px' : '0'
+        borderRadius: isCorner ? '2px' : '0',
       };
 
       // Position the handle
       switch (handle.position) {
         case 'top-left':
-          positionStyle = { ...positionStyle, top: -handleSize/2, left: -handleSize/2 };
+          positionStyle = { ...positionStyle, top: -handleSize / 2, left: -handleSize / 2 };
           break;
         case 'top-right':
-          positionStyle = { ...positionStyle, top: -handleSize/2, right: -handleSize/2 };
+          positionStyle = { ...positionStyle, top: -handleSize / 2, right: -handleSize / 2 };
           break;
         case 'bottom-left':
-          positionStyle = { ...positionStyle, bottom: -handleSize/2, left: -handleSize/2 };
+          positionStyle = { ...positionStyle, bottom: -handleSize / 2, left: -handleSize / 2 };
           break;
         case 'bottom-right':
-          positionStyle = { ...positionStyle, bottom: -handleSize/2, right: -handleSize/2 };
+          positionStyle = { ...positionStyle, bottom: -handleSize / 2, right: -handleSize / 2 };
           break;
         case 'top':
-          positionStyle = { ...positionStyle, top: -handleSize/2, left: 0, height: handleSize };
+          positionStyle = { ...positionStyle, top: -handleSize / 2, left: 0, height: handleSize };
           break;
         case 'bottom':
-          positionStyle = { ...positionStyle, bottom: -handleSize/2, left: 0, height: handleSize };
+          positionStyle = {
+            ...positionStyle,
+            bottom: -handleSize / 2,
+            left: 0,
+            height: handleSize,
+          };
           break;
         case 'left':
-          positionStyle = { ...positionStyle, left: -handleSize/2, top: 0, width: handleSize };
+          positionStyle = { ...positionStyle, left: -handleSize / 2, top: 0, width: handleSize };
           break;
         case 'right':
-          positionStyle = { ...positionStyle, right: -handleSize/2, top: 0, width: handleSize };
+          positionStyle = { ...positionStyle, right: -handleSize / 2, top: 0, width: handleSize };
           break;
       }
 
@@ -330,7 +379,7 @@ const SortableWidget: React.FC<{
         <div
           key={handle.position}
           style={positionStyle}
-          onMouseDown={(e) => handleResizeStart(e, handle.position)}
+          onMouseDown={e => handleResizeStart(e, handle.position)}
           className="resize-handle opacity-0 hover:opacity-100 transition-opacity duration-200"
         />
       );
@@ -346,7 +395,7 @@ const SortableWidget: React.FC<{
       } ${isMultiSelected ? 'ring-2 ring-blue-300' : ''} ${
         sortableIsDragging ? 'opacity-50' : ''
       } ${widget.locked ? 'cursor-not-allowed opacity-75' : ''}`}
-      onClick={(e) => {
+      onClick={e => {
         e.stopPropagation();
         onSelect(widget.id, e.ctrlKey || e.metaKey);
       }}
@@ -395,7 +444,7 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
   onWidgetResize,
   onWidgetSelect,
   onLayoutChange,
-  className = ''
+  className = '',
 }) => {
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [draggedWidget, setDraggedWidget] = useState<string | null>(null);
@@ -411,29 +460,35 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
   );
 
   // Handle widget selection
-  const handleWidgetSelect = useCallback((widgetId: string, multiSelect: boolean) => {
-    setSelectedWidgets(prev => {
-      if (multiSelect && enableMultiSelect) {
-        if (prev.includes(widgetId)) {
-          return prev.filter(id => id !== widgetId);
+  const handleWidgetSelect = useCallback(
+    (widgetId: string, multiSelect: boolean) => {
+      setSelectedWidgets(prev => {
+        if (multiSelect && enableMultiSelect) {
+          if (prev.includes(widgetId)) {
+            return prev.filter(id => id !== widgetId);
+          } else {
+            return [...prev, widgetId];
+          }
         } else {
-          return [...prev, widgetId];
+          return [widgetId];
         }
-      } else {
-        return [widgetId];
-      }
-    });
-    
-    onWidgetSelect?.(selectedWidgets);
-  }, [selectedWidgets, enableMultiSelect, onWidgetSelect]);
+      });
+
+      onWidgetSelect?.(selectedWidgets);
+    },
+    [selectedWidgets, enableMultiSelect, onWidgetSelect]
+  );
 
   // Handle container click (deselect all)
-  const handleContainerClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      setSelectedWidgets([]);
-      onWidgetSelect?.([]);
-    }
-  }, [onWidgetSelect]);
+  const handleContainerClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        setSelectedWidgets([]);
+        onWidgetSelect?.([]);
+      }
+    },
+    [onWidgetSelect]
+  );
 
   // Handle drag start
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -441,16 +496,19 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
   }, []);
 
   // Handle drag end
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    setDraggedWidget(null);
-    
-    const { active, over } = event;
-    
-    if (active.id !== over?.id) {
-      // Handle widget reordering or repositioning
-      onLayoutChange?.(widgets);
-    }
-  }, [widgets, onLayoutChange]);
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      setDraggedWidget(null);
+
+      const { active, over } = event;
+
+      if (active.id !== over?.id) {
+        // Handle widget reordering or repositioning
+        onLayoutChange?.(widgets);
+      }
+    },
+    [widgets, onLayoutChange]
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -459,7 +517,7 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
         setSelectedWidgets([]);
         onWidgetSelect?.([]);
       }
-      
+
       if (e.key === 'Delete' && selectedWidgets.length > 0) {
         // Handle widget deletion
         const remainingWidgets = widgets.filter(w => !selectedWidgets.includes(w.id));
@@ -480,11 +538,7 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
   }, [selectedWidgets, widgets, onWidgetSelect, onLayoutChange]);
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div
         ref={containerRef}
         className={`relative overflow-hidden select-none ${className}`}
@@ -500,7 +554,7 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
                 linear-gradient(to right, #e5e7eb 1px, transparent 1px),
                 linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
               `,
-              backgroundSize: `${gridSize}px ${gridSize}px`
+              backgroundSize: `${gridSize}px ${gridSize}px`,
             }}
           />
         )}
@@ -526,11 +580,13 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
 
         {/* Selection Rectangle (for multi-select) */}
         {/* TODO: Implement selection rectangle for drag-to-select */}
-        
+
         {/* Status Bar */}
         <div className="absolute bottom-4 left-4 bg-black bg-opacity-75 text-white text-xs px-3 py-1 rounded">
           {selectedWidgets.length > 0 ? (
-            <span>{selectedWidgets.length} widget{selectedWidgets.length > 1 ? 's' : ''} selected</span>
+            <span>
+              {selectedWidgets.length} widget{selectedWidgets.length > 1 ? 's' : ''} selected
+            </span>
           ) : (
             <span>Click to select • Ctrl+Click for multi-select • Drag to move</span>
           )}

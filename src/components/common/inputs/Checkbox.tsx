@@ -51,16 +51,16 @@ const Checkbox: React.FC<CheckboxProps> = ({
   className = '',
   checkboxClassName = '',
   labelClassName = '',
-  animate = true
+  animate = true,
 }) => {
   const checkboxRef = useRef<HTMLInputElement>(null);
   const isControlled = controlledChecked !== undefined;
-  
+
   const [state, setState] = useState<CheckboxState>({
     isChecked: controlledChecked ?? defaultChecked,
     isIndeterminate: indeterminate,
     isFocused: false,
-    isPressed: false
+    isPressed: false,
   });
 
   // Update state when controlled values change
@@ -81,22 +81,25 @@ const Checkbox: React.FC<CheckboxProps> = ({
     }
   }, [state.isIndeterminate]);
 
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (disabled) return;
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (disabled) return;
 
-    const newChecked = event.target.checked;
-    const newIndeterminate = false; // Clicking always resolves indeterminate state
-    
-    if (!isControlled) {
-      setState(prev => ({ 
-        ...prev, 
-        isChecked: newChecked, 
-        isIndeterminate: newIndeterminate 
-      }));
-    }
+      const newChecked = event.target.checked;
+      const newIndeterminate = false; // Clicking always resolves indeterminate state
 
-    onChange?.(newChecked, newIndeterminate);
-  }, [disabled, isControlled, onChange]);
+      if (!isControlled) {
+        setState(prev => ({
+          ...prev,
+          isChecked: newChecked,
+          isIndeterminate: newIndeterminate,
+        }));
+      }
+
+      onChange?.(newChecked, newIndeterminate);
+    },
+    [disabled, isControlled, onChange]
+  );
 
   const handleFocus = useCallback(() => {
     setState(prev => ({ ...prev, isFocused: true }));
@@ -125,20 +128,20 @@ const Checkbox: React.FC<CheckboxProps> = ({
         checkbox: 'w-4 h-4',
         icon: 'w-3 h-3',
         label: 'text-sm',
-        description: 'text-xs'
+        description: 'text-xs',
       },
       md: {
         checkbox: 'w-5 h-5',
         icon: 'w-3.5 h-3.5',
         label: 'text-base',
-        description: 'text-sm'
+        description: 'text-sm',
       },
       lg: {
         checkbox: 'w-6 h-6',
         icon: 'w-4 h-4',
         label: 'text-lg',
-        description: 'text-base'
-      }
+        description: 'text-base',
+      },
     };
     return configs[size];
   };
@@ -150,32 +153,32 @@ const Checkbox: React.FC<CheckboxProps> = ({
         border: 'border-gray-300',
         checked: 'bg-gray-600 border-gray-600',
         focus: 'focus:ring-gray-500',
-        hover: 'hover:border-gray-400'
+        hover: 'hover:border-gray-400',
       },
       primary: {
         border: 'border-gray-300',
         checked: 'bg-blue-600 border-blue-600',
         focus: 'focus:ring-blue-500',
-        hover: 'hover:border-blue-400'
+        hover: 'hover:border-blue-400',
       },
       success: {
         border: 'border-gray-300',
         checked: 'bg-green-600 border-green-600',
         focus: 'focus:ring-green-500',
-        hover: 'hover:border-green-400'
+        hover: 'hover:border-green-400',
       },
       warning: {
         border: 'border-gray-300',
         checked: 'bg-yellow-500 border-yellow-500',
         focus: 'focus:ring-yellow-500',
-        hover: 'hover:border-yellow-400'
+        hover: 'hover:border-yellow-400',
       },
       danger: {
         border: 'border-gray-300',
         checked: 'bg-red-600 border-red-600',
         focus: 'focus:ring-red-500',
-        hover: 'hover:border-red-400'
-      }
+        hover: 'hover:border-red-400',
+      },
     };
     return configs[variant];
   };
@@ -219,11 +222,11 @@ const Checkbox: React.FC<CheckboxProps> = ({
     if (state.isIndeterminate) {
       return <Minus className={`${sizeConfig.icon} text-white`} />;
     }
-    
+
     if (state.isChecked) {
       return <Check className={`${sizeConfig.icon} text-white`} />;
     }
-    
+
     return null;
   };
 
@@ -247,14 +250,12 @@ const Checkbox: React.FC<CheckboxProps> = ({
           onMouseUp={handleMouseUp}
           className="sr-only"
         />
-        
+
         <label
           htmlFor={checkboxId}
           className={`cursor-pointer ${disabled ? 'cursor-not-allowed' : ''}`}
         >
-          <div className={getCheckboxClasses()}>
-            {getIcon()}
-          </div>
+          <div className={getCheckboxClasses()}>{getIcon()}</div>
         </label>
       </div>
 
@@ -277,12 +278,14 @@ const Checkbox: React.FC<CheckboxProps> = ({
             </label>
           )}
           {description && (
-            <p className={`
+            <p
+              className={`
               mt-1 
               ${disabled ? 'text-gray-400' : 'text-gray-600'}
               ${invalid ? 'text-red-500' : ''}
               ${sizeConfig.description}
-            `}>
+            `}
+            >
               {description}
             </p>
           )}
@@ -336,7 +339,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   orientation = 'vertical',
   columns,
   className = '',
-  optionClassName = ''
+  optionClassName = '',
 }) => {
   const isControlled = controlledValue !== undefined;
   const [selectedValues, setSelectedValues] = useState<string[]>(controlledValue || defaultValue);
@@ -347,27 +350,30 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
     }
   }, [controlledValue, isControlled]);
 
-  const handleOptionChange = useCallback((optionValue: string, checked: boolean) => {
-    const newValues = checked
-      ? [...selectedValues, optionValue]
-      : selectedValues.filter(v => v !== optionValue);
-    
-    if (!isControlled) {
-      setSelectedValues(newValues);
-    }
-    
-    onChange?.(newValues);
-  }, [selectedValues, isControlled, onChange]);
+  const handleOptionChange = useCallback(
+    (optionValue: string, checked: boolean) => {
+      const newValues = checked
+        ? [...selectedValues, optionValue]
+        : selectedValues.filter(v => v !== optionValue);
+
+      if (!isControlled) {
+        setSelectedValues(newValues);
+      }
+
+      onChange?.(newValues);
+    },
+    [selectedValues, isControlled, onChange]
+  );
 
   const getContainerClasses = () => {
     if (columns && orientation === 'vertical') {
       return `grid grid-cols-${columns} gap-4`;
     }
-    
+
     if (orientation === 'horizontal') {
       return 'flex flex-wrap gap-6';
     }
-    
+
     return 'space-y-4';
   };
 
@@ -378,7 +384,9 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
       {/* Group Label */}
       {label && (
         <div className="mb-4">
-          <legend className={`text-base font-medium ${disabled ? 'text-gray-400' : 'text-gray-900'}`}>
+          <legend
+            className={`text-base font-medium ${disabled ? 'text-gray-400' : 'text-gray-900'}`}
+          >
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
           </legend>
@@ -391,14 +399,18 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
       )}
 
       {/* Options */}
-      <div className={getContainerClasses()} role="group" aria-labelledby={label ? `${groupId}-label` : undefined}>
-        {options.map((option) => (
+      <div
+        className={getContainerClasses()}
+        role="group"
+        aria-labelledby={label ? `${groupId}-label` : undefined}
+      >
+        {options.map(option => (
           <Checkbox
             key={option.value}
             name={name}
             value={option.value}
             checked={selectedValues.includes(option.value)}
-            onChange={(checked) => handleOptionChange(option.value, checked)}
+            onChange={checked => handleOptionChange(option.value, checked)}
             label={option.label}
             description={option.description}
             disabled={disabled || option.disabled}
@@ -418,17 +430,13 @@ export const useCheckboxGroup = (initialValues: string[] = []) => {
   const [selectedValues, setSelectedValues] = useState<string[]>(initialValues);
 
   const toggleValue = useCallback((value: string) => {
-    setSelectedValues(prev => 
-      prev.includes(value) 
-        ? prev.filter(v => v !== value)
-        : [...prev, value]
+    setSelectedValues(prev =>
+      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
     );
   }, []);
 
   const selectValue = useCallback((value: string) => {
-    setSelectedValues(prev => 
-      prev.includes(value) ? prev : [...prev, value]
-    );
+    setSelectedValues(prev => (prev.includes(value) ? prev : [...prev, value]));
   }, []);
 
   const deselectValue = useCallback((value: string) => {
@@ -443,9 +451,12 @@ export const useCheckboxGroup = (initialValues: string[] = []) => {
     setSelectedValues([]);
   }, []);
 
-  const isSelected = useCallback((value: string) => {
-    return selectedValues.includes(value);
-  }, [selectedValues]);
+  const isSelected = useCallback(
+    (value: string) => {
+      return selectedValues.includes(value);
+    },
+    [selectedValues]
+  );
 
   const getSelectedCount = useCallback(() => {
     return selectedValues.length;
@@ -460,7 +471,7 @@ export const useCheckboxGroup = (initialValues: string[] = []) => {
     selectAll,
     deselectAll,
     isSelected,
-    getSelectedCount
+    getSelectedCount,
   };
 };
 
@@ -471,7 +482,7 @@ export const ExampleCheckboxes: React.FC = () => {
     parent: false,
     child1: false,
     child2: false,
-    child3: false
+    child3: false,
   });
 
   const { selectedValues: interests } = useCheckboxGroup(['reading', 'music']);
@@ -484,7 +495,7 @@ export const ExampleCheckboxes: React.FC = () => {
       parent: checked,
       child1: checked,
       child2: checked,
-      child3: checked
+      child3: checked,
     });
   }, []);
 
@@ -493,16 +504,20 @@ export const ExampleCheckboxes: React.FC = () => {
       const newState = { ...prev, [childKey]: checked };
       const childStates = [newState.child1, newState.child2, newState.child3];
       const checkedCount = childStates.filter(Boolean).length;
-      
+
       return {
         ...newState,
-        parent: checkedCount === 3
+        parent: checkedCount === 3,
       };
     });
   }, []);
 
   const getParentIndeterminate = () => {
-    const childStates = [indeterminateState.child1, indeterminateState.child2, indeterminateState.child3];
+    const childStates = [
+      indeterminateState.child1,
+      indeterminateState.child2,
+      indeterminateState.child3,
+    ];
     const checkedCount = childStates.filter(Boolean).length;
     return checkedCount > 0 && checkedCount < 3;
   };
@@ -513,14 +528,14 @@ export const ExampleCheckboxes: React.FC = () => {
     { value: 'sports', label: 'Sports', description: 'Playing and watching sports' },
     { value: 'travel', label: 'Travel', description: 'Exploring new places' },
     { value: 'cooking', label: 'Cooking', description: 'Preparing delicious meals' },
-    { value: 'technology', label: 'Technology', description: 'Latest gadgets and software' }
+    { value: 'technology', label: 'Technology', description: 'Latest gadgets and software' },
   ];
 
   const permissionOptions: CheckboxOption[] = [
     { value: 'read', label: 'Read', description: 'View content and data' },
     { value: 'write', label: 'Write', description: 'Create and edit content' },
     { value: 'delete', label: 'Delete', description: 'Remove content and data' },
-    { value: 'admin', label: 'Admin', description: 'Full administrative access' }
+    { value: 'admin', label: 'Admin', description: 'Full administrative access' },
   ];
 
   const featureOptions: CheckboxOption[] = [
@@ -529,14 +544,14 @@ export const ExampleCheckboxes: React.FC = () => {
     { value: 'themes', label: 'Custom Themes' },
     { value: 'export', label: 'Data Export' },
     { value: 'api', label: 'API Access' },
-    { value: 'support', label: 'Priority Support' }
+    { value: 'support', label: 'Priority Support' },
   ];
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto p-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Checkbox Examples</h3>
-        
+
         <div className="space-y-8">
           {/* Single Checkboxes */}
           <div>
@@ -582,19 +597,19 @@ export const ExampleCheckboxes: React.FC = () => {
               <div className="ml-6 space-y-2">
                 <Checkbox
                   checked={indeterminateState.child1}
-                  onChange={(checked) => handleChildChange('child1', checked)}
+                  onChange={checked => handleChildChange('child1', checked)}
                   label="Feature A"
                   size="sm"
                 />
                 <Checkbox
                   checked={indeterminateState.child2}
-                  onChange={(checked) => handleChildChange('child2', checked)}
+                  onChange={checked => handleChildChange('child2', checked)}
                   label="Feature B"
                   size="sm"
                 />
                 <Checkbox
                   checked={indeterminateState.child3}
-                  onChange={(checked) => handleChildChange('child3', checked)}
+                  onChange={checked => handleChildChange('child3', checked)}
                   label="Feature C"
                   size="sm"
                 />
@@ -609,7 +624,7 @@ export const ExampleCheckboxes: React.FC = () => {
               <CheckboxGroup
                 options={interestOptions}
                 value={interests}
-                onChange={(values) => interests.length = 0 && interests.push(...values)}
+                onChange={values => (interests.length = 0 && interests.push(...values))}
                 label="Select your interests"
                 description="Choose topics that interest you"
                 name="interests"
@@ -653,7 +668,7 @@ export const ExampleCheckboxes: React.FC = () => {
             <CheckboxGroup
               options={interestOptions}
               value={interests}
-              onChange={(values) => interests.splice(0, interests.length, ...values)}
+              onChange={values => interests.splice(0, interests.length, ...values)}
               label="Select Interests (Grid)"
               name="interests-grid"
               columns={3}
@@ -667,13 +682,23 @@ export const ExampleCheckboxes: React.FC = () => {
           <h4 className="font-medium mb-2">Current State</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <p><strong>Single Checkbox:</strong> {singleChecked ? 'Checked' : 'Unchecked'}</p>
-              <p><strong>Selected Interests:</strong> {interests.join(', ') || 'None'}</p>
-              <p><strong>Permissions:</strong> {permissions.join(', ') || 'None'}</p>
-              <p><strong>Features:</strong> {features.join(', ') || 'None'}</p>
+              <p>
+                <strong>Single Checkbox:</strong> {singleChecked ? 'Checked' : 'Unchecked'}
+              </p>
+              <p>
+                <strong>Selected Interests:</strong> {interests.join(', ') || 'None'}
+              </p>
+              <p>
+                <strong>Permissions:</strong> {permissions.join(', ') || 'None'}
+              </p>
+              <p>
+                <strong>Features:</strong> {features.join(', ') || 'None'}
+              </p>
             </div>
             <div>
-              <p><strong>Indeterminate State:</strong></p>
+              <p>
+                <strong>Indeterminate State:</strong>
+              </p>
               <pre className="text-xs bg-white p-2 rounded border mt-1">
                 {JSON.stringify(indeterminateState, null, 2)}
               </pre>

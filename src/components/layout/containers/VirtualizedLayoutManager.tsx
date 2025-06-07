@@ -48,9 +48,9 @@ const MemoizedWidget = React.memo<{
         setIsIntersecting(visible);
         onVisibilityChange?.(visible);
       },
-      { 
+      {
         threshold: 0.1,
-        rootMargin: '50px' // Start loading before widget enters viewport
+        rootMargin: '50px', // Start loading before widget enters viewport
       }
     );
 
@@ -72,11 +72,7 @@ const MemoizedWidget = React.memo<{
   }
 
   return (
-    <div
-      ref={widgetRef}
-      style={style}
-      className="widget-container transition-all duration-200"
-    >
+    <div ref={widgetRef} style={style} className="widget-container transition-all duration-200">
       <widget.component {...widget.props} title={widget.title} />
     </div>
   );
@@ -92,10 +88,10 @@ const useVirtualizedWidgets = (
     if (!containerBounds) return widgets;
 
     const expandedBounds = {
-      top: containerBounds.top - (overscan * 100),
-      bottom: containerBounds.bottom + (overscan * 100),
-      left: containerBounds.left - (overscan * 100),
-      right: containerBounds.right + (overscan * 100)
+      top: containerBounds.top - overscan * 100,
+      bottom: containerBounds.bottom + overscan * 100,
+      left: containerBounds.left - overscan * 100,
+      right: containerBounds.right + overscan * 100,
     };
 
     return widgets.map(widget => {
@@ -103,7 +99,7 @@ const useVirtualizedWidgets = (
         top: widget.position.y,
         bottom: widget.position.y + widget.size.height,
         left: widget.position.x,
-        right: widget.position.x + widget.size.width
+        right: widget.position.x + widget.size.width,
       };
 
       const isVisible = !(
@@ -115,7 +111,7 @@ const useVirtualizedWidgets = (
 
       return {
         ...widget,
-        visible: isVisible
+        visible: isVisible,
       };
     });
   }, [widgets, containerBounds, overscan]);
@@ -127,30 +123,30 @@ const usePerformanceMonitor = () => {
     renderTime: 0,
     memoryUsage: 0,
     widgetCount: 0,
-    virtualizedCount: 0
+    virtualizedCount: 0,
   });
 
   const measureRender = useCallback((fn: () => React.ReactNode): React.ReactNode => {
     const start = performance.now();
     const result = fn();
     const end = performance.now();
-    
+
     setMetrics(prev => ({
       ...prev,
-      renderTime: end - start
+      renderTime: end - start,
     }));
-    
+
     return result;
   }, []);
 
   const updateMetrics = useCallback((widgets: VirtualizedWidget[]) => {
     const virtualizedCount = widgets.filter(w => w.shouldVirtualize && !w.visible).length;
-    
+
     setMetrics(prev => ({
       ...prev,
       widgetCount: widgets.length,
       virtualizedCount,
-      memoryUsage: (performance as any).memory?.usedJSHeapSize || 0
+      memoryUsage: (performance as any).memory?.usedJSHeapSize || 0,
     }));
   }, []);
 
@@ -165,7 +161,7 @@ const VirtualizedLayoutManager: React.FC<VirtualizedLayoutManagerProps> = ({
   overscan = 2,
   enableVirtualization = true,
   onWidgetVisibilityChange,
-  className = ''
+  className = '',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerBounds, setContainerBounds] = useState<DOMRect | null>(null);
@@ -198,7 +194,7 @@ const VirtualizedLayoutManager: React.FC<VirtualizedLayoutManagerProps> = ({
     const target = e.target as HTMLDivElement;
     setScrollPosition({
       x: target.scrollLeft,
-      y: target.scrollTop
+      y: target.scrollTop,
     });
   }, []);
 
@@ -213,27 +209,21 @@ const VirtualizedLayoutManager: React.FC<VirtualizedLayoutManagerProps> = ({
     return virtualizedWidgets.map((widget, index) => {
       const col = index % cols;
       const row = Math.floor(index / cols);
-      
+
       // Enhanced widget sizing with content-aware dimensions
-      const widgetWidth = Math.max(
-        cellWidth - itemMargin * 2,
-        widget.minWidth || 160
-      );
-      const widgetHeight = Math.max(
-        cellHeight - itemMargin,
-        widget.minHeight || 120
-      );
-      
+      const widgetWidth = Math.max(cellWidth - itemMargin * 2, widget.minWidth || 160);
+      const widgetHeight = Math.max(cellHeight - itemMargin, widget.minHeight || 120);
+
       return {
         ...widget,
         position: {
           x: col * cellWidth + itemMargin,
-          y: row * cellHeight + itemMargin
+          y: row * cellHeight + itemMargin,
         },
         size: {
           width: widgetWidth,
-          height: widgetHeight
-        }
+          height: widgetHeight,
+        },
       };
     });
   }, [virtualizedWidgets, containerWidth, itemMargin]);
@@ -249,7 +239,7 @@ const VirtualizedLayoutManager: React.FC<VirtualizedLayoutManagerProps> = ({
           width: widget.size.width,
           height: widget.size.height,
           transform: `translate3d(0, 0, 0)`, // GPU acceleration
-          willChange: widget.visible ? 'auto' : 'transform' // Optimize for animations
+          willChange: widget.visible ? 'auto' : 'transform', // Optimize for animations
         };
 
         return (
@@ -258,7 +248,7 @@ const VirtualizedLayoutManager: React.FC<VirtualizedLayoutManagerProps> = ({
             widget={widget}
             style={style}
             isVisible={widget.visible || !enableVirtualization}
-            onVisibilityChange={(visible) => {
+            onVisibilityChange={visible => {
               onWidgetVisibilityChange?.(widget.id, visible);
             }}
           />
@@ -286,16 +276,19 @@ const VirtualizedLayoutManager: React.FC<VirtualizedLayoutManagerProps> = ({
         onScroll={handleScroll}
         style={{
           contain: 'layout style paint', // CSS containment for better performance
-          willChange: 'scroll-position'
+          willChange: 'scroll-position',
         }}
       >
         <div
           className="relative"
           style={{
             width: containerWidth,
-            height: Math.max(containerHeight, gridLayout.length > 0 ? 
-              Math.max(...gridLayout.map(w => w.position.y + w.size.height)) + itemMargin : 0
-            )
+            height: Math.max(
+              containerHeight,
+              gridLayout.length > 0
+                ? Math.max(...gridLayout.map(w => w.position.y + w.size.height)) + itemMargin
+                : 0
+            ),
           }}
         >
           {renderWidgets()}
@@ -312,11 +305,11 @@ function throttle<T extends (...args: any[]) => any>(
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null;
   let previous = 0;
-  
-  return function(this: any, ...args: Parameters<T>) {
+
+  return function (this: any, ...args: Parameters<T>) {
     const now = Date.now();
     const remaining = wait - (now - previous);
-    
+
     if (remaining <= 0 || remaining > wait) {
       if (timeout) {
         clearTimeout(timeout);

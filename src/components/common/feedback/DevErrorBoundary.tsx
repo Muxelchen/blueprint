@@ -21,14 +21,14 @@ export class DevErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: Error): State {
     return {
       hasError: true,
-      error
+      error,
     };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({
       error,
-      errorInfo
+      errorInfo,
     });
 
     // Call custom error handler if provided
@@ -59,14 +59,22 @@ export class DevErrorBoundary extends Component<Props, State> {
             <div className="bg-white border border-red-200 rounded-lg p-6 shadow-lg">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
-                  <svg className="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.96-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  <svg
+                    className="h-8 w-8 text-red-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.96-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-red-800">
-                    Development Error
-                  </h3>
+                  <h3 className="text-lg font-medium text-red-800">Development Error</h3>
                   <p className="text-red-600">
                     Something went wrong while rendering this component
                   </p>
@@ -112,7 +120,9 @@ export class DevErrorBoundary extends Component<Props, State> {
                         this.setState({ hasError: false, error: undefined, errorInfo: undefined });
                         // Force a re-render of the child component tree
                         if (this.props.onError) {
-                          this.props.onError(new Error('Manual recovery triggered'), { componentStack: '' });
+                          this.props.onError(new Error('Manual recovery triggered'), {
+                            componentStack: '',
+                          });
                         }
                       }}
                       className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"

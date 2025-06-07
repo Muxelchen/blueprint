@@ -5,6 +5,7 @@ export { default as AlertBanner } from './AlertBanner';
 export { default as ToastNotification } from './ToastNotification';
 export { default as PushNotification } from './PushNotification';
 export { default as ProgressNotification } from './ProgressNotification';
+export { default as NotificationCenter } from './NotificationCenter';
 
 // Loading and state components
 export { default as LoadingState } from './LoadingState';

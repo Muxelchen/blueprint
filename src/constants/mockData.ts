@@ -1,15 +1,15 @@
 // Complete mock data for all components
-import { 
-  ChartData, 
-  KPIData, 
-  WeatherData, 
-  LocationData, 
-  MapMarker, 
+import {
+  ChartData,
+  KPIData,
+  WeatherData,
+  LocationData,
+  MapMarker,
   HeatmapPoint,
   NotificationHistoryItem,
   User,
   TreemapNode,
-  GaugeSegment
+  GaugeSegment,
 } from '../types';
 
 // ===== CHART DATA =====
@@ -24,7 +24,7 @@ export const mockLineChartData: ChartData = {
       borderColor: '#3B82F6',
       backgroundColor: 'rgba(59, 130, 246, 0.1)',
       fill: true,
-      tension: 0.4
+      tension: 0.4,
     },
     {
       label: 'Expenses',
@@ -32,9 +32,9 @@ export const mockLineChartData: ChartData = {
       borderColor: '#EF4444',
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
       fill: true,
-      tension: 0.4
-    }
-  ]
+      tension: 0.4,
+    },
+  ],
 };
 
 // Bar Chart Data
@@ -44,14 +44,14 @@ export const mockBarChartData: ChartData = {
     {
       label: 'Sales',
       data: [850, 920, 1100, 1350, 1200, 1450],
-      backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4']
+      backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'],
     },
     {
       label: 'Target',
       data: [800, 900, 1000, 1300, 1150, 1400],
-      backgroundColor: 'rgba(156, 163, 175, 0.5)'
-    }
-  ]
+      backgroundColor: 'rgba(156, 163, 175, 0.5)',
+    },
+  ],
 };
 
 // Pie Chart Data
@@ -61,9 +61,9 @@ export const mockPieChartData: ChartData = {
     {
       label: 'Device Usage',
       data: [45.2, 32.8, 15.3, 4.7, 2.0],
-      backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
-    }
-  ]
+      backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
+    },
+  ],
 };
 
 // Scatter Plot Data
@@ -73,19 +73,19 @@ export const mockScatterPlotData: ChartData = {
       label: 'Dataset 1',
       data: Array.from({ length: 50 }, () => ({
         x: Math.random() * 100,
-        y: Math.random() * 100
+        y: Math.random() * 100,
       })) as any,
-      backgroundColor: 'rgba(59, 130, 246, 0.6)'
+      backgroundColor: 'rgba(59, 130, 246, 0.6)',
     },
     {
-      label: 'Dataset 2', 
+      label: 'Dataset 2',
       data: Array.from({ length: 50 }, () => ({
         x: Math.random() * 100,
-        y: Math.random() * 100
+        y: Math.random() * 100,
       })) as any,
-      backgroundColor: 'rgba(16, 185, 129, 0.6)'
-    }
-  ]
+      backgroundColor: 'rgba(16, 185, 129, 0.6)',
+    },
+  ],
 };
 
 // Area Chart Data
@@ -97,16 +97,16 @@ export const mockAreaChartData: ChartData = {
       data: [20, 35, 60, 45, 70, 55, 30],
       borderColor: '#3B82F6',
       backgroundColor: 'rgba(59, 130, 246, 0.3)',
-      fill: true
+      fill: true,
     },
     {
       label: 'Memory Usage',
       data: [15, 25, 40, 35, 50, 45, 25],
       borderColor: '#10B981',
       backgroundColor: 'rgba(16, 185, 129, 0.3)',
-      fill: true
-    }
-  ]
+      fill: true,
+    },
+  ],
 };
 
 // ===== KPI DATA =====
@@ -120,7 +120,7 @@ export const mockKPIData: KPIData[] = [
     changeType: 'increase',
     change: 5.3,
     color: '#10B981',
-    icon: '💰'
+    icon: '💰',
   },
   {
     id: 'users',
@@ -131,7 +131,7 @@ export const mockKPIData: KPIData[] = [
     changeType: 'increase',
     change: 8.6,
     color: '#3B82F6',
-    icon: '👥'
+    icon: '👥',
   },
   {
     id: 'conversion',
@@ -142,7 +142,7 @@ export const mockKPIData: KPIData[] = [
     changeType: 'increase',
     change: 14.3,
     color: '#F59E0B',
-    icon: '📈'
+    icon: '📈',
   },
   {
     id: 'orders',
@@ -153,8 +153,8 @@ export const mockKPIData: KPIData[] = [
     changeType: 'decrease',
     change: -10.2,
     color: '#EF4444',
-    icon: '🛒'
-  }
+    icon: '🛒',
+  },
 ];
 
 // ===== WEATHER DATA =====
@@ -178,63 +178,63 @@ export const mockWeatherData: WeatherData = {
       low: Math.round(10 + Math.random() * 8),
       condition: ['Sunny', 'Cloudy', 'Rainy', 'Partly Cloudy'][Math.floor(Math.random() * 4)],
       precipitation: Math.round(Math.random() * 100),
-      icon: ['☀️', '☁️', '🌧️', '⛅'][Math.floor(Math.random() * 4)]
+      icon: ['☀️', '☁️', '🌧️', '⛅'][Math.floor(Math.random() * 4)],
     };
-  })
+  }),
 };
 
 // ===== TABLE DATA =====
 export const mockTableData = [
-  { 
-    id: 1, 
-    name: 'John Doe', 
-    email: 'john@company.com', 
-    department: 'Engineering', 
-    status: 'Active', 
-    joinDate: '2023-01-15', 
-    salary: 85000, 
-    performance: 92 
+  {
+    id: 1,
+    name: 'John Doe',
+    email: 'john@company.com',
+    department: 'Engineering',
+    status: 'Active',
+    joinDate: '2023-01-15',
+    salary: 85000,
+    performance: 92,
   },
-  { 
-    id: 2, 
-    name: 'Jane Smith', 
-    email: 'jane@company.com', 
-    department: 'Marketing', 
-    status: 'Active', 
-    joinDate: '2023-03-22', 
-    salary: 72000, 
-    performance: 88 
+  {
+    id: 2,
+    name: 'Jane Smith',
+    email: 'jane@company.com',
+    department: 'Marketing',
+    status: 'Active',
+    joinDate: '2023-03-22',
+    salary: 72000,
+    performance: 88,
   },
-  { 
-    id: 3, 
-    name: 'Mike Johnson', 
-    email: 'mike@company.com', 
-    department: 'Sales', 
-    status: 'Pending', 
-    joinDate: '2023-06-10', 
-    salary: 68000, 
-    performance: 85 
+  {
+    id: 3,
+    name: 'Mike Johnson',
+    email: 'mike@company.com',
+    department: 'Sales',
+    status: 'Pending',
+    joinDate: '2023-06-10',
+    salary: 68000,
+    performance: 85,
   },
-  { 
-    id: 4, 
-    name: 'Sarah Wilson', 
-    email: 'sarah@company.com', 
-    department: 'Design', 
-    status: 'Active', 
-    joinDate: '2022-11-08', 
-    salary: 75000, 
-    performance: 95 
+  {
+    id: 4,
+    name: 'Sarah Wilson',
+    email: 'sarah@company.com',
+    department: 'Design',
+    status: 'Active',
+    joinDate: '2022-11-08',
+    salary: 75000,
+    performance: 95,
   },
-  { 
-    id: 5, 
-    name: 'David Brown', 
-    email: 'david@company.com', 
-    department: 'Engineering', 
-    status: 'Active', 
-    joinDate: '2023-02-14', 
-    salary: 92000, 
-    performance: 90 
-  }
+  {
+    id: 5,
+    name: 'David Brown',
+    email: 'david@company.com',
+    department: 'Engineering',
+    status: 'Active',
+    joinDate: '2023-02-14',
+    salary: 92000,
+    performance: 90,
+  },
 ];
 
 // ===== MAP DATA =====
@@ -247,17 +247,17 @@ export const mockMapMarkers: MapMarker[] = [
     description: 'Main headquarters',
     category: 'office',
     icon: '🏢',
-    color: '#3B82F6'
+    color: '#3B82F6',
   },
   {
     id: 'marker-2',
     latitude: 40.7128,
-    longitude: -74.0060,
+    longitude: -74.006,
     title: 'New York Office',
     description: 'East coast branch',
     category: 'office',
     icon: '🏢',
-    color: '#10B981'
+    color: '#10B981',
   },
   {
     id: 'marker-3',
@@ -267,7 +267,7 @@ export const mockMapMarkers: MapMarker[] = [
     description: 'West coast expansion',
     category: 'office',
     icon: '🏢',
-    color: '#F59E0B'
+    color: '#F59E0B',
   },
   {
     id: 'marker-4',
@@ -277,8 +277,8 @@ export const mockMapMarkers: MapMarker[] = [
     description: 'European headquarters',
     category: 'office',
     icon: '🏢',
-    color: '#EF4444'
-  }
+    color: '#EF4444',
+  },
 ];
 
 export const mockLocationData: LocationData[] = [
@@ -305,7 +305,7 @@ export const mockLocationData: LocationData[] = [
     amenities: ['Free WiFi', 'Outdoor Seating', 'Takeout Available'],
     verified: true,
     distance: 0.3,
-    lastUpdated: new Date()
+    lastUpdated: new Date(),
   },
   {
     id: 'loc-2',
@@ -330,8 +330,8 @@ export const mockLocationData: LocationData[] = [
     amenities: ['High-Speed WiFi', 'Parking', 'Meeting Rooms', '24/7 Access'],
     verified: true,
     distance: 1.2,
-    lastUpdated: new Date()
-  }
+    lastUpdated: new Date(),
+  },
 ];
 
 export const mockHeatmapData: HeatmapPoint[] = Array.from({ length: 100 }, () => ({
@@ -340,7 +340,7 @@ export const mockHeatmapData: HeatmapPoint[] = Array.from({ length: 100 }, () =>
   weight: Math.random() * 100,
   intensity: Math.random(),
   category: ['traffic', 'events', 'business'][Math.floor(Math.random() * 3)],
-  timestamp: new Date(Date.now() - Math.random() * 86400000 * 30)
+  timestamp: new Date(Date.now() - Math.random() * 86400000 * 30),
 }));
 
 // ===== USER DATA =====
@@ -352,7 +352,7 @@ export const mockUsers: User[] = [
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
     role: 'admin',
     status: 'active',
-    permissions: ['read', 'write', 'delete', 'admin']
+    permissions: ['read', 'write', 'delete', 'admin'],
   },
   {
     id: 'user-2',
@@ -361,7 +361,7 @@ export const mockUsers: User[] = [
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=manager',
     role: 'manager',
     status: 'active',
-    permissions: ['read', 'write']
+    permissions: ['read', 'write'],
   },
   {
     id: 'user-3',
@@ -370,8 +370,8 @@ export const mockUsers: User[] = [
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=viewer',
     role: 'viewer',
     status: 'active',
-    permissions: ['read']
-  }
+    permissions: ['read'],
+  },
 ];
 
 // ===== NOTIFICATION DATA =====
@@ -384,7 +384,7 @@ export const mockNotifications: NotificationHistoryItem[] = [
     duration: 4000,
     createdAt: new Date(Date.now() - 3600000),
     readAt: new Date(Date.now() - 3000000),
-    metadata: { exportId: 'exp-123', fileSize: '2.5MB' }
+    metadata: { exportId: 'exp-123', fileSize: '2.5MB' },
   },
   {
     id: 'notif-2',
@@ -394,7 +394,7 @@ export const mockNotifications: NotificationHistoryItem[] = [
     duration: 0,
     persistent: true,
     createdAt: new Date(Date.now() - 7200000),
-    metadata: { serverId: 'srv-456', cpuUsage: 85 }
+    metadata: { serverId: 'srv-456', cpuUsage: 85 },
   },
   {
     id: 'notif-3',
@@ -404,7 +404,7 @@ export const mockNotifications: NotificationHistoryItem[] = [
     duration: 6000,
     createdAt: new Date(Date.now() - 86400000),
     clickedAt: new Date(Date.now() - 86000000),
-    metadata: { feature: 'widgets-v2' }
+    metadata: { feature: 'widgets-v2' },
   },
   {
     id: 'notif-4',
@@ -414,8 +414,8 @@ export const mockNotifications: NotificationHistoryItem[] = [
     duration: 0,
     persistent: true,
     createdAt: new Date(Date.now() - 172800000),
-    metadata: { paymentId: 'pay-789', amount: 99.99 }
-  }
+    metadata: { paymentId: 'pay-789', amount: 99.99 },
+  },
 ];
 
 // ===== CALENDAR DATA =====
@@ -427,7 +427,7 @@ export const mockCalendarEvents = [
     end: new Date(2024, 5, 15, 11, 0),
     category: 'meeting',
     color: '#3B82F6',
-    attendees: ['john@company.com', 'jane@company.com']
+    attendees: ['john@company.com', 'jane@company.com'],
   },
   {
     id: 'event-2',
@@ -436,7 +436,7 @@ export const mockCalendarEvents = [
     end: new Date(2024, 5, 20, 16, 0),
     category: 'milestone',
     color: '#10B981',
-    attendees: ['team@company.com']
+    attendees: ['team@company.com'],
   },
   {
     id: 'event-3',
@@ -445,8 +445,8 @@ export const mockCalendarEvents = [
     end: new Date(2024, 5, 25, 16, 30),
     category: 'presentation',
     color: '#F59E0B',
-    attendees: ['sales@company.com']
-  }
+    attendees: ['sales@company.com'],
+  },
 ];
 
 // ===== TREEMAP DATA =====
@@ -460,8 +460,8 @@ export const mockTreemapData: TreemapNode[] = [
     children: [
       { id: 'frontend', name: 'Frontend', value: 20000, color: '#60A5FA' },
       { id: 'backend', name: 'Backend', value: 15000, color: '#3B82F6' },
-      { id: 'devops', name: 'DevOps', value: 10000, color: '#1D4ED8' }
-    ]
+      { id: 'devops', name: 'DevOps', value: 10000, color: '#1D4ED8' },
+    ],
   },
   {
     id: 'sales',
@@ -471,8 +471,8 @@ export const mockTreemapData: TreemapNode[] = [
     category: 'department',
     children: [
       { id: 'enterprise', name: 'Enterprise', value: 18000, color: '#34D399' },
-      { id: 'smb', name: 'SMB', value: 14000, color: '#10B981' }
-    ]
+      { id: 'smb', name: 'SMB', value: 14000, color: '#10B981' },
+    ],
   },
   {
     id: 'marketing',
@@ -482,9 +482,9 @@ export const mockTreemapData: TreemapNode[] = [
     category: 'department',
     children: [
       { id: 'digital', name: 'Digital', value: 16000, color: '#FBBF24' },
-      { id: 'content', name: 'Content', value: 12000, color: '#F59E0B' }
-    ]
-  }
+      { id: 'content', name: 'Content', value: 12000, color: '#F59E0B' },
+    ],
+  },
 ];
 
 // ===== GAUGE DATA =====
@@ -492,7 +492,7 @@ export const mockGaugeSegments: GaugeSegment[] = [
   { min: 0, max: 25, color: '#EF4444', label: 'Poor' },
   { min: 25, max: 50, color: '#F59E0B', label: 'Fair' },
   { min: 50, max: 75, color: '#10B981', label: 'Good' },
-  { min: 75, max: 100, color: '#3B82F6', label: 'Excellent' }
+  { min: 75, max: 100, color: '#3B82F6', label: 'Excellent' },
 ];
 
 // ===== TIMELINE DATA =====
@@ -504,7 +504,7 @@ export const mockTimelineEvents = [
     description: 'Initial project kickoff and planning phase',
     type: 'milestone',
     color: '#3B82F6',
-    icon: '🚀'
+    icon: '🚀',
   },
   {
     id: 'timeline-2',
@@ -513,7 +513,7 @@ export const mockTimelineEvents = [
     description: 'Completed first development sprint with core features',
     type: 'completion',
     color: '#10B981',
-    icon: '✅'
+    icon: '✅',
   },
   {
     id: 'timeline-3',
@@ -522,7 +522,7 @@ export const mockTimelineEvents = [
     description: 'Released beta version to selected customers',
     type: 'release',
     color: '#F59E0B',
-    icon: '🎯'
+    icon: '🎯',
   },
   {
     id: 'timeline-4',
@@ -531,7 +531,7 @@ export const mockTimelineEvents = [
     description: 'Completed third-party security audit',
     type: 'security',
     color: '#8B5CF6',
-    icon: '🔒'
+    icon: '🔒',
   },
   {
     id: 'timeline-5',
@@ -540,8 +540,8 @@ export const mockTimelineEvents = [
     description: 'Official public launch with marketing campaign',
     type: 'launch',
     color: '#EF4444',
-    icon: '🎉'
-  }
+    icon: '🎉',
+  },
 ];
 
 // ===== FORM SAMPLE DATA =====
@@ -553,32 +553,32 @@ export const mockFormData = {
     phone: '+1-555-0123',
     dateOfBirth: '1990-05-15',
     gender: 'male',
-    nationality: 'US'
+    nationality: 'US',
   },
   address: {
     street: '123 Main Street',
     city: 'San Francisco',
     state: 'CA',
     postalCode: '94105',
-    country: 'USA'
+    country: 'USA',
   },
   preferences: {
     notifications: {
       email: true,
       sms: false,
-      push: true
+      push: true,
     },
     privacy: {
       profileVisibility: 'public',
       dataSharing: false,
-      analytics: true
+      analytics: true,
     },
     display: {
       theme: 'light',
       language: 'en',
-      timezone: 'America/Los_Angeles'
-    }
-  }
+      timezone: 'America/Los_Angeles',
+    },
+  },
 };
 
 // ===== SELECT OPTIONS =====
@@ -591,15 +591,27 @@ export const mockSelectOptions = {
     { value: 'fr', label: 'France', icon: '🇫🇷' },
     { value: 'jp', label: 'Japan', icon: '🇯🇵' },
     { value: 'au', label: 'Australia', icon: '🇦🇺' },
-    { value: 'br', label: 'Brazil', icon: '🇧🇷' }
+    { value: 'br', label: 'Brazil', icon: '🇧🇷' },
   ],
   departments: [
-    { value: 'engineering', label: 'Engineering', description: 'Software development and technical roles' },
-    { value: 'marketing', label: 'Marketing', description: 'Brand, growth, and customer acquisition' },
+    {
+      value: 'engineering',
+      label: 'Engineering',
+      description: 'Software development and technical roles',
+    },
+    {
+      value: 'marketing',
+      label: 'Marketing',
+      description: 'Brand, growth, and customer acquisition',
+    },
     { value: 'sales', label: 'Sales', description: 'Revenue generation and client relations' },
     { value: 'design', label: 'Design', description: 'UI/UX and creative services' },
-    { value: 'hr', label: 'Human Resources', description: 'People operations and talent management' },
-    { value: 'finance', label: 'Finance', description: 'Financial planning and accounting' }
+    {
+      value: 'hr',
+      label: 'Human Resources',
+      description: 'People operations and talent management',
+    },
+    { value: 'finance', label: 'Finance', description: 'Financial planning and accounting' },
   ],
   categories: [
     { value: 'electronics', label: 'Electronics', group: 'Technology' },
@@ -609,8 +621,8 @@ export const mockSelectOptions = {
     { value: 'shoes', label: 'Shoes', group: 'Fashion' },
     { value: 'accessories', label: 'Accessories', group: 'Fashion' },
     { value: 'books', label: 'Books', group: 'Education' },
-    { value: 'courses', label: 'Online Courses', group: 'Education' }
-  ]
+    { value: 'courses', label: 'Online Courses', group: 'Education' },
+  ],
 };
 
 // ===== EXPORT ALL MOCK DATA =====
@@ -620,7 +632,7 @@ export const mockData = {
     bar: mockBarChartData,
     pie: mockPieChartData,
     area: mockAreaChartData,
-    scatter: mockScatterPlotData
+    scatter: mockScatterPlotData,
   },
   kpis: mockKPIData,
   weather: mockWeatherData,
@@ -628,7 +640,7 @@ export const mockData = {
   maps: {
     markers: mockMapMarkers,
     locations: mockLocationData,
-    heatmap: mockHeatmapData
+    heatmap: mockHeatmapData,
   },
   users: mockUsers,
   notifications: mockNotifications,
@@ -638,8 +650,8 @@ export const mockData = {
   timeline: mockTimelineEvents,
   forms: {
     data: mockFormData,
-    options: mockSelectOptions
-  }
+    options: mockSelectOptions,
+  },
 };
 
 export default mockData;

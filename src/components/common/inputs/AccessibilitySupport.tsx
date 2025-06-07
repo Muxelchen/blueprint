@@ -17,7 +17,17 @@ export interface AriaLiveRegionProps {
   message: string;
   priority?: 'polite' | 'assertive' | 'off';
   atomic?: boolean;
-  relevant?: 'additions' | 'removals' | 'text' | 'all' | 'additions text' | 'additions removals' | 'removals text' | 'text additions' | 'text removals' | 'removals additions';
+  relevant?:
+    | 'additions'
+    | 'removals'
+    | 'text'
+    | 'all'
+    | 'additions text'
+    | 'additions removals'
+    | 'removals text'
+    | 'text additions'
+    | 'text removals'
+    | 'removals additions';
   busy?: boolean;
 }
 
@@ -65,7 +75,7 @@ const AriaLiveRegion: React.FC<AriaLiveRegionProps> = ({
   priority = 'polite',
   atomic = false,
   relevant = 'additions text',
-  busy = false
+  busy = false,
 }) => {
   return (
     <div
@@ -89,24 +99,26 @@ const AccessibilitySupport: React.FC<AccessibilityProps> = ({
   keyboardNavigation = true,
   focusVisible = true,
   className = '',
-  children
+  children,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [liveMessage, setLiveMessage] = useState('');
   const [livePriority, setLivePriority] = useState<'polite' | 'assertive'>('polite');
   const [preferences, setPreferences] = useState<AccessibilityPreferences>(() => {
     const saved = localStorage.getItem('accessibility-preferences');
-    return saved ? JSON.parse(saved) : {
-      announceChanges,
-      highContrast,
-      reducedMotion,
-      screenReaderMode,
-      keyboardNavigation,
-      focusVisible,
-      fontSize: 16,
-      soundEnabled: true,
-      autoplay: false
-    };
+    return saved
+      ? JSON.parse(saved)
+      : {
+          announceChanges,
+          highContrast,
+          reducedMotion,
+          screenReaderMode,
+          keyboardNavigation,
+          focusVisible,
+          fontSize: 16,
+          soundEnabled: true,
+          autoplay: false,
+        };
   });
 
   // Save preferences to localStorage
@@ -117,31 +129,31 @@ const AccessibilitySupport: React.FC<AccessibilityProps> = ({
   // Apply CSS custom properties based on preferences
   useEffect(() => {
     const root = document.documentElement;
-    
+
     // High contrast
     if (preferences.highContrast) {
       root.classList.add('high-contrast');
     } else {
       root.classList.remove('high-contrast');
     }
-    
+
     // Reduced motion
     if (preferences.reducedMotion) {
       root.classList.add('reduce-motion');
     } else {
       root.classList.remove('reduce-motion');
     }
-    
+
     // Focus visible
     if (preferences.focusVisible) {
       root.classList.add('focus-visible');
     } else {
       root.classList.remove('focus-visible');
     }
-    
+
     // Font size
     root.style.setProperty('--accessibility-font-size', `${preferences.fontSize}px`);
-    
+
     // Screen reader mode
     if (preferences.screenReaderMode) {
       root.classList.add('screen-reader-mode');
@@ -151,15 +163,18 @@ const AccessibilitySupport: React.FC<AccessibilityProps> = ({
   }, [preferences]);
 
   // Announce message function
-  const announceMessage = useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
-    if (!preferences.announceChanges) return;
-    
-    setLiveMessage('');
-    setTimeout(() => {
-      setLiveMessage(message);
-      setLivePriority(priority);
-    }, 100);
-  }, [preferences.announceChanges]);
+  const announceMessage = useCallback(
+    (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+      if (!preferences.announceChanges) return;
+
+      setLiveMessage('');
+      setTimeout(() => {
+        setLiveMessage(message);
+        setLivePriority(priority);
+      }, 100);
+    },
+    [preferences.announceChanges]
+  );
 
   // ARIA helper functions
   const setAriaLabel = useCallback((element: HTMLElement, label: string) => {
@@ -228,15 +243,18 @@ const AccessibilitySupport: React.FC<AccessibilityProps> = ({
     }
   }, []);
 
-  const updatePreferences = useCallback((updates: Partial<AccessibilityPreferences>) => {
-    setPreferences(prev => ({ ...prev, ...updates }));
-    
-    // Announce preference changes
-    Object.entries(updates).forEach(([key, value]) => {
-      const prefName = key.replace(/([A-Z])/g, ' $1').toLowerCase();
-      announceMessage(`${prefName} ${value ? 'enabled' : 'disabled'}`);
-    });
-  }, [announceMessage]);
+  const updatePreferences = useCallback(
+    (updates: Partial<AccessibilityPreferences>) => {
+      setPreferences(prev => ({ ...prev, ...updates }));
+
+      // Announce preference changes
+      Object.entries(updates).forEach(([key, value]) => {
+        const prefName = key.replace(/([A-Z])/g, ' $1').toLowerCase();
+        announceMessage(`${prefName} ${value ? 'enabled' : 'disabled'}`);
+      });
+    },
+    [announceMessage]
+  );
 
   const contextValue: AccessibilityContextType = {
     announceMessage,
@@ -251,7 +269,7 @@ const AccessibilitySupport: React.FC<AccessibilityProps> = ({
     addAriaDescribedBy,
     removeAriaDescribedBy,
     preferences,
-    updatePreferences
+    updatePreferences,
   };
 
   if (!enabled) {
@@ -260,14 +278,10 @@ const AccessibilitySupport: React.FC<AccessibilityProps> = ({
 
   return (
     <AccessibilityContext.Provider value={contextValue}>
-      <div
-        ref={containerRef}
-        className={`accessibility-container ${className}`}
-        role="main"
-      >
+      <div ref={containerRef} className={`accessibility-container ${className}`} role="main">
         {/* Live region for announcements */}
         <AriaLiveRegion message={liveMessage} priority={livePriority} />
-        
+
         {children}
       </div>
     </AccessibilityContext.Provider>
@@ -298,7 +312,7 @@ export const AccessibleButton: React.FC<{
   ariaDescription,
   role = 'button',
   className = '',
-  variant = 'primary'
+  variant = 'primary',
 }) => {
   const { announceMessage, setAriaDescription: setDesc } = useAccessibility();
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -311,20 +325,21 @@ export const AccessibleButton: React.FC<{
 
   const handleClick = () => {
     if (disabled) return;
-    
+
     onClick?.();
-    
+
     if (ariaLabel) {
       announceMessage(`${ariaLabel} activated`);
     }
   };
 
   const getVariantClasses = () => {
-    const base = 'px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
+    const base =
+      'px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
     const variants = {
       primary: `${base} bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:bg-blue-300`,
       secondary: `${base} bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500 disabled:bg-gray-300`,
-      danger: `${base} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-300`
+      danger: `${base} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-300`,
     };
     return variants[variant];
   };
@@ -371,7 +386,7 @@ export const AccessibleInput: React.FC<{
   help,
   placeholder,
   ariaLabel,
-  className = ''
+  className = '',
 }) => {
   const { announceMessage } = useAccessibility();
   const inputId = `input-${Math.random().toString(36).substring(2, 11)}`;
@@ -381,7 +396,7 @@ export const AccessibleInput: React.FC<{
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     onChange?.(newValue);
-    
+
     if (error) {
       announceMessage(`Input error: ${error}`, 'assertive');
     }
@@ -391,16 +406,15 @@ export const AccessibleInput: React.FC<{
 
   return (
     <div className={`space-y-1 ${className}`}>
-      <label
-        htmlFor={inputId}
-        className="block text-sm font-medium text-gray-700"
-      >
+      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">
         {label}
         {required && (
-          <span className="text-red-500 ml-1" aria-label="required">*</span>
+          <span className="text-red-500 ml-1" aria-label="required">
+            *
+          </span>
         )}
       </label>
-      
+
       <input
         id={inputId}
         type={type}
@@ -413,18 +427,16 @@ export const AccessibleInput: React.FC<{
         aria-describedby={describedBy || undefined}
         aria-invalid={error ? 'true' : 'false'}
         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          error 
-            ? 'border-red-500 focus:ring-red-500' 
-            : 'border-gray-300'
+          error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
         } ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
       />
-      
+
       {help && (
         <p id={helpId} className="text-sm text-gray-600">
           {help}
         </p>
       )}
-      
+
       {error && (
         <p id={errorId} role="alert" className="text-sm text-red-600">
           {error}
@@ -477,11 +489,11 @@ export const AccessibilityPreferencesPanel: React.FC<{
               ×
             </AccessibleButton>
           </div>
-          
+
           <p id="accessibility-description" className="text-sm text-gray-600 mb-6">
             Customize your accessibility settings for a better experience.
           </p>
-          
+
           <div className="space-y-4">
             {/* Visual Preferences */}
             <div>
@@ -496,7 +508,7 @@ export const AccessibilityPreferencesPanel: React.FC<{
                   />
                   <span className="text-sm">High Contrast</span>
                 </label>
-                
+
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
@@ -506,7 +518,7 @@ export const AccessibilityPreferencesPanel: React.FC<{
                   />
                   <span className="text-sm">Reduce Motion</span>
                 </label>
-                
+
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
@@ -556,7 +568,7 @@ export const AccessibilityPreferencesPanel: React.FC<{
                   />
                   <span className="text-sm">Keyboard Navigation</span>
                 </label>
-                
+
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
@@ -566,7 +578,7 @@ export const AccessibilityPreferencesPanel: React.FC<{
                   />
                   <span className="text-sm">Announce Changes</span>
                 </label>
-                
+
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
@@ -592,7 +604,7 @@ export const AccessibilityPreferencesPanel: React.FC<{
                   />
                   <span className="text-sm">Sound Effects</span>
                 </label>
-                
+
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
@@ -605,7 +617,7 @@ export const AccessibilityPreferencesPanel: React.FC<{
               </div>
             </div>
           </div>
-          
+
           <div className="mt-6 pt-4 border-t border-gray-200">
             <AccessibleButton
               onClick={onClose}
@@ -656,7 +668,7 @@ export const ExampleAccessibilitySupport: React.FC = () => {
       <div className="space-y-8 p-6">
         <div>
           <h3 className="text-lg font-semibold mb-4">Accessibility Support System</h3>
-          
+
           {/* Preferences Panel Trigger */}
           <div className="mb-6">
             <AccessibleButton
@@ -668,11 +680,11 @@ export const ExampleAccessibilitySupport: React.FC = () => {
               <Type className="w-4 h-4 mr-2" />
               Accessibility Preferences
             </AccessibleButton>
-            
+
             <p className="text-sm text-gray-600">
-              Current preferences: High contrast: {preferences.highContrast ? 'On' : 'Off'}, 
-              Font size: {preferences.fontSize}px, 
-              Announcements: {preferences.announceChanges ? 'On' : 'Off'}
+              Current preferences: High contrast: {preferences.highContrast ? 'On' : 'Off'}, Font
+              size: {preferences.fontSize}px, Announcements:{' '}
+              {preferences.announceChanges ? 'On' : 'Off'}
             </p>
           </div>
 
@@ -680,12 +692,12 @@ export const ExampleAccessibilitySupport: React.FC = () => {
           <div className="space-y-6">
             <div>
               <h4 className="font-medium mb-3">Accessible Form Controls</h4>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <AccessibleInput
                   label="Username"
                   value={inputValue}
-                  onChange={(value) => {
+                  onChange={value => {
                     setInputValue(value);
                     validateInput(value);
                   }}
@@ -694,7 +706,7 @@ export const ExampleAccessibilitySupport: React.FC = () => {
                   help="Enter a username with at least 3 characters"
                   placeholder="Enter username"
                 />
-                
+
                 <AccessibleInput
                   label="Email"
                   type="email"
@@ -707,7 +719,7 @@ export const ExampleAccessibilitySupport: React.FC = () => {
             {/* Interactive Elements */}
             <div>
               <h4 className="font-medium mb-3">Interactive Elements</h4>
-              
+
               <div className="flex flex-wrap gap-4 mb-4">
                 <AccessibleButton
                   onClick={togglePressed}
@@ -718,7 +730,7 @@ export const ExampleAccessibilitySupport: React.FC = () => {
                 >
                   {buttonPressed ? 'Pressed' : 'Not Pressed'}
                 </AccessibleButton>
-                
+
                 <AccessibleButton
                   onClick={toggleList}
                   expanded={listExpanded}
@@ -728,7 +740,7 @@ export const ExampleAccessibilitySupport: React.FC = () => {
                 >
                   Options {listExpanded ? '▲' : '▼'}
                 </AccessibleButton>
-                
+
                 <AccessibleButton
                   onClick={() => announceMessage('Action completed successfully', 'assertive')}
                   variant="primary"
@@ -746,7 +758,9 @@ export const ExampleAccessibilitySupport: React.FC = () => {
                   aria-labelledby="options-heading"
                   className="border border-gray-200 rounded-lg p-4"
                 >
-                  <h5 id="options-heading" className="font-medium mb-2">Available Options</h5>
+                  <h5 id="options-heading" className="font-medium mb-2">
+                    Available Options
+                  </h5>
                   <ul role="list" className="space-y-2">
                     <li role="listitem">
                       <AccessibleButton
@@ -836,8 +850,12 @@ export const ExampleAccessibilitySupport: React.FC = () => {
                   </thead>
                   <tbody>
                     <tr role="row" className="border-t border-gray-200">
-                      <td role="cell" className="px-4 py-2">John Doe</td>
-                      <td role="cell" className="px-4 py-2">Administrator</td>
+                      <td role="cell" className="px-4 py-2">
+                        John Doe
+                      </td>
+                      <td role="cell" className="px-4 py-2">
+                        Administrator
+                      </td>
                       <td role="cell" className="px-4 py-2">
                         <span
                           role="status"
@@ -848,8 +866,12 @@ export const ExampleAccessibilitySupport: React.FC = () => {
                       </td>
                     </tr>
                     <tr role="row" className="border-t border-gray-200">
-                      <td role="cell" className="px-4 py-2">Jane Smith</td>
-                      <td role="cell" className="px-4 py-2">Editor</td>
+                      <td role="cell" className="px-4 py-2">
+                        Jane Smith
+                      </td>
+                      <td role="cell" className="px-4 py-2">
+                        Editor
+                      </td>
                       <td role="cell" className="px-4 py-2">
                         <span
                           role="status"

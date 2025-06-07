@@ -32,7 +32,7 @@ interface WeatherWidgetProps {
 const WeatherWidget: React.FC<WeatherWidgetProps> = ({
   location = 'San Francisco, CA',
   showForecast = true,
-  units = 'celsius'
+  units = 'celsius',
 }) => {
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
   const [forecast, setForecast] = useState<ForecastDay[]>([]);
@@ -48,7 +48,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
       { name: 'Rainy', icon: '🌧️' },
       { name: 'Stormy', icon: '⛈️' },
       { name: 'Snowy', icon: '❄️' },
-      { name: 'Foggy', icon: '🌫️' }
+      { name: 'Foggy', icon: '🌫️' },
     ];
 
     const condition = conditions[Math.floor(Math.random() * conditions.length)];
@@ -66,7 +66,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
       visibility: Math.round(5 + Math.random() * 15),
       uvIndex: Math.round(1 + Math.random() * 10),
       feelsLike: Math.round(baseTemp + (Math.random() - 0.5) * tempVariation + Math.random() * 5),
-      icon: condition.icon
+      icon: condition.icon,
     };
   };
 
@@ -76,7 +76,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
       { name: 'Partly Cloudy', icon: '⛅' },
       { name: 'Cloudy', icon: '☁️' },
       { name: 'Rainy', icon: '🌧️' },
-      { name: 'Snowy', icon: '❄️' }
+      { name: 'Snowy', icon: '❄️' },
     ];
 
     return Array.from({ length: 7 }, (_, i) => {
@@ -92,7 +92,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
         low: Math.round(baseLow + (Math.random() - 0.5) * 10),
         condition: condition.name,
         precipitation: Math.round(Math.random() * 100),
-        icon: condition.icon
+        icon: condition.icon,
       };
     });
   };
@@ -111,9 +111,12 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
 
   // Update weather data every 5 minutes
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentWeather(generateMockWeather());
-    }, 5 * 60 * 1000);
+    const interval = setInterval(
+      () => {
+        setCurrentWeather(generateMockWeather());
+      },
+      5 * 60 * 1000
+    );
 
     return () => clearInterval(interval);
   }, [selectedUnit]);
@@ -215,7 +218,9 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-lg font-bold">{currentWeather.uvIndex}</span>
-            <div className={`w-3 h-3 rounded-full ${getUVIndexColor(currentWeather.uvIndex)}`}></div>
+            <div
+              className={`w-3 h-3 rounded-full ${getUVIndexColor(currentWeather.uvIndex)}`}
+            ></div>
           </div>
         </div>
       </div>
@@ -226,7 +231,10 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
           <h4 className="text-lg font-semibold mb-4">7-Day Forecast</h4>
           <div className="space-y-2">
             {forecast.map((day, index) => (
-              <div key={index} className="flex items-center justify-between bg-white bg-opacity-20 p-3 rounded-lg">
+              <div
+                key={index}
+                className="flex items-center justify-between bg-white bg-opacity-20 p-3 rounded-lg"
+              >
                 <div className="flex items-center space-x-3">
                   <span className="text-xl">{day.icon}</span>
                   <div>
@@ -239,9 +247,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
                     {day.high}°/{day.low}°
                   </div>
                   {day.precipitation > 0 && (
-                    <div className="text-xs opacity-75">
-                      {day.precipitation}% rain
-                    </div>
+                    <div className="text-xs opacity-75">{day.precipitation}% rain</div>
                   )}
                 </div>
               </div>

@@ -26,8 +26,8 @@ interface DonutChartProps {
   showTrends?: boolean;
 }
 
-const DonutChart: React.FC<DonutChartProps> = ({ 
-  data = mockData, 
+const DonutChart: React.FC<DonutChartProps> = ({
+  data = mockData,
   title = 'Device Usage Distribution',
   centerText = 'Total Users',
   size = 'auto',
@@ -45,28 +45,28 @@ const DonutChart: React.FC<DonutChartProps> = ({
   // Calculate adaptive dimensions based on content complexity
   const getAdaptiveDimensions = () => {
     const dataComplexity = data.length;
-    
+
     // Calculate space needed for each section
     let extraSectionHeight = 0;
-    
+
     if (showLegend && !compact) {
       const legendRows = Math.ceil(data.length / (data.length <= 2 ? 1 : 2));
-      extraSectionHeight += 60 + (legendRows * 60); // Header + rows
+      extraSectionHeight += 60 + legendRows * 60; // Header + rows
     }
-    
+
     if (showSummary && !compact) {
       extraSectionHeight += 120; // Summary section height
     }
-    
+
     if (showTrends && !compact) {
       extraSectionHeight += 60; // Trends section height
     }
-    
+
     let chartHeight: number;
     let containerMinHeight: number;
     let outerRadius: number;
     let innerRadius: number;
-    
+
     if (height) {
       // Use provided height if specified
       chartHeight = Math.max(height * 0.4, 200); // Reduced from 0.6 to leave more space for sections
@@ -92,13 +92,13 @@ const DonutChart: React.FC<DonutChartProps> = ({
       // Auto sizing based on data complexity
       const baseHeight = 220;
       const complexityBonus = Math.min(dataComplexity * 15, 60);
-      
+
       chartHeight = baseHeight + complexityBonus;
       containerMinHeight = chartHeight + 140 + extraSectionHeight;
       outerRadius = Math.max(80, Math.min(120, chartHeight * 0.35));
       innerRadius = outerRadius * 0.5;
     }
-    
+
     return {
       chartHeight: Math.max(chartHeight, compact ? 140 : 180),
       containerMinHeight: Math.max(containerMinHeight, compact ? 280 : 420),
@@ -116,11 +116,11 @@ const DonutChart: React.FC<DonutChartProps> = ({
     if (active && payload && payload.length) {
       const data = payload[0];
       const percentage = ((data.value / total) * 100).toFixed(1);
-      
+
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <div className="flex items-center mb-2">
-            <div 
+            <div
               className="w-4 h-4 rounded-full mr-2"
               style={{ backgroundColor: data.payload.color }}
             ></div>
@@ -161,11 +161,11 @@ const DonutChart: React.FC<DonutChartProps> = ({
     if (percent < 0.05) return null; // Don't show labels for segments < 5%
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
         fontSize={dimensions.fontSize}
         fontWeight="bold"
@@ -177,15 +177,19 @@ const DonutChart: React.FC<DonutChartProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`bg-white ${compact ? 'p-3' : 'p-6'} rounded-lg shadow-lg`}
-      style={{ 
+      style={{
         minHeight: `${dimensions.containerMinHeight}px`,
-        height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto'
+        height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto',
       }}
     >
-      <h3 className={`${compact ? 'text-sm' : 'text-lg'} font-semibold ${compact ? 'mb-2' : 'mb-4'} text-center`}>{title}</h3>
-      
+      <h3
+        className={`${compact ? 'text-sm' : 'text-lg'} font-semibold ${compact ? 'mb-2' : 'mb-4'} text-center`}
+      >
+        {title}
+      </h3>
+
       <div style={{ height: `${dimensions.chartHeight}px` }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -205,23 +209,30 @@ const DonutChart: React.FC<DonutChartProps> = ({
               animationEasing="ease-out"
             >
               {data.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
+                <Cell
+                  key={`cell-${index}`}
                   fill={entry.color}
                   stroke={activeIndex === index ? '#ffffff' : 'none'}
                   strokeWidth={activeIndex === index ? (compact ? 2 : 3) : 0}
                   style={{
-                    filter: activeIndex === index ? 'brightness(1.1) drop-shadow(0 4px 8px rgba(0,0,0,0.3))' : 'none',
+                    filter:
+                      activeIndex === index
+                        ? 'brightness(1.1) drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                        : 'none',
                     transform: activeIndex === index ? 'scale(1.05)' : 'scale(1)',
                     transformOrigin: 'center',
-                    transition: 'all 0.2s ease-in-out'
+                    transition: 'all 0.2s ease-in-out',
                   }}
                 />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
             <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central">
-              <tspan x="50%" y="45%" className={`${dimensions.centerTextSize} font-bold fill-gray-800`}>
+              <tspan
+                x="50%"
+                y="45%"
+                className={`${dimensions.centerTextSize} font-bold fill-gray-800`}
+              >
                 {compact ? `${Math.round(total / 1000)}k` : total.toLocaleString()}
               </tspan>
               <tspan x="50%" y="60%" className={`${compact ? 'text-xs' : 'text-sm'} fill-gray-600`}>
@@ -234,13 +245,15 @@ const DonutChart: React.FC<DonutChartProps> = ({
 
       {/* Legend with adaptive layout */}
       {showLegend && !compact && (
-        <div className={`${compact ? 'mt-3' : 'mt-6'} grid grid-cols-${dimensions.legendCols} gap-${compact ? '2' : '3'}`}>
+        <div
+          className={`${compact ? 'mt-3' : 'mt-6'} grid grid-cols-${dimensions.legendCols} gap-${compact ? '2' : '3'}`}
+        >
           {data.map((item, index) => {
             const percentage = ((item.value / total) * 100).toFixed(1);
             const isHovered = hoveredSegment === item.name;
-            
+
             return (
-              <div 
+              <div
                 key={item.name}
                 className={`flex items-center ${compact ? 'p-2' : 'p-3'} rounded-lg cursor-pointer transition-all ${
                   isHovered ? 'bg-gray-100 scale-105' : 'bg-gray-50 hover:bg-gray-100'
@@ -254,13 +267,17 @@ const DonutChart: React.FC<DonutChartProps> = ({
                   setHoveredSegment(null);
                 }}
               >
-                <div 
+                <div
                   className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} rounded-full ${compact ? 'mr-2' : 'mr-3'} flex-shrink-0`}
                   style={{ backgroundColor: item.color }}
                 ></div>
                 <div className="flex-1 min-w-0">
-                  <p className={`font-medium ${compact ? 'text-xs' : 'text-sm'} text-gray-800 truncate`}>
-                    {compact ? item.name.slice(0, 8) + (item.name.length > 8 ? '...' : '') : item.name}
+                  <p
+                    className={`font-medium ${compact ? 'text-xs' : 'text-sm'} text-gray-800 truncate`}
+                  >
+                    {compact
+                      ? item.name.slice(0, 8) + (item.name.length > 8 ? '...' : '')
+                      : item.name}
                   </p>
                   <div className="flex justify-between items-center">
                     <span className={`${compact ? 'text-xs' : 'text-xs'} text-gray-600`}>
@@ -288,13 +305,19 @@ const DonutChart: React.FC<DonutChartProps> = ({
             </div>
             <div>
               <p className="font-bold text-lg">
-                {data.reduce((max, item) => item.value > max.value ? item : max, data[0]).name}
+                {data.reduce((max, item) => (item.value > max.value ? item : max), data[0]).name}
               </p>
               <p className="text-gray-600">Largest</p>
             </div>
             <div>
               <p className="font-bold text-lg">
-                {((data.reduce((max, item) => item.value > max.value ? item : max, data[0]).value / total) * 100).toFixed(0)}%
+                {(
+                  (data.reduce((max, item) => (item.value > max.value ? item : max), data[0])
+                    .value /
+                    total) *
+                  100
+                ).toFixed(0)}
+                %
               </p>
               <p className="text-gray-600">Max Share</p>
             </div>
@@ -305,14 +328,14 @@ const DonutChart: React.FC<DonutChartProps> = ({
       {/* Trend indicators - Only show in non-compact mode */}
       {showTrends && !compact && (
         <div className="mt-4 flex justify-center space-x-6 text-xs">
-          {data.map((item) => {
+          {data.map(item => {
             const trend = Math.random() > 0.5 ? 'up' : 'down';
             const change = (Math.random() * 10).toFixed(1);
-            
+
             return (
               <div key={item.name} className="text-center">
                 <div className="flex items-center justify-center space-x-1">
-                  <div 
+                  <div
                     className="w-2 h-2 rounded-full"
                     style={{ backgroundColor: item.color }}
                   ></div>

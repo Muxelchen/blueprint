@@ -1,5 +1,12 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import {
+  ResponsiveContainer,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+} from 'recharts';
 import { TrendingUp, Eye, Download, RotateCcw, Zap, Activity } from 'lucide-react';
 
 interface PieData {
@@ -43,10 +50,10 @@ interface PieChartProps {
 
 // Advanced data processing with virtualization
 const processDataWithVirtualization = (
-  data: PieData[], 
+  data: PieData[],
   maxPoints: number = 10,
   enableVirtualization: boolean = false
-): { processedData: PieData[], isVirtualized: boolean } => {
+): { processedData: PieData[]; isVirtualized: boolean } => {
   if (!enableVirtualization || data.length <= maxPoints) {
     return { processedData: data, isVirtualized: false };
   }
@@ -55,19 +62,19 @@ const processDataWithVirtualization = (
   const sortedData = [...data].sort((a, b) => b.value - a.value);
   const topItems = sortedData.slice(0, maxPoints - 1);
   const otherItems = sortedData.slice(maxPoints - 1);
-  
+
   if (otherItems.length > 0) {
     const othersValue = otherItems.reduce((sum, item) => sum + item.value, 0);
     const othersItem: PieData = {
       name: `Others (${otherItems.length} items)`,
       value: othersValue,
       color: '#6B7280',
-      id: 'others-virtualized'
+      id: 'others-virtualized',
     };
-    
-    return { 
-      processedData: [...topItems, othersItem], 
-      isVirtualized: true 
+
+    return {
+      processedData: [...topItems, othersItem],
+      isVirtualized: true,
     };
   }
 
@@ -110,42 +117,48 @@ const getDimensions = (size: string, compact: boolean, height?: number) => {
     },
   };
 
-  return compact 
-    ? { ...sizeMap[size as keyof typeof sizeMap], minHeight: sizeMap[size as keyof typeof sizeMap].minHeight * 0.8 }
+  return compact
+    ? {
+        ...sizeMap[size as keyof typeof sizeMap],
+        minHeight: sizeMap[size as keyof typeof sizeMap].minHeight * 0.8,
+      }
     : sizeMap[size as keyof typeof sizeMap];
 };
 
 // Custom hook for performance monitoring
 const usePerformanceMonitoring = (
-  enabled: boolean, 
+  enabled: boolean,
   onUpdate?: (metrics: PerformanceMetrics) => void
 ) => {
   const metricsRef = useRef<PerformanceMetrics>({
     renderTime: 0,
     dataProcessingTime: 0,
     totalRenderCount: 0,
-    lastOptimization: 'initial'
+    lastOptimization: 'initial',
   });
 
   const startTiming = useCallback(() => {
     return enabled ? performance.now() : 0;
   }, [enabled]);
 
-  const endTiming = useCallback((startTime: number, operation: keyof PerformanceMetrics) => {
-    if (!enabled) return;
-    
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-    
-    metricsRef.current = {
-      ...metricsRef.current,
-      [operation]: duration,
-      totalRenderCount: metricsRef.current.totalRenderCount + 1,
-      lastOptimization: new Date().toISOString()
-    };
+  const endTiming = useCallback(
+    (startTime: number, operation: keyof PerformanceMetrics) => {
+      if (!enabled) return;
 
-    onUpdate?.(metricsRef.current);
-  }, [enabled, onUpdate]);
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+
+      metricsRef.current = {
+        ...metricsRef.current,
+        [operation]: duration,
+        totalRenderCount: metricsRef.current.totalRenderCount + 1,
+        lastOptimization: new Date().toISOString(),
+      };
+
+      onUpdate?.(metricsRef.current);
+    },
+    [enabled, onUpdate]
+  );
 
   return { startTiming, endTiming, metrics: metricsRef.current };
 };
@@ -163,11 +176,11 @@ const PieChart: React.FC<PieChartProps> = ({
   enableVirtualization = false,
   enablePerformanceMonitoring = false,
   animationDuration = 800,
-  onPerformanceUpdate
+  onPerformanceUpdate,
 }) => {
   // Performance monitoring
   const { startTiming, endTiming, metrics } = usePerformanceMonitoring(
-    enablePerformanceMonitoring, 
+    enablePerformanceMonitoring,
     onPerformanceUpdate
   );
 
@@ -183,27 +196,30 @@ const PieChart: React.FC<PieChartProps> = ({
   // Memoized data processing with virtualization
   const { processedData, calculatedTotal, dimensions, isVirtualized } = useMemo(() => {
     const processingStart = startTiming();
-    
-    const { processedData: virtualizedData, isVirtualized: isDataVirtualized } = 
+
+    const { processedData: virtualizedData, isVirtualized: isDataVirtualized } =
       processDataWithVirtualization(data, maxDataPoints, enableVirtualization);
-    
+
     const total = virtualizedData.reduce((sum, item) => sum + item.value, 0);
     const dims = getDimensions(size, compact, height);
-    
+
     endTiming(processingStart, 'dataProcessingTime');
-    
+
     return {
       processedData: virtualizedData,
       calculatedTotal: total,
       dimensions: dims,
-      isVirtualized: isDataVirtualized
+      isVirtualized: isDataVirtualized,
     };
   }, [data, size, compact, height, maxDataPoints, enableVirtualization, startTiming, endTiming]);
 
   // Optimized percentage calculation
-  const getPercentage = useCallback((value: number) => {
-    return calculatedTotal > 0 ? ((value / calculatedTotal) * 100).toFixed(1) : '0.0';
-  }, [calculatedTotal]);
+  const getPercentage = useCallback(
+    (value: number) => {
+      return calculatedTotal > 0 ? ((value / calculatedTotal) * 100).toFixed(1) : '0.0';
+    },
+    [calculatedTotal]
+  );
 
   // Enhanced mouse handlers with throttling
   const handleMouseEnter = useCallback((index: number) => {
@@ -223,7 +239,7 @@ const PieChart: React.FC<PieChartProps> = ({
   const handleRefresh = useCallback(() => {
     const refreshStart = startTiming();
     setIsAnimating(true);
-    
+
     // Simulate data refresh
     setTimeout(() => {
       setIsAnimating(false);
@@ -237,23 +253,26 @@ const PieChart: React.FC<PieChartProps> = ({
   }, []);
 
   // Enhanced tooltip content
-  const CustomTooltip = useCallback(({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
-          <p className="font-medium text-gray-900 dark:text-white">{data.name}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Value: <span className="font-semibold">{data.value}</span>
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Percentage: <span className="font-semibold">{getPercentage(data.value)}%</span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  }, [getPercentage]);
+  const CustomTooltip = useCallback(
+    ({ active, payload }: any) => {
+      if (active && payload && payload.length) {
+        const data = payload[0].payload;
+        return (
+          <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
+            <p className="font-medium text-gray-900 dark:text-white">{data.name}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Value: <span className="font-semibold">{data.value}</span>
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Percentage: <span className="font-semibold">{getPercentage(data.value)}%</span>
+            </p>
+          </div>
+        );
+      }
+      return null;
+    },
+    [getPercentage]
+  );
 
   // Custom legend with enhanced features
   const CustomLegend = useMemo(() => {
@@ -265,8 +284,8 @@ const PieChart: React.FC<PieChartProps> = ({
           <div
             key={entry.id || entry.name}
             className={`flex items-center space-x-2 p-2 rounded cursor-pointer transition-all duration-200 ${
-              hoveredIndex === index 
-                ? 'bg-gray-100 dark:bg-gray-700 scale-105' 
+              hoveredIndex === index
+                ? 'bg-gray-100 dark:bg-gray-700 scale-105'
                 : 'hover:bg-gray-50 dark:hover:bg-gray-800'
             }`}
             onMouseEnter={() => handleMouseEnter(index)}
@@ -288,7 +307,15 @@ const PieChart: React.FC<PieChartProps> = ({
         ))}
       </div>
     );
-  }, [processedData, showLegend, dimensions.legendCols, hoveredIndex, getPercentage, handleMouseEnter, handleMouseLeave]);
+  }, [
+    processedData,
+    showLegend,
+    dimensions.legendCols,
+    hoveredIndex,
+    getPercentage,
+    handleMouseEnter,
+    handleMouseLeave,
+  ]);
 
   // Export functionality
   const handleExport = useCallback(async () => {
@@ -303,7 +330,7 @@ const PieChart: React.FC<PieChartProps> = ({
       const dataStr = JSON.stringify(processedData, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(dataBlob);
-      
+
       const link = document.createElement('a');
       link.href = url;
       link.download = `pie-chart-data-${Date.now()}.json`;
@@ -346,7 +373,13 @@ const PieChart: React.FC<PieChartProps> = ({
         </div>
       </div>
     );
-  }, [showPerformanceStats, enablePerformanceMonitoring, isVirtualized, processedData.length, data.length]);
+  }, [
+    showPerformanceStats,
+    enablePerformanceMonitoring,
+    isVirtualized,
+    processedData.length,
+    data.length,
+  ]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -368,7 +401,7 @@ const PieChart: React.FC<PieChartProps> = ({
   }, [processedData, startTiming, endTiming]);
 
   return (
-    <div 
+    <div
       ref={chartRef}
       className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${dimensions.containerPadding} ${
         isAnimating ? 'opacity-75 pointer-events-none' : ''
@@ -388,7 +421,7 @@ const PieChart: React.FC<PieChartProps> = ({
             </span>
           )}
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {enablePerformanceMonitoring && (
             <button
@@ -403,7 +436,7 @@ const PieChart: React.FC<PieChartProps> = ({
               <Zap className="w-4 h-4" />
             </button>
           )}
-          
+
           <button
             onClick={handleExport}
             className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-md transition-colors"
@@ -411,7 +444,7 @@ const PieChart: React.FC<PieChartProps> = ({
           >
             <Download className="w-4 h-4" />
           </button>
-          
+
           <button
             onClick={handleRefresh}
             className={`p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-md transition-all ${
@@ -422,7 +455,7 @@ const PieChart: React.FC<PieChartProps> = ({
           >
             <RotateCcw className="w-4 h-4" />
           </button>
-          
+
           <button
             onClick={() => setShowPerformanceStats(prev => !prev)}
             className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-md transition-colors"
@@ -453,18 +486,18 @@ const PieChart: React.FC<PieChartProps> = ({
                 <Cell
                   key={`cell-${entry.id || index}`}
                   fill={entry.color}
-                  stroke={hoveredIndex === index ? "#ffffff" : "transparent"}
+                  stroke={hoveredIndex === index ? '#ffffff' : 'transparent'}
                   strokeWidth={hoveredIndex === index ? 2 : 0}
                   style={{
                     filter: hoveredIndex === index ? 'brightness(1.1)' : 'none',
                     transformOrigin: 'center',
                     transform: hoveredIndex === index ? 'scale(1.05)' : 'scale(1)',
-                    transition: 'all 0.2s ease-in-out'
+                    transition: 'all 0.2s ease-in-out',
                   }}
                 />
               ))}
             </Pie>
-            
+
             {showTooltip && <Tooltip content={CustomTooltip} />}
           </RechartsPieChart>
         </ResponsiveContainer>
@@ -473,12 +506,8 @@ const PieChart: React.FC<PieChartProps> = ({
         {centerText && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {centerText}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Total: {calculatedTotal}
-              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{centerText}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Total: {calculatedTotal}</p>
             </div>
           </div>
         )}

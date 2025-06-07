@@ -8,15 +8,10 @@ describe('Navigation Components', () => {
     it('renders brand and navigation items', () => {
       const items: NavigationItem[] = [
         { id: '1', label: 'Home', href: '/' },
-        { id: '2', label: 'About', href: '/about' }
+        { id: '2', label: 'About', href: '/about' },
       ];
 
-      render(
-        <NavBar 
-          brand={<span>Test Brand</span>}
-          items={items}
-        />
-      );
+      render(<NavBar brand={<span>Test Brand</span>} items={items} />);
 
       expect(screen.getByText('Test Brand')).toBeInTheDocument();
       expect(screen.getByText('Home')).toBeInTheDocument();
@@ -25,14 +20,14 @@ describe('Navigation Components', () => {
 
     it('handles mobile menu toggle', () => {
       render(<NavBar />);
-      
+
       const mobileButton = screen.getByRole('button');
       expect(mobileButton).toBeInTheDocument();
     });
 
     it('applies sticky and transparent styles', () => {
       render(<NavBar sticky transparent />);
-      
+
       const nav = screen.getByRole('navigation');
       expect(nav).toHaveClass('sticky');
       expect(nav).toHaveClass('bg-transparent');
@@ -75,15 +70,10 @@ describe('Navigation Components', () => {
   describe('NavigationSystem', () => {
     it('renders navbar type', () => {
       const navbarProps = {
-        brand: <span>Test</span>
+        brand: <span>Test</span>,
       };
 
-      render(
-        <NavigationSystem 
-          type="navbar" 
-          navbarProps={navbarProps}
-        />
-      );
+      render(<NavigationSystem type="navbar" navbarProps={navbarProps} />);
 
       expect(screen.getByText('Test')).toBeInTheDocument();
     });
@@ -91,15 +81,10 @@ describe('Navigation Components', () => {
     it('renders drawer type', () => {
       const drawerProps = {
         open: true,
-        children: <div>Drawer Test</div>
+        children: <div>Drawer Test</div>,
       };
 
-      render(
-        <NavigationSystem 
-          type="drawer" 
-          drawerProps={drawerProps}
-        />
-      );
+      render(<NavigationSystem type="drawer" drawerProps={drawerProps} />);
 
       expect(screen.getByText('Drawer Test')).toBeInTheDocument();
     });

@@ -34,7 +34,7 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
   onWidgetAdd,
   onWidgetRemove,
   onWidgetUpdate,
-  className = ''
+  className = '',
 }) => {
   const [widgets, setWidgets] = useState<Widget[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -66,7 +66,7 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
       visible: true,
       position: { x: 20, y: 20 },
       size: { width: 300, height: 200 },
-      config: widgetType.defaultProps || {}
+      config: widgetType.defaultProps || {},
     };
 
     setWidgets(prev => [...prev, newWidget]);
@@ -80,25 +80,29 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
   };
 
   const toggleWidgetVisibility = (widgetId: string) => {
-    setWidgets(prev => prev.map(widget => {
-      if (widget.id === widgetId) {
-        const updated = { ...widget, visible: !widget.visible };
-        onWidgetUpdate?.(updated);
-        return updated;
-      }
-      return widget;
-    }));
+    setWidgets(prev =>
+      prev.map(widget => {
+        if (widget.id === widgetId) {
+          const updated = { ...widget, visible: !widget.visible };
+          onWidgetUpdate?.(updated);
+          return updated;
+        }
+        return widget;
+      })
+    );
   };
 
   const updateWidgetPosition = (widgetId: string, position: { x: number; y: number }) => {
-    setWidgets(prev => prev.map(widget => {
-      if (widget.id === widgetId) {
-        const updated = { ...widget, position };
-        onWidgetUpdate?.(updated);
-        return updated;
-      }
-      return widget;
-    }));
+    setWidgets(prev =>
+      prev.map(widget => {
+        if (widget.id === widgetId) {
+          const updated = { ...widget, position };
+          onWidgetUpdate?.(updated);
+          return updated;
+        }
+        return widget;
+      })
+    );
   };
 
   const handleDragStart = (e: React.DragEvent, widgetId: string) => {
@@ -126,11 +130,13 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
   };
 
   const resetLayout = () => {
-    setWidgets(prev => prev.map((widget, index) => ({
-      ...widget,
-      position: { x: 20 + (index % 3) * 320, y: 20 + Math.floor(index / 3) * 220 },
-      size: { width: 300, height: 200 }
-    })));
+    setWidgets(prev =>
+      prev.map((widget, index) => ({
+        ...widget,
+        position: { x: 20 + (index % 3) * 320, y: 20 + Math.floor(index / 3) * 220 },
+        size: { width: 300, height: 200 },
+      }))
+    );
   };
 
   const clearAllWidgets = () => {
@@ -156,12 +162,7 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
           >
             Add Widget
           </Button>
-          <IconButton
-            icon={<Settings />}
-            tooltip="Reset Layout"
-            onClick={resetLayout}
-            size="sm"
-          />
+          <IconButton icon={<Settings />} tooltip="Reset Layout" onClick={resetLayout} size="sm" />
         </div>
       </div>
 
@@ -170,16 +171,12 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
         {widgets.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 mb-4">No widgets added yet</p>
-            <Button
-              variant="primary"
-              onClick={() => setShowAddModal(true)}
-              leftIcon={<Plus />}
-            >
+            <Button variant="primary" onClick={() => setShowAddModal(true)} leftIcon={<Plus />}>
               Add Your First Widget
             </Button>
           </div>
         ) : (
-          widgets.map((widget) => {
+          widgets.map(widget => {
             const widgetType = availableWidgets.find(w => w.id === widget.type);
             return (
               <div
@@ -188,26 +185,21 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
                   draggedWidget === widget.id ? 'opacity-50' : ''
                 }`}
                 draggable
-                onDragStart={(e) => handleDragStart(e, widget.id)}
+                onDragStart={e => handleDragStart(e, widget.id)}
                 onDragEnd={handleDragEnd}
               >
                 <Move className="w-4 h-4 text-gray-400 mr-3 cursor-move" />
-                
-                {widgetType && (
-                  <div className="w-6 h-6 mr-3 text-gray-600">
-                    {widgetType.icon}
-                  </div>
-                )}
-                
+
+                {widgetType && <div className="w-6 h-6 mr-3 text-gray-600">{widgetType.icon}</div>}
+
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">
-                    {widget.title}
-                  </p>
+                  <p className="font-medium text-gray-900 truncate">{widget.title}</p>
                   <p className="text-xs text-gray-500">
-                    {widget.position.x}, {widget.position.y} • {widget.size.width}×{widget.size.height}
+                    {widget.position.x}, {widget.position.y} • {widget.size.width}×
+                    {widget.size.height}
                   </p>
                 </div>
-                
+
                 <div className="flex items-center space-x-1">
                   <IconButton
                     icon={widget.visible ? <Eye /> : <EyeOff />}
@@ -234,20 +226,10 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
       {widgets.length > 0 && (
         <div className="p-4 border-t border-gray-200 space-y-2">
           <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetLayout}
-              fullWidth
-            >
+            <Button variant="outline" size="sm" onClick={resetLayout} fullWidth>
               Reset Layout
             </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={clearAllWidgets}
-              fullWidth
-            >
+            <Button variant="danger" size="sm" onClick={clearAllWidgets} fullWidth>
               Clear All
             </Button>
           </div>
@@ -260,23 +242,17 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Add Widget</h3>
-              <IconButton
-                icon={<X />}
-                onClick={() => setShowAddModal(false)}
-                size="sm"
-              />
+              <IconButton icon={<X />} onClick={() => setShowAddModal(false)} size="sm" />
             </div>
-            
+
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {availableWidgets.map((widgetType) => (
+              {availableWidgets.map(widgetType => (
                 <button
                   key={widgetType.id}
                   onClick={() => addWidget(widgetType)}
                   className="w-full flex items-center p-3 text-left hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors"
                 >
-                  <div className="w-8 h-8 mr-3 text-gray-600">
-                    {widgetType.icon}
-                  </div>
+                  <div className="w-8 h-8 mr-3 text-gray-600">{widgetType.icon}</div>
                   <div>
                     <p className="font-medium text-gray-900">{widgetType.name}</p>
                     <p className="text-sm text-gray-500">
@@ -286,12 +262,9 @@ const WidgetManager: React.FC<WidgetManagerProps> = ({
                 </button>
               ))}
             </div>
-            
+
             <div className="mt-4 flex justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setShowAddModal(false)}
-              >
+              <Button variant="outline" onClick={() => setShowAddModal(false)}>
                 Cancel
               </Button>
             </div>

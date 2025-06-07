@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 interface ScatterData {
   x: number;
@@ -36,24 +44,23 @@ interface CategoryColors {
   [key: string]: string;
 }
 
-const ScatterPlot: React.FC<ScatterPlotProps> = ({ 
-  data = mockData, 
-  title = 'Performance vs Engagement Analysis' 
+const ScatterPlot: React.FC<ScatterPlotProps> = ({
+  data = mockData,
+  title = 'Performance vs Engagement Analysis',
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [hoveredPoint, setHoveredPoint] = useState<any>(null);
 
   const categoryColors: CategoryColors = {
     A: '#3B82F6',
-    B: '#10B981', 
+    B: '#10B981',
     C: '#F59E0B',
     D: '#EF4444',
-    E: '#8B5CF6'
+    E: '#8B5CF6',
   };
 
-  const filteredData = selectedCategory === null 
-    ? data 
-    : data.filter(d => d.category === selectedCategory);
+  const filteredData =
+    selectedCategory === null ? data : data.filter(d => d.category === selectedCategory);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -64,7 +71,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span>Category:</span>
-              <span 
+              <span
                 className="font-medium px-2 py-1 rounded text-xs text-white"
                 style={{ backgroundColor: categoryColors[data.category] }}
               >
@@ -96,7 +103,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
     const isHovered = hoveredPoint === payload.name;
     const baseSize = Math.sqrt(payload.z) / 3;
     const size = isSelected || isHovered ? baseSize * 1.5 : baseSize;
-    
+
     return (
       <circle
         cx={cx}
@@ -108,7 +115,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         style={{
           filter: isSelected || isHovered ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' : 'none',
           cursor: 'pointer',
-          transition: 'all 0.2s ease-in-out'
+          transition: 'all 0.2s ease-in-out',
         }}
         onClick={() => {
           // setSelectedPoints(prev => {
@@ -138,11 +145,11 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   // Stats calculation function - available for future use
   // const getStatistics = () => {
   //   const dataToAnalyze = filteredData;
-  //   
+  //
   //   const xValues = dataToAnalyze.map(d => d.x);
   //   const yValues = dataToAnalyze.map(d => d.y);
   //   const zValues = dataToAnalyze.map(d => d.z);
-  //   
+  //
   //   return {
   //     count: dataToAnalyze.length,
   //     xAvg: xValues.reduce((a, b) => a + b, 0) / xValues.length,
@@ -189,22 +196,22 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         >
           All Categories
         </button>
-        
+
         {Object.keys(categoryColors).map(category => (
           <button
             key={category}
             onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
             className={`flex items-center px-3 py-1 text-xs rounded-lg border transition-colors ${
-              selectedCategory === category 
-                ? 'bg-gray-200 text-gray-800 border-gray-400' 
+              selectedCategory === category
+                ? 'bg-gray-200 text-gray-800 border-gray-400'
                 : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
             }`}
-            style={{ 
+            style={{
               backgroundColor: selectedCategory === category ? categoryColors[category] : undefined,
-              color: selectedCategory === category ? 'white' : undefined
+              color: selectedCategory === category ? 'white' : undefined,
             }}
           >
-            <div 
+            <div
               className="w-3 h-3 rounded-full mr-2"
               style={{ backgroundColor: categoryColors[category] }}
             ></div>
@@ -215,25 +222,10 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
 
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart
-            margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-            data={filteredData}
-          >
+          <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }} data={filteredData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis 
-              type="number" 
-              dataKey="x" 
-              stroke="#666"
-              fontSize={12}
-              name="Performance"
-            />
-            <YAxis 
-              type="number" 
-              dataKey="y" 
-              stroke="#666"
-              fontSize={12}
-              name="Efficiency"
-            />
+            <XAxis type="number" dataKey="x" stroke="#666" fontSize={12} name="Performance" />
+            <YAxis type="number" dataKey="y" stroke="#666" fontSize={12} name="Efficiency" />
             <Tooltip content={<CustomTooltip />} />
             <Scatter
               name="Data Points"
@@ -257,22 +249,22 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         >
           All Categories
         </button>
-        
+
         {Object.keys(categoryColors).map(category => (
           <button
             key={category}
             onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
             className={`flex items-center px-3 py-1 text-xs rounded-lg border transition-colors ${
-              selectedCategory === category 
-                ? 'bg-gray-200 text-gray-800 border-gray-400' 
+              selectedCategory === category
+                ? 'bg-gray-200 text-gray-800 border-gray-400'
                 : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
             }`}
-            style={{ 
+            style={{
               backgroundColor: selectedCategory === category ? categoryColors[category] : undefined,
-              color: selectedCategory === category ? 'white' : undefined
+              color: selectedCategory === category ? 'white' : undefined,
             }}
           >
-            <div 
+            <div
               className="w-3 h-3 rounded-full mr-2"
               style={{ backgroundColor: categoryColors[category] }}
             ></div>
@@ -286,23 +278,31 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         {Object.keys(categoryColors).map(category => {
           const categoryData = filteredData.filter((d: any) => d.category === category);
           if (categoryData.length === 0) return null;
-          
-          const avgX = categoryData.reduce((sum: number, d: any) => sum + d.x, 0) / categoryData.length;
-          const avgY = categoryData.reduce((sum: number, d: any) => sum + d.y, 0) / categoryData.length;
-          
+
+          const avgX =
+            categoryData.reduce((sum: number, d: any) => sum + d.x, 0) / categoryData.length;
+          const avgY =
+            categoryData.reduce((sum: number, d: any) => sum + d.y, 0) / categoryData.length;
+
           return (
             <div key={category} className="bg-gray-50 p-3 rounded-lg">
               <div className="flex items-center mb-2">
-                <div 
+                <div
                   className="w-3 h-3 rounded-full mr-2"
                   style={{ backgroundColor: categoryColors[category] }}
                 ></div>
                 <span className="font-medium text-sm">Category {category}</span>
               </div>
               <div className="space-y-1 text-xs">
-                <div>Count: <span className="font-bold">{categoryData.length}</span></div>
-                <div>Avg X: <span className="font-bold">{avgX.toFixed(1)}</span></div>
-                <div>Avg Y: <span className="font-bold">{avgY.toFixed(1)}</span></div>
+                <div>
+                  Count: <span className="font-bold">{categoryData.length}</span>
+                </div>
+                <div>
+                  Avg X: <span className="font-bold">{avgX.toFixed(1)}</span>
+                </div>
+                <div>
+                  Avg Y: <span className="font-bold">{avgY.toFixed(1)}</span>
+                </div>
               </div>
             </div>
           );

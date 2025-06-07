@@ -23,13 +23,13 @@ const defaultLanguages: Language[] = [
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
   { code: 'zh', name: '中文', flag: '🇨🇳' },
   { code: 'ja', name: '日本語', flag: '🇯🇵' },
-  { code: 'ko', name: '한국어', flag: '🇰🇷' }
+  { code: 'ko', name: '한국어', flag: '🇰🇷' },
 ];
 
 const LanguageSwitch: React.FC<LanguageSwitchProps> = ({
   className = '',
   languages = defaultLanguages,
-  onLanguageChange
+  onLanguageChange,
 }) => {
   const [currentLanguage, setCurrentLanguage] = useState<Language>(() => {
     // Initialize from localStorage or default to English
@@ -46,10 +46,10 @@ const LanguageSwitch: React.FC<LanguageSwitchProps> = ({
   useEffect(() => {
     // Save to localStorage
     localStorage.setItem('language', currentLanguage.code);
-    
+
     // Set document language attribute
     document.documentElement.lang = currentLanguage.code;
-    
+
     // Trigger callback
     onLanguageChange?.(currentLanguage);
   }, [currentLanguage, onLanguageChange]);
@@ -85,23 +85,23 @@ const LanguageSwitch: React.FC<LanguageSwitchProps> = ({
         <span className="text-sm font-medium text-gray-700 hidden sm:block">
           {currentLanguage.name}
         </span>
-        <ChevronDown 
+        <ChevronDown
           className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
-          }`} 
+          }`}
         />
       </button>
 
       {/* Dropdown */}
       {isOpen && (
         <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
-          {languages.map((language) => (
+          {languages.map(language => (
             <button
               key={language.code}
               onClick={() => handleLanguageSelect(language)}
               className={`w-full flex items-center space-x-3 px-4 py-2 text-left hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors duration-150 ${
-                currentLanguage.code === language.code 
-                  ? 'bg-blue-50 text-blue-700' 
+                currentLanguage.code === language.code
+                  ? 'bg-blue-50 text-blue-700'
                   : 'text-gray-700'
               }`}
             >

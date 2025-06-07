@@ -27,7 +27,7 @@ const Modal: React.FC<ModalProps> = ({
   closeOnOverlayClick = true,
   closeOnEscape = true,
   footer,
-  className = ''
+  className = '',
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const firstElementRef = useRef<HTMLElement | null>(null);
@@ -39,7 +39,7 @@ const Modal: React.FC<ModalProps> = ({
       const focusableElements = modalRef.current?.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
-      
+
       if (focusableElements && focusableElements.length > 0) {
         firstElementRef.current = focusableElements[0] as HTMLElement;
         lastElementRef.current = focusableElements[focusableElements.length - 1] as HTMLElement;
@@ -85,7 +85,7 @@ const Modal: React.FC<ModalProps> = ({
       md: 'max-w-lg',
       lg: 'max-w-2xl',
       xl: 'max-w-4xl',
-      full: 'max-w-full mx-4'
+      full: 'max-w-full mx-4',
     };
     return sizeClasses[size];
   };
@@ -96,7 +96,7 @@ const Modal: React.FC<ModalProps> = ({
       success: <CheckCircle className="w-6 h-6 text-green-600" />,
       warning: <AlertTriangle className="w-6 h-6 text-yellow-600" />,
       danger: <AlertCircle className="w-6 h-6 text-red-600" />,
-      info: <Info className="w-6 h-6 text-blue-600" />
+      info: <Info className="w-6 h-6 text-blue-600" />,
     };
     return icons[variant];
   };
@@ -107,7 +107,7 @@ const Modal: React.FC<ModalProps> = ({
       success: 'border-green-200 bg-green-50',
       warning: 'border-yellow-200 bg-yellow-50',
       danger: 'border-red-200 bg-red-50',
-      info: 'border-blue-200 bg-blue-50'
+      info: 'border-blue-200 bg-blue-50',
     };
     return variantClasses[variant];
   };
@@ -117,12 +117,12 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
         onClick={closeOnOverlayClick ? onClose : undefined}
         aria-hidden="true"
       />
-      
+
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div
@@ -138,7 +138,9 @@ const Modal: React.FC<ModalProps> = ({
         >
           {/* Header */}
           {(title || showCloseButton) && (
-            <div className={`flex items-center justify-between p-6 border-b ${getVariantClasses()}`}>
+            <div
+              className={`flex items-center justify-between p-6 border-b ${getVariantClasses()}`}
+            >
               <div className="flex items-center gap-3">
                 {getVariantIcon()}
                 {title && (
@@ -147,7 +149,7 @@ const Modal: React.FC<ModalProps> = ({
                   </h3>
                 )}
               </div>
-              
+
               {showCloseButton && (
                 <button
                   className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -161,9 +163,7 @@ const Modal: React.FC<ModalProps> = ({
           )}
 
           {/* Content */}
-          <div className="p-6">
-            {children}
-          </div>
+          <div className="p-6">{children}</div>
 
           {/* Footer */}
           {footer && (
@@ -189,7 +189,7 @@ export const useModal = (defaultOpen = false) => {
     isOpen,
     openModal,
     closeModal,
-    toggleModal
+    toggleModal,
   };
 };
 
@@ -217,18 +217,16 @@ export const ExampleModals: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-4">
-        <Button onClick={basicModal.openModal}>
-          Basic Modal
-        </Button>
-        
+        <Button onClick={basicModal.openModal}>Basic Modal</Button>
+
         <Button onClick={confirmModal.openModal} variant="danger">
           Confirm Modal
         </Button>
-        
+
         <Button onClick={formModal.openModal} variant="primary">
           Form Modal
         </Button>
-        
+
         <Button onClick={warningModal.openModal} variant="warning">
           Warning Modal
         </Button>
@@ -278,7 +276,9 @@ export const ExampleModals: React.FC = () => {
           <p>Are you sure you want to delete this item? This action cannot be undone.</p>
           <div className="p-3 bg-red-50 border border-red-200 rounded-md">
             <p className="text-red-800 text-sm font-medium">⚠️ Warning</p>
-            <p className="text-red-700 text-sm">This will permanently delete the selected item and all associated data.</p>
+            <p className="text-red-700 text-sm">
+              This will permanently delete the selected item and all associated data.
+            </p>
           </div>
         </div>
       </Modal>
@@ -303,9 +303,7 @@ export const ExampleModals: React.FC = () => {
         <form id="item-form" onSubmit={handleFormSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Item Name *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Item Name *</label>
               <input
                 type="text"
                 required
@@ -313,11 +311,9 @@ export const ExampleModals: React.FC = () => {
                 placeholder="Enter item name"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
               <select className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Select category</option>
                 <option value="electronics">Electronics</option>
@@ -327,23 +323,19 @@ export const ExampleModals: React.FC = () => {
               </select>
             </div>
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
               rows={4}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter description"
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
               <input
                 type="number"
                 step="0.01"
@@ -351,22 +343,18 @@ export const ExampleModals: React.FC = () => {
                 placeholder="0.00"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quantity
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
               <input
                 type="number"
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="0"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                SKU
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -374,7 +362,7 @@ export const ExampleModals: React.FC = () => {
               />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <input type="checkbox" id="featured" className="rounded" />
             <label htmlFor="featured" className="text-sm text-gray-700">

@@ -43,11 +43,11 @@ const AlertBanner: React.FC<AlertBannerProps> = ({
   actions = [],
   link,
   onDismiss,
-  className = ''
+  className = '',
 }) => {
   const [state, setState] = useState<AlertState>({
     visible: true,
-    dismissed: false
+    dismissed: false,
   });
 
   // Load dismissed state from localStorage
@@ -73,14 +73,14 @@ const AlertBanner: React.FC<AlertBannerProps> = ({
 
   const handleDismiss = useCallback(() => {
     setState(prev => ({ ...prev, visible: false }));
-    
+
     // Store dismissal in localStorage for persistent alerts
     if (persistent) {
       const dismissedAlerts = JSON.parse(localStorage.getItem('dismissedAlerts') || '{}');
       dismissedAlerts[id] = {
         dismissedAt: new Date().toISOString(),
         alertType: type,
-        title
+        title,
       };
       localStorage.setItem('dismissedAlerts', JSON.stringify(dismissedAlerts));
     }
@@ -93,8 +93,8 @@ const AlertBanner: React.FC<AlertBannerProps> = ({
   }, [id, persistent, type, title, onDismiss]);
 
   const getIcon = () => {
-    const iconClasses = "w-5 h-5 flex-shrink-0";
-    
+    const iconClasses = 'w-5 h-5 flex-shrink-0';
+
     switch (type) {
       case 'success':
         return <CheckCircle className={`${iconClasses} text-green-600`} />;
@@ -134,8 +134,8 @@ const AlertBanner: React.FC<AlertBannerProps> = ({
   };
 
   const getButtonStyles = (variant: 'primary' | 'secondary' = 'primary') => {
-    const baseStyles = "px-3 py-1 text-sm font-medium rounded-md transition-colors";
-    
+    const baseStyles = 'px-3 py-1 text-sm font-medium rounded-md transition-colors';
+
     if (variant === 'primary') {
       switch (type) {
         case 'success':
@@ -176,19 +176,13 @@ const AlertBanner: React.FC<AlertBannerProps> = ({
   return (
     <div className={`${getAlertStyles()} ${className}`}>
       <div className="flex items-start">
-        <div className="mr-3 mt-0.5">
-          {getIcon()}
-        </div>
+        <div className="mr-3 mt-0.5">{getIcon()}</div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h3 className="text-sm font-semibold">{title}</h3>
-              {message && (
-                <div className="mt-1 text-sm opacity-90">
-                  {message}
-                </div>
-              )}
+              {message && <div className="mt-1 text-sm opacity-90">{message}</div>}
 
               {link && (
                 <div className="mt-2">
@@ -246,9 +240,9 @@ export const useAlertManager = () => {
   const addAlert = useCallback((alert: Omit<AlertBannerProps, 'id'>) => {
     const id = `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const newAlert = { ...alert, id };
-    
+
     setState(prev => ({
-      alerts: [...prev.alerts, newAlert]
+      alerts: [...prev.alerts, newAlert],
     }));
 
     return id;
@@ -256,7 +250,7 @@ export const useAlertManager = () => {
 
   const removeAlert = useCallback((id: string) => {
     setState(prev => ({
-      alerts: prev.alerts.filter(alert => alert.id !== id)
+      alerts: prev.alerts.filter(alert => alert.id !== id),
     }));
   }, []);
 
@@ -273,7 +267,7 @@ export const useAlertManager = () => {
     addAlert,
     removeAlert,
     clearAllAlerts,
-    clearDismissedAlerts
+    clearDismissedAlerts,
   };
 };
 
@@ -284,11 +278,7 @@ export const AlertContainer: React.FC<{ className?: string }> = ({ className = '
   return (
     <div className={`space-y-3 ${className}`}>
       {alerts.map(alert => (
-        <AlertBanner
-          key={alert.id}
-          {...alert}
-          onDismiss={() => removeAlert(alert.id)}
-        />
+        <AlertBanner key={alert.id} {...alert} onDismiss={() => removeAlert(alert.id)} />
       ))}
     </div>
   );
@@ -304,7 +294,7 @@ export const ExampleAlerts: React.FC = () => {
       title: 'Success!',
       message: 'Your changes have been saved successfully.',
       autoHide: true,
-      duration: 5000
+      duration: 5000,
     });
 
     setTimeout(() => {
@@ -316,14 +306,14 @@ export const ExampleAlerts: React.FC = () => {
           {
             label: 'Extend Session',
             onClick: () => console.log('Session extended'),
-            variant: 'primary'
+            variant: 'primary',
           },
           {
             label: 'Logout',
             onClick: () => console.log('Logged out'),
-            variant: 'secondary'
-          }
-        ]
+            variant: 'secondary',
+          },
+        ],
       });
     }, 1000);
 
@@ -336,8 +326,8 @@ export const ExampleAlerts: React.FC = () => {
         link: {
           text: 'Check Status Page',
           url: 'https://status.example.com',
-          external: true
-        }
+          external: true,
+        },
       });
     }, 2000);
 
@@ -345,14 +335,14 @@ export const ExampleAlerts: React.FC = () => {
       addAlert({
         type: 'info',
         title: 'New Feature Available',
-        message: 'We\'ve added a new dashboard with advanced analytics.',
+        message: "We've added a new dashboard with advanced analytics.",
         actions: [
           {
             label: 'Explore Now',
             onClick: () => console.log('Exploring new feature'),
-            variant: 'primary'
-          }
-        ]
+            variant: 'primary',
+          },
+        ],
       });
     }, 3000);
 
@@ -360,9 +350,10 @@ export const ExampleAlerts: React.FC = () => {
       addAlert({
         type: 'announcement',
         title: 'Scheduled Maintenance',
-        message: 'Our services will be temporarily unavailable tomorrow from 2:00 AM to 4:00 AM UTC.',
+        message:
+          'Our services will be temporarily unavailable tomorrow from 2:00 AM to 4:00 AM UTC.',
         dismissible: false,
-        persistent: true
+        persistent: true,
       });
     }, 4000);
   };
@@ -371,79 +362,89 @@ export const ExampleAlerts: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Alert Banner Examples</h3>
-        
+
         <div className="flex flex-wrap gap-2 mb-6">
           <button
-            onClick={() => addAlert({
-              type: 'success',
-              title: 'Success!',
-              message: 'Operation completed successfully.'
-            })}
+            onClick={() =>
+              addAlert({
+                type: 'success',
+                title: 'Success!',
+                message: 'Operation completed successfully.',
+              })
+            }
             className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
             Success Alert
           </button>
-          
+
           <button
-            onClick={() => addAlert({
-              type: 'error',
-              title: 'Error!',
-              message: 'Something went wrong. Please try again.'
-            })}
+            onClick={() =>
+              addAlert({
+                type: 'error',
+                title: 'Error!',
+                message: 'Something went wrong. Please try again.',
+              })
+            }
             className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
           >
             Error Alert
           </button>
-          
+
           <button
-            onClick={() => addAlert({
-              type: 'warning',
-              title: 'Warning!',
-              message: 'This action cannot be undone.'
-            })}
+            onClick={() =>
+              addAlert({
+                type: 'warning',
+                title: 'Warning!',
+                message: 'This action cannot be undone.',
+              })
+            }
             className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
           >
             Warning Alert
           </button>
-          
+
           <button
-            onClick={() => addAlert({
-              type: 'info',
-              title: 'Information',
-              message: 'Here\'s some helpful information.',
-              link: { text: 'Learn More', url: '#' }
-            })}
+            onClick={() =>
+              addAlert({
+                type: 'info',
+                title: 'Information',
+                message: "Here's some helpful information.",
+                link: { text: 'Learn More', url: '#' },
+              })
+            }
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Info with Link
           </button>
-          
+
           <button
-            onClick={() => addAlert({
-              type: 'announcement',
-              title: 'Announcement',
-              message: 'Important system update coming soon.',
-              persistent: true
-            })}
+            onClick={() =>
+              addAlert({
+                type: 'announcement',
+                title: 'Announcement',
+                message: 'Important system update coming soon.',
+                persistent: true,
+              })
+            }
             className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
           >
             Persistent Alert
           </button>
-          
+
           <button
             onClick={showExampleAlerts}
             className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
           >
             Show All Types
           </button>
-          
+
           <button
             onClick={clearAllAlerts}
             className="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500"
           >
             Clear All
           </button>
-          
+
           <button
             onClick={clearDismissedAlerts}
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"

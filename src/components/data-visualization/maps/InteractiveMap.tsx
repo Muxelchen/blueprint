@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import { 
-  ZoomIn, 
-  ZoomOut, 
-  Locate, 
-  Navigation, 
-  Layers, 
+import {
+  ZoomIn,
+  ZoomOut,
+  Locate,
+  Navigation,
+  Layers,
   MapPin,
   Search,
   Download,
-  Share2
+  Share2,
 } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
@@ -69,17 +69,17 @@ const mockLocations: MapLocation[] = [
     description: 'Main headquarters with 200+ employees',
     category: 'office',
     color: '#3B82F6',
-    data: { employees: 250, revenue: 5000000 }
+    data: { employees: 250, revenue: 5000000 },
   },
   {
     id: '2',
     lat: 40.7128,
-    lng: -74.0060,
+    lng: -74.006,
     title: 'New York Branch',
     description: 'East coast operations center',
     category: 'office',
     color: '#10B981',
-    data: { employees: 180, revenue: 3500000 }
+    data: { employees: 180, revenue: 3500000 },
   },
   {
     id: '3',
@@ -89,7 +89,7 @@ const mockLocations: MapLocation[] = [
     description: 'Creative design studio',
     category: 'studio',
     color: '#F59E0B',
-    data: { employees: 95, revenue: 2000000 }
+    data: { employees: 95, revenue: 2000000 },
   },
   {
     id: '4',
@@ -99,17 +99,17 @@ const mockLocations: MapLocation[] = [
     description: 'Midwest distribution center',
     category: 'warehouse',
     color: '#EF4444',
-    data: { employees: 120, revenue: 1800000 }
+    data: { employees: 120, revenue: 1800000 },
   },
   {
     id: '5',
     lat: 32.7767,
-    lng: -96.7970,
+    lng: -96.797,
     title: 'Dallas Operations',
     description: 'Southern region office',
     category: 'office',
     color: '#8B5CF6',
-    data: { employees: 85, revenue: 1500000 }
+    data: { employees: 85, revenue: 1500000 },
   },
   {
     id: '6',
@@ -119,7 +119,7 @@ const mockLocations: MapLocation[] = [
     description: 'Technology development facility',
     category: 'tech',
     color: '#06B6D4',
-    data: { employees: 300, revenue: 8000000 }
+    data: { employees: 300, revenue: 8000000 },
   },
   {
     id: '7',
@@ -129,7 +129,7 @@ const mockLocations: MapLocation[] = [
     description: 'Latin America sales division',
     category: 'sales',
     color: '#EC4899',
-    data: { employees: 60, revenue: 1200000 }
+    data: { employees: 60, revenue: 1200000 },
   },
   {
     id: '8',
@@ -139,8 +139,8 @@ const mockLocations: MapLocation[] = [
     description: 'Mountain region logistics center',
     category: 'warehouse',
     color: '#84CC16',
-    data: { employees: 75, revenue: 900000 }
-  }
+    data: { employees: 75, revenue: 900000 },
+  },
 ];
 
 // Custom icon factory
@@ -169,7 +169,7 @@ const createCustomIcon = (color: string, category: string) => {
     className: 'custom-marker',
     iconSize: [30, 30],
     iconAnchor: [15, 15],
-    popupAnchor: [0, -15]
+    popupAnchor: [0, -15],
   });
 };
 
@@ -239,10 +239,11 @@ const MapSearch: React.FC<{
 
   useEffect(() => {
     if (query.trim()) {
-      const filtered = locations.filter(location =>
-        location.title.toLowerCase().includes(query.toLowerCase()) ||
-        location.description?.toLowerCase().includes(query.toLowerCase()) ||
-        location.category?.toLowerCase().includes(query.toLowerCase())
+      const filtered = locations.filter(
+        location =>
+          location.title.toLowerCase().includes(query.toLowerCase()) ||
+          location.description?.toLowerCase().includes(query.toLowerCase()) ||
+          location.category?.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredLocations(filtered);
       setIsOpen(true);
@@ -266,7 +267,7 @@ const MapSearch: React.FC<{
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
             placeholder="Search locations..."
             className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg shadow-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           />
@@ -274,7 +275,7 @@ const MapSearch: React.FC<{
 
         {isOpen && filteredLocations.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-            {filteredLocations.map((location) => (
+            {filteredLocations.map(location => (
               <button
                 key={location.id}
                 onClick={() => handleLocationSelect(location)}
@@ -305,7 +306,7 @@ const MapEventHandlers: React.FC<{
   onBoundsChange?: (bounds: MapBounds) => void;
 }> = ({ onMapClick, onBoundsChange }) => {
   const map = useMapEvents({
-    click: (e) => {
+    click: e => {
       if (onMapClick) {
         onMapClick(e.latlng.lat, e.latlng.lng);
       }
@@ -317,10 +318,10 @@ const MapEventHandlers: React.FC<{
           north: bounds.getNorth(),
           south: bounds.getSouth(),
           east: bounds.getEast(),
-          west: bounds.getWest()
+          west: bounds.getWest(),
         });
       }
-    }
+    },
   });
 
   return null;
@@ -341,10 +342,10 @@ const MapController: React.FC<{
       locate: () => {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
-            (position) => {
+            position => {
               map.setView([position.coords.latitude, position.coords.longitude], 15);
             },
-            (error) => {
+            error => {
               console.warn('Geolocation failed:', error);
             }
           );
@@ -353,7 +354,7 @@ const MapController: React.FC<{
       reset: () => map.setView(center, zoom),
       flyTo: (lat: number, lng: number, zoomLevel?: number) => {
         map.flyTo([lat, lng], zoomLevel || map.getZoom());
-      }
+      },
     });
   }, [map, center, zoom, onControlsReady]);
 
@@ -374,7 +375,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   className = '',
   interactive = true,
   showScale = true,
-  showAttribution = true
+  showAttribution = true,
 }) => {
   const [mapControls, setMapControls] = useState<any>(null);
   const [currentLayer, setCurrentLayer] = useState<string>('openstreetmap');
@@ -384,16 +385,17 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const tileLayers = {
     openstreetmap: {
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      attribution:
+        '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     },
     satellite: {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      attribution: '© <a href="https://www.esri.com/">Esri</a>'
+      attribution: '© <a href="https://www.esri.com/">Esri</a>',
     },
     terrain: {
       url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-      attribution: '© <a href="https://opentopomap.org/">OpenTopoMap</a>'
-    }
+      attribution: '© <a href="https://opentopomap.org/">OpenTopoMap</a>',
+    },
   };
 
   const handleLocationClick = (location: MapLocation) => {
@@ -404,9 +406,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
   };
 
   const handleSearch = (query: string) => {
-    const location = locations.find(loc => 
-      loc.title.toLowerCase().includes(query.toLowerCase())
-    );
+    const location = locations.find(loc => loc.title.toLowerCase().includes(query.toLowerCase()));
     if (location) {
       handleLocationClick(location);
     }
@@ -425,7 +425,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
       locations,
       center,
       zoom,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -444,7 +444,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         await navigator.share({
           title: 'Interactive Map',
           text: 'Check out this interactive map with location data',
-          url: window.location.href
+          url: window.location.href,
         });
       } catch (error) {
         console.log('Error sharing:', error);
@@ -469,7 +469,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
             {locations.length} locations
           </span>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <button
             onClick={handleExport}
@@ -511,26 +511,19 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
           />
 
           {/* Map Event Handlers */}
-          <MapEventHandlers
-            onMapClick={onMapClick}
-            onBoundsChange={onBoundsChange}
-          />
+          <MapEventHandlers onMapClick={onMapClick} onBoundsChange={onBoundsChange} />
 
           {/* Map Controller */}
-          <MapController
-            center={center}
-            zoom={zoom}
-            onControlsReady={setMapControls}
-          />
+          <MapController center={center} zoom={zoom} onControlsReady={setMapControls} />
 
           {/* Location Markers */}
-          {locations.map((location) => (
+          {locations.map(location => (
             <Marker
               key={location.id}
               position={[location.lat, location.lng]}
               icon={createCustomIcon(location.color || '#3B82F6', location.category || 'default')}
               eventHandlers={{
-                click: () => handleLocationClick(location)
+                click: () => handleLocationClick(location),
               }}
             >
               <Popup maxWidth={300} className="custom-popup">
@@ -542,11 +535,11 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     />
                     <h4 className="font-semibold text-gray-900">{location.title}</h4>
                   </div>
-                  
+
                   {location.description && (
                     <p className="text-sm text-gray-600 mb-3">{location.description}</p>
                   )}
-                  
+
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
                       <span className="text-gray-500">Category:</span>
@@ -558,17 +551,16 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
                         {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
                       </span>
                     </div>
-                    
+
                     {location.data && (
                       <>
                         {Object.entries(location.data).map(([key, value]) => (
                           <div key={key} className="flex justify-between">
                             <span className="text-gray-500 capitalize">{key}:</span>
                             <span className="font-medium">
-                              {typeof value === 'number' && key.includes('revenue') 
+                              {typeof value === 'number' && key.includes('revenue')
                                 ? `$${value.toLocaleString()}`
-                                : value?.toLocaleString()
-                              }
+                                : value?.toLocaleString()}
                             </span>
                           </div>
                         ))}
@@ -582,12 +574,7 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
         </MapContainer>
 
         {/* Search */}
-        {showSearch && (
-          <MapSearch
-            onSearch={handleSearch}
-            locations={locations}
-          />
-        )}
+        {showSearch && <MapSearch onSearch={handleSearch} locations={locations} />}
 
         {/* Controls */}
         {showControls && mapControls && (
@@ -637,10 +624,8 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               </span>
             </div>
           </div>
-          
-          <div className="text-gray-500">
-            Total locations: {locations.length}
-          </div>
+
+          <div className="text-gray-500">Total locations: {locations.length}</div>
         </div>
       </div>
     </div>

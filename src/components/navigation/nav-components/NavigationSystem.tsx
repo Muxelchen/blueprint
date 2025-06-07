@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Menu, 
-  X, 
-  ChevronDown, 
-  ChevronRight, 
-  Home, 
-  Settings, 
-  Search, 
-  Bell, 
-  Star, 
+import {
+  Menu,
+  X,
+  ChevronDown,
+  ChevronRight,
+  Home,
+  Settings,
+  Search,
+  Bell,
+  Star,
   Shield,
   Zap,
   Users,
   ExternalLink,
   Clock,
-  FileText
+  FileText,
 } from 'lucide-react';
 
 export interface NavigationItem {
@@ -67,7 +67,7 @@ const defaultNavigationItems: NavigationItem[] = [
     href: '/dashboard',
     icon: <Home className="w-5 h-5" />,
     isActive: true,
-    description: 'Main dashboard overview'
+    description: 'Main dashboard overview',
   },
   {
     id: 'analytics',
@@ -82,22 +82,22 @@ const defaultNavigationItems: NavigationItem[] = [
         id: 'reports',
         label: 'Reports',
         href: '/analytics/reports',
-        description: 'Generate and view reports'
+        description: 'Generate and view reports',
       },
       {
         id: 'metrics',
         label: 'Metrics',
         href: '/analytics/metrics',
         badge: 5,
-        description: 'Key performance metrics'
+        description: 'Key performance metrics',
       },
       {
         id: 'charts',
         label: 'Charts & Graphs',
         href: '/analytics/charts',
-        description: 'Visual data representations'
-      }
-    ]
+        description: 'Visual data representations',
+      },
+    ],
   },
   {
     id: 'users',
@@ -111,23 +111,23 @@ const defaultNavigationItems: NavigationItem[] = [
         id: 'all-users',
         label: 'All Users',
         href: '/users/all',
-        description: 'View all users'
+        description: 'View all users',
       },
       {
         id: 'roles',
         label: 'Roles & Permissions',
         href: '/users/roles',
         icon: <Shield className="w-4 h-4" />,
-        description: 'Manage user roles'
+        description: 'Manage user roles',
       },
       {
         id: 'invitations',
         label: 'Invitations',
         href: '/users/invitations',
         badge: 3,
-        description: 'Pending user invitations'
-      }
-    ]
+        description: 'Pending user invitations',
+      },
+    ],
   },
   {
     id: 'content',
@@ -140,15 +140,15 @@ const defaultNavigationItems: NavigationItem[] = [
         id: 'documents',
         label: 'Documents',
         href: '/content/documents',
-        description: 'Document library'
+        description: 'Document library',
       },
       {
         id: 'media',
         label: 'Media Library',
         href: '/content/media',
-        description: 'Images, videos, and files'
-      }
-    ]
+        description: 'Images, videos, and files',
+      },
+    ],
   },
   {
     id: 'notifications',
@@ -156,7 +156,7 @@ const defaultNavigationItems: NavigationItem[] = [
     href: '/notifications',
     icon: <Bell className="w-5 h-5" />,
     badge: 8,
-    description: 'System notifications'
+    description: 'System notifications',
   },
   {
     id: 'settings',
@@ -169,22 +169,22 @@ const defaultNavigationItems: NavigationItem[] = [
         id: 'general',
         label: 'General',
         href: '/settings/general',
-        description: 'General application settings'
+        description: 'General application settings',
       },
       {
         id: 'security',
         label: 'Security',
         href: '/settings/security',
         icon: <Shield className="w-4 h-4" />,
-        description: 'Security and privacy settings'
+        description: 'Security and privacy settings',
       },
       {
         id: 'integrations',
         label: 'Integrations',
         href: '/settings/integrations',
-        description: 'Third-party integrations'
-      }
-    ]
+        description: 'Third-party integrations',
+      },
+    ],
   },
   {
     id: 'help',
@@ -192,8 +192,8 @@ const defaultNavigationItems: NavigationItem[] = [
     href: 'https://help.example.com',
     external: true,
     description: 'Get help and support',
-    shortcut: '?'
-  }
+    shortcut: '?',
+  },
 ];
 
 const NavigationSystem: React.FC<NavigationSystemProps> = ({
@@ -211,7 +211,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
   onToggleFavorite,
   onSearch,
   className = '',
-  maxRecent = 5
+  maxRecent = 5,
 }) => {
   const [state, setState] = useState<NavigationState>({
     expandedItems: new Set(['analytics', 'users']),
@@ -221,12 +221,22 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
     recentItems: [
       { id: 'reports', label: 'Reports', href: '/analytics/reports' },
       { id: 'all-users', label: 'All Users', href: '/users/all' },
-      { id: 'documents', label: 'Documents', href: '/content/documents' }
+      { id: 'documents', label: 'Documents', href: '/content/documents' },
     ],
     favoriteItems: [
-      { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: <Home className="w-4 h-4" /> },
-      { id: 'metrics', label: 'Metrics', href: '/analytics/metrics', icon: <Zap className="w-4 h-4" /> }
-    ]
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        href: '/dashboard',
+        icon: <Home className="w-4 h-4" />,
+      },
+      {
+        id: 'metrics',
+        label: 'Metrics',
+        href: '/analytics/metrics',
+        icon: <Zap className="w-4 h-4" />,
+      },
+    ],
   });
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -239,7 +249,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
         e.preventDefault();
         searchInputRef.current?.focus();
       }
-      
+
       // Help shortcut (?)
       if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
         const helpItem = items.find(item => item.shortcut === '?');
@@ -281,15 +291,15 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
   const handleNavigate = (item: NavigationItem) => {
     // Add to recent items
     setState(prev => {
-      const recentItems = [
-        item,
-        ...prev.recentItems.filter(i => i.id !== item.id)
-      ].slice(0, maxRecent);
-      
-      return { 
-        ...prev, 
+      const recentItems = [item, ...prev.recentItems.filter(i => i.id !== item.id)].slice(
+        0,
+        maxRecent
+      );
+
+      return {
+        ...prev,
         recentItems,
-        isMobileOpen: false 
+        isMobileOpen: false,
       };
     });
 
@@ -302,7 +312,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
       const favoriteItems = isFavorite
         ? prev.favoriteItems.filter(f => f.id !== item.id)
         : [...prev.favoriteItems, item];
-      
+
       return { ...prev, favoriteItems };
     });
 
@@ -311,18 +321,19 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
 
   const filterItems = (items: NavigationItem[]): NavigationItem[] => {
     if (!state.searchQuery) return items;
-    
+
     return items.filter(item => {
-      const matchesSearch = item.label.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
-                           item.description?.toLowerCase().includes(state.searchQuery.toLowerCase());
-      
+      const matchesSearch =
+        item.label.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
+        item.description?.toLowerCase().includes(state.searchQuery.toLowerCase());
+
       if (matchesSearch) return true;
-      
+
       // Check children
       if (item.children) {
         return filterItems(item.children).length > 0;
       }
-      
+
       return false;
     });
   };
@@ -330,7 +341,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
   const generateBreadcrumbs = (): NavigationItem[] => {
     const pathParts = currentPath.split('/').filter(Boolean);
     const breadcrumbs: NavigationItem[] = [];
-    
+
     // Helper function to find item by path
     const findItemByPath = (items: NavigationItem[], targetPath: string): NavigationItem | null => {
       for (const item of items) {
@@ -366,9 +377,10 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
       <div key={item.id} className="relative">
         <div
           className={`group flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer
-            ${isActive 
-              ? 'bg-blue-100 text-blue-900 border-l-4 border-blue-500' 
-              : 'text-gray-700 hover:bg-gray-100'
+            ${
+              isActive
+                ? 'bg-blue-100 text-blue-900 border-l-4 border-blue-500'
+                : 'text-gray-700 hover:bg-gray-100'
             }
             ${level > 0 ? 'ml-4' : ''}
             ${state.isCollapsed && level === 0 ? 'justify-center' : ''}
@@ -384,32 +396,33 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
         >
           <div className="flex items-center flex-1 min-w-0">
             {item.icon && (
-              <div className={`flex-shrink-0 mr-3 ${state.isCollapsed && level === 0 ? 'mr-0' : ''}`}>
+              <div
+                className={`flex-shrink-0 mr-3 ${state.isCollapsed && level === 0 ? 'mr-0' : ''}`}
+              >
                 {item.icon}
               </div>
             )}
-            
+
             {(!state.isCollapsed || level > 0) && (
               <>
-                <span className="flex-1 text-sm font-medium truncate">
-                  {item.label}
-                </span>
-                
-                {item.external && (
-                  <ExternalLink className="w-3 h-3 ml-1 text-gray-400" />
-                )}
-                
+                <span className="flex-1 text-sm font-medium truncate">{item.label}</span>
+
+                {item.external && <ExternalLink className="w-3 h-3 ml-1 text-gray-400" />}
+
                 {item.badge && (
-                  <span className={`ml-2 px-2 py-0.5 text-xs rounded-full font-medium
-                    ${typeof item.badge === 'number' 
-                      ? 'bg-red-100 text-red-800' 
-                      : 'bg-green-100 text-green-800'
+                  <span
+                    className={`ml-2 px-2 py-0.5 text-xs rounded-full font-medium
+                    ${
+                      typeof item.badge === 'number'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-green-100 text-green-800'
                     }
-                  `}>
+                  `}
+                  >
                     {item.badge}
                   </span>
                 )}
-                
+
                 {item.isNew && (
                   <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full font-medium">
                     New
@@ -422,7 +435,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
           <div className="flex items-center space-x-1">
             {(!state.isCollapsed || level > 0) && (
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   handleToggleFavorite(item);
                 }}
@@ -433,7 +446,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
                 <Star className={`w-3 h-3 ${isFavorite ? 'fill-current' : ''}`} />
               </button>
             )}
-            
+
             {hasChildren && (!state.isCollapsed || level > 0) && (
               <div className="p-1">
                 {isExpanded ? (
@@ -545,7 +558,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
   const sizeClasses = {
     sm: 'w-56',
     md: 'w-64',
-    lg: 'w-72'
+    lg: 'w-72',
   };
 
   const filteredItems = filterItems(items);
@@ -563,8 +576,14 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
 
         {/* Mobile Overlay */}
         {state.isMobileOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-black bg-opacity-50" onClick={toggleMobileOpen}>
-            <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl p-4" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="lg:hidden fixed inset-0 z-50 bg-black bg-opacity-50"
+            onClick={toggleMobileOpen}
+          >
+            <div
+              className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl p-4"
+              onClick={e => e.stopPropagation()}
+            >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Navigation</h2>
                 <button
@@ -583,7 +602,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
                     type="text"
                     placeholder={searchPlaceholder}
                     value={state.searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
+                    onChange={e => handleSearch(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -602,9 +621,11 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
   }
 
   return (
-    <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${
-      state.isCollapsed ? 'w-16' : sizeClasses[size]
-    } ${className}`}>
+    <div
+      className={`bg-white border-r border-gray-200 transition-all duration-300 ${
+        state.isCollapsed ? 'w-16' : sizeClasses[size]
+      } ${className}`}
+    >
       <div className="h-full flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
@@ -633,7 +654,7 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
                 type="text"
                 placeholder={searchPlaceholder}
                 value={state.searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
+                onChange={e => handleSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
@@ -647,10 +668,8 @@ const NavigationSystem: React.FC<NavigationSystemProps> = ({
         <div className="flex-1 overflow-y-auto p-4">
           {renderBreadcrumbs()}
           {renderQuickAccess()}
-          
-          <div className="space-y-1">
-            {filteredItems.map(item => renderNavigationItem(item))}
-          </div>
+
+          <div className="space-y-1">{filteredItems.map(item => renderNavigationItem(item))}</div>
         </div>
 
         {/* Footer */}

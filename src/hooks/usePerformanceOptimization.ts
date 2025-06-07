@@ -30,32 +30,35 @@ interface UsePerformanceOptimizationReturn {
  */
 export function usePerformanceOptimization(): UsePerformanceOptimizationReturn {
   // Visibility optimization using Intersection Observer
-  const useVisibilityOptimization = useCallback((threshold: number = 0.1): [React.RefObject<HTMLDivElement>, boolean] => {
-    const elementRef = useRef<HTMLDivElement>(null);
-    const [isVisible, setIsVisible] = useState(false);
+  const useVisibilityOptimization = useCallback(
+    (threshold: number = 0.1): [React.RefObject<HTMLDivElement>, boolean] => {
+      const elementRef = useRef<HTMLDivElement>(null);
+      const [isVisible, setIsVisible] = useState(false);
 
-    useEffect(() => {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          setIsVisible(entry.isIntersecting);
-        },
-        { threshold }
-      );
+      useEffect(() => {
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            setIsVisible(entry.isIntersecting);
+          },
+          { threshold }
+        );
 
-      const element = elementRef.current;
-      if (element) {
-        observer.observe(element);
-      }
-
-      return () => {
+        const element = elementRef.current;
         if (element) {
-          observer.unobserve(element);
+          observer.observe(element);
         }
-      };
-    }, [threshold]);
 
-    return [elementRef, isVisible];
-  }, []);
+        return () => {
+          if (element) {
+            observer.unobserve(element);
+          }
+        };
+      }, [threshold]);
+
+      return [elementRef, isVisible];
+    },
+    []
+  );
 
   // Render performance measurement
   const useRenderOptimization = useCallback((componentName: string) => {
@@ -69,7 +72,7 @@ export function usePerformanceOptimization(): UsePerformanceOptimizationReturn {
     const endMeasure = useCallback(() => {
       const endTime = performance.now();
       const renderTime = endTime - startTimeRef.current;
-      
+
       // Get memory usage if available
       const memoryInfo = (performance as any).memory;
       const memoryUsage = memoryInfo ? memoryInfo.usedJSHeapSize / 1024 / 1024 : 0;
@@ -78,11 +81,12 @@ export function usePerformanceOptimization(): UsePerformanceOptimizationReturn {
         renderTime,
         memoryUsage,
         frameRate: 60, // Will be updated by frame rate optimization
-        componentName
+        componentName,
       });
 
       // Log performance warnings
-      if (renderTime > 16.67) { // More than one frame at 60fps
+      if (renderTime > 16.67) {
+        // More than one frame at 60fps
         console.warn(`⚠️ ${componentName}: Slow render detected: ${renderTime.toFixed(2)}ms`);
       }
     }, [componentName]);
@@ -100,13 +104,13 @@ export function usePerformanceOptimization(): UsePerformanceOptimizationReturn {
         const usedMB = memoryInfo.usedJSHeapSize / 1024 / 1024;
         const limitMB = memoryInfo.jsHeapSizeLimit / 1024 / 1024;
         const usage = (usedMB / limitMB) * 100;
-        
+
         // Clear cache if memory usage is high
         if (usage > 80) {
           console.warn('🧠 High memory usage detected, clearing cache...');
           cache.current.clear();
         }
-        
+
         return usage;
       }
       return 0;
@@ -136,10 +140,10 @@ export function usePerformanceOptimization(): UsePerformanceOptimizationReturn {
         if (now - lastTimeRef.current >= 1000) {
           const currentFrameRate = frameCountRef.current;
           setFrameRate(currentFrameRate);
-          
+
           // Skip renders if frame rate is too low
           setShouldSkipRender(currentFrameRate < 30);
-          
+
           frameCountRef.current = 0;
           lastTimeRef.current = now;
         }
@@ -161,7 +165,7 @@ export function usePerformanceOptimization(): UsePerformanceOptimizationReturn {
     useVisibilityOptimization,
     useRenderOptimization,
     useMemoryOptimization,
-    useFrameRateOptimization
+    useFrameRateOptimization,
   };
 }
 
@@ -182,10 +186,10 @@ export function useChartOptimization<T extends Record<string, any>>(
 
     // Calculate statistics for numeric fields
     const statistics: Record<string, { min: number; max: number; avg: number; sum: number }> = {};
-    
+
     if (optimizedData.length > 0) {
-      const numericKeys = Object.keys(optimizedData[0]).filter(key => 
-        typeof optimizedData[0][key] === 'number'
+      const numericKeys = Object.keys(optimizedData[0]).filter(
+        key => typeof optimizedData[0][key] === 'number'
       );
 
       numericKeys.forEach(key => {
@@ -195,7 +199,7 @@ export function useChartOptimization<T extends Record<string, any>>(
             min: Math.min(...values),
             max: Math.max(...values),
             avg: values.reduce((sum, val) => sum + val, 0) / values.length,
-            sum: values.reduce((sum, val) => sum + val, 0)
+            sum: values.reduce((sum, val) => sum + val, 0),
           };
         }
       });

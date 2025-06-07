@@ -22,8 +22,8 @@ class ComponentRegistry {
 
   // Enhanced registration with performance metadata
   register(
-    name: string, 
-    component: ComponentType<any>, 
+    name: string,
+    component: ComponentType<any>,
     category: string,
     metadata: ComponentEntry['metadata'] = {}
   ) {
@@ -34,8 +34,8 @@ class ComponentRegistry {
         preload: false,
         priority: 'medium',
         size: 'medium',
-        ...metadata
-      }
+        ...metadata,
+      },
     };
 
     this.components.set(name, entry);
@@ -61,7 +61,7 @@ class ComponentRegistry {
 
     const preloadPromise = this.loadComponent(name);
     this.preloadCache.set(name, preloadPromise);
-    
+
     try {
       const component = await preloadPromise;
       this.loadedComponents.add(name);
@@ -76,13 +76,11 @@ class ComponentRegistry {
   // Preload components by category
   async preloadCategory(category: string): Promise<void> {
     const categoryComponents = this.getByCategory(category);
-    await Promise.all(
-      categoryComponents.map(entry => this.preloadComponent(entry.name))
-    );
+    await Promise.all(categoryComponents.map(entry => this.preloadComponent(entry.name)));
   }
 
   // Get components by category with metadata
-  getByCategory(category: string): Array<{name: string; entry: ComponentEntry}> {
+  getByCategory(category: string): Array<{ name: string; entry: ComponentEntry }> {
     return Array.from(this.components.entries())
       .filter(([, entry]) => entry.category === category)
       .map(([name, entry]) => ({ name, entry }));
@@ -97,10 +95,10 @@ class ComponentRegistry {
       const loadedComponent = entry.component;
       // Handle both default and named exports
       const component = (loadedComponent as any).default || loadedComponent;
-      
+
       // Mark as loaded for performance tracking
       this.loadedComponents.add(name);
-      
+
       return component;
     } catch (error) {
       console.error(`Failed to load component ${name}:`, error);
@@ -115,7 +113,7 @@ class ComponentRegistry {
       loadedComponents: this.loadedComponents.size,
       preloadedComponents: this.preloadCache.size,
       loadRatio: this.loadedComponents.size / this.components.size,
-      categoryBreakdown: this.getCategoryBreakdown()
+      categoryBreakdown: this.getCategoryBreakdown(),
     };
   }
 
@@ -169,7 +167,7 @@ const registerCommonComponents = () => {
   );
 
   componentRegistry.register(
-    'IconButton', 
+    'IconButton',
     lazy(() => import('../components/common/buttons/IconButton')),
     'buttons',
     { description: 'Icon button component' }
@@ -186,7 +184,7 @@ const registerCommonComponents = () => {
   componentRegistry.register(
     'InputField',
     lazy(() => import('../components/common/inputs/InputField')),
-    'inputs', 
+    'inputs',
     { description: 'Text input field' }
   );
 
@@ -372,6 +370,13 @@ const registerCommonComponents = () => {
     lazy(() => import('../components/common/feedback/ToastNotification')),
     'feedback',
     { description: 'Toast notification component' }
+  );
+
+  componentRegistry.register(
+    'NotificationCenter',
+    lazy(() => import('../components/common/feedback/NotificationCenter')),
+    'feedback',
+    { description: 'Unified notification center with multiple sources', priority: 'high' }
   );
 
   // Overlays

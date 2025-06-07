@@ -2,39 +2,39 @@
 import { BaseComponent } from './index';
 
 // Base chart types
-export type ChartType = 
-  | 'line' 
-  | 'bar' 
-  | 'area' 
-  | 'pie' 
-  | 'donut' 
-  | 'scatter' 
-  | 'bubble' 
-  | 'radar' 
-  | 'polar' 
-  | 'gauge' 
-  | 'funnel' 
-  | 'heatmap' 
-  | 'treemap' 
-  | 'sankey' 
-  | 'candlestick' 
-  | 'waterfall' 
-  | 'box' 
-  | 'violin' 
-  | 'histogram' 
+export type ChartType =
+  | 'line'
+  | 'bar'
+  | 'area'
+  | 'pie'
+  | 'donut'
+  | 'scatter'
+  | 'bubble'
+  | 'radar'
+  | 'polar'
+  | 'gauge'
+  | 'funnel'
+  | 'heatmap'
+  | 'treemap'
+  | 'sankey'
+  | 'candlestick'
+  | 'waterfall'
+  | 'box'
+  | 'violin'
+  | 'histogram'
   | 'realtime';
 
-export type ColorScheme = 
-  | 'blue' 
-  | 'green' 
-  | 'red' 
-  | 'purple' 
-  | 'orange' 
-  | 'teal' 
-  | 'pink' 
-  | 'indigo' 
-  | 'gray' 
-  | 'rainbow' 
+export type ColorScheme =
+  | 'blue'
+  | 'green'
+  | 'red'
+  | 'purple'
+  | 'orange'
+  | 'teal'
+  | 'pink'
+  | 'indigo'
+  | 'gray'
+  | 'rainbow'
   | 'custom';
 
 // Base chart interfaces
@@ -126,7 +126,16 @@ export interface ChartAxis {
     drawTicks?: boolean;
   };
   time?: {
-    unit?: 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year';
+    unit?:
+      | 'millisecond'
+      | 'second'
+      | 'minute'
+      | 'hour'
+      | 'day'
+      | 'week'
+      | 'month'
+      | 'quarter'
+      | 'year';
     stepSize?: number;
     displayFormats?: Record<string, string>;
     tooltipFormat?: string;
@@ -218,23 +227,27 @@ export interface ChartOptions {
   };
   onClick?: (event: Event, elements: any[], chart: any) => void;
   onHover?: (event: Event, elements: any[], chart: any) => void;
-  animation?: boolean | {
-    duration?: number;
-    easing?: string;
-    delay?: number;
-    loop?: boolean;
-    onComplete?: (animation: any) => void;
-    onProgress?: (animation: any) => void;
-  };
+  animation?:
+    | boolean
+    | {
+        duration?: number;
+        easing?: string;
+        delay?: number;
+        loop?: boolean;
+        onComplete?: (animation: any) => void;
+        onProgress?: (animation: any) => void;
+      };
   animations?: Record<string, any>;
   transitions?: Record<string, any>;
   layout?: {
-    padding?: number | {
-      top?: number;
-      right?: number;
-      bottom?: number;
-      left?: number;
-    };
+    padding?:
+      | number
+      | {
+          top?: number;
+          right?: number;
+          bottom?: number;
+          left?: number;
+        };
   };
   scales?: Record<string, ChartAxis>;
   plugins?: {
@@ -275,12 +288,14 @@ export interface ChartOptions {
       listeners?: Record<string, (context: any) => boolean>;
       offset?: number;
       opacity?: number | ((context: any) => number);
-      padding?: number | {
-        top?: number;
-        right?: number;
-        bottom?: number;
-        left?: number;
-      };
+      padding?:
+        | number
+        | {
+            top?: number;
+            right?: number;
+            bottom?: number;
+            left?: number;
+          };
       rotation?: number | ((context: any) => number);
       textAlign?: 'start' | 'center' | 'end';
       textStrokeColor?: string | ((context: any) => string);

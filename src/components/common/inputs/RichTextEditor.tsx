@@ -1,8 +1,27 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { 
-  Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, 
-  AlignJustify, List, ListOrdered, Link, Image, Code, Quote, Undo, Redo,
-  Type, Palette, Eye, EyeOff, Maximize, Minimize
+import {
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  List,
+  ListOrdered,
+  Link,
+  Image,
+  Code,
+  Quote,
+  Undo,
+  Redo,
+  Type,
+  Palette,
+  Eye,
+  EyeOff,
+  Maximize,
+  Minimize,
 } from 'lucide-react';
 
 export interface RichTextEditorProps {
@@ -96,7 +115,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     quote: true,
     undo: true,
     colors: true,
-    fontSize: true
+    fontSize: true,
   },
   onChange,
   onFocus,
@@ -106,7 +125,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   editorClassName = '',
   toolbarClassName = '',
   name,
-  id
+  id,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -122,7 +141,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     history: [controlledValue || defaultValue],
     historyIndex: 0,
     wordCount: 0,
-    charCount: 0
+    charCount: 0,
   });
 
   // Update content when controlled value changes
@@ -133,9 +152,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         content: controlledValue || '',
         textContent: getTextContent(controlledValue || ''),
         wordCount: getWordCount(controlledValue || ''),
-        charCount: getCharCount(controlledValue || '')
+        charCount: getCharCount(controlledValue || ''),
       }));
-      
+
       if (editorRef.current) {
         editorRef.current.innerHTML = controlledValue || '';
       }
@@ -170,44 +189,53 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     return div.textContent || div.innerText || '';
   }, []);
 
-  const getWordCount = useCallback((html: string): number => {
-    const text = getTextContent(html);
-    return text.trim() ? text.trim().split(/\s+/).length : 0;
-  }, [getTextContent]);
+  const getWordCount = useCallback(
+    (html: string): number => {
+      const text = getTextContent(html);
+      return text.trim() ? text.trim().split(/\s+/).length : 0;
+    },
+    [getTextContent]
+  );
 
-  const getCharCount = useCallback((html: string): number => {
-    return getTextContent(html).length;
-  }, [getTextContent]);
+  const getCharCount = useCallback(
+    (html: string): number => {
+      return getTextContent(html).length;
+    },
+    [getTextContent]
+  );
 
   // Update content and stats
-  const updateContent = useCallback((newContent: string, addToHistory = true) => {
-    const textContent = getTextContent(newContent);
-    const wordCount = getWordCount(newContent);
-    const charCount = getCharCount(newContent);
+  const updateContent = useCallback(
+    (newContent: string, addToHistory = true) => {
+      const textContent = getTextContent(newContent);
+      const wordCount = getWordCount(newContent);
+      const charCount = getCharCount(newContent);
 
-    if (!isControlled) {
-      setState(prev => {
-        const newState = {
-          ...prev,
-          content: newContent,
-          textContent,
-          wordCount,
-          charCount
-        };
+      if (!isControlled) {
+        setState(prev => {
+          const newState = {
+            ...prev,
+            content: newContent,
+            textContent,
+            wordCount,
+            charCount,
+          };
 
-        if (addToHistory && newContent !== prev.content) {
-          const newHistory = prev.history.slice(0, prev.historyIndex + 1);
-          newHistory.push(newContent);
-          newState.history = newHistory.slice(-50); // Keep last 50 states
-          newState.historyIndex = newState.history.length - 1;
-        }
+          if (addToHistory && newContent !== prev.content) {
+            const newHistory = prev.history.slice(0, prev.historyIndex + 1);
+            newHistory.push(newContent);
+            newState.history = newHistory.slice(-50); // Keep last 50 states
+            newState.historyIndex = newState.history.length - 1;
+          }
 
-        return newState;
-      });
-    }
+          return newState;
+        });
+      }
 
-    onChange?.(newContent, textContent);
-  }, [isControlled, onChange, getTextContent, getWordCount, getCharCount]);
+      onChange?.(newContent, textContent);
+    },
+    [isControlled, onChange, getTextContent, getWordCount, getCharCount]
+  );
 
   // Editor event handlers
   const handleInput = useCallback(() => {
@@ -272,31 +300,34 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   }, []);
 
   // Command execution
-  const execCommand = useCallback((command: string, value?: string) => {
-    if (disabled || readOnly) return;
+  const execCommand = useCallback(
+    (command: string, value?: string) => {
+      if (disabled || readOnly) return;
 
-    document.execCommand(command, false, value);
-    
-    if (editorRef.current) {
-      const content = editorRef.current.innerHTML;
-      updateContent(content);
-    }
-    
-    editorRef.current?.focus();
-  }, [disabled, readOnly, updateContent]);
+      document.execCommand(command, false, value);
+
+      if (editorRef.current) {
+        const content = editorRef.current.innerHTML;
+        updateContent(content);
+      }
+
+      editorRef.current?.focus();
+    },
+    [disabled, readOnly, updateContent]
+  );
 
   // Toolbar actions
   const handleBold = () => execCommand('bold');
   const handleItalic = () => execCommand('italic');
   const handleUnderline = () => execCommand('underline');
   const handleStrikethrough = () => execCommand('strikeThrough');
-  
+
   const handleAlignment = (align: string) => {
     const commands = {
       left: 'justifyLeft',
       center: 'justifyCenter',
       right: 'justifyRight',
-      justify: 'justifyFull'
+      justify: 'justifyFull',
     };
     execCommand(commands[align as keyof typeof commands]);
   };
@@ -343,13 +374,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (state.historyIndex > 0) {
       const newIndex = state.historyIndex - 1;
       const content = state.history[newIndex];
-      
+
       setState(prev => ({ ...prev, historyIndex: newIndex }));
-      
+
       if (editorRef.current) {
         editorRef.current.innerHTML = content;
       }
-      
+
       updateContent(content, false);
     }
   };
@@ -358,13 +389,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (state.historyIndex < state.history.length - 1) {
       const newIndex = state.historyIndex + 1;
       const content = state.history[newIndex];
-      
+
       setState(prev => ({ ...prev, historyIndex: newIndex }));
-      
+
       if (editorRef.current) {
         editorRef.current.innerHTML = content;
       }
-      
+
       updateContent(content, false);
     }
   };
@@ -393,20 +424,20 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         toolbar: 'px-2 py-1',
         button: 'w-6 h-6 p-1',
         icon: 'w-3 h-3',
-        text: 'text-sm'
+        text: 'text-sm',
       },
       md: {
         toolbar: 'px-3 py-2',
         button: 'w-8 h-8 p-1.5',
         icon: 'w-4 h-4',
-        text: 'text-base'
+        text: 'text-base',
       },
       lg: {
         toolbar: 'px-4 py-3',
         button: 'w-10 h-10 p-2',
         icon: 'w-5 h-5',
-        text: 'text-lg'
-      }
+        text: 'text-lg',
+      },
     };
     return configs[size];
   };
@@ -429,10 +460,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       title={title}
       className={`
         ${sizeConfig.button} rounded transition-colors
-        ${active 
-          ? 'bg-blue-500 text-white' 
-          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-        }
+        ${active ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}
     >
@@ -447,9 +475,24 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     icon: React.ReactNode;
   }> = ({ onColorSelect, title, icon }) => {
     const colors = [
-      '#000000', '#333333', '#666666', '#999999', '#cccccc', '#ffffff',
-      '#ff0000', '#ff8800', '#ffff00', '#88ff00', '#00ff00', '#00ff88',
-      '#00ffff', '#0088ff', '#0000ff', '#8800ff', '#ff00ff', '#ff0088'
+      '#000000',
+      '#333333',
+      '#666666',
+      '#999999',
+      '#cccccc',
+      '#ffffff',
+      '#ff0000',
+      '#ff8800',
+      '#ffff00',
+      '#88ff00',
+      '#00ff00',
+      '#00ff88',
+      '#00ffff',
+      '#0088ff',
+      '#0000ff',
+      '#8800ff',
+      '#ff00ff',
+      '#ff0088',
     ];
 
     return (
@@ -480,10 +523,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (!showToolbar) return null;
 
     return (
-      <div className={`
+      <div
+        className={`
         border-b border-gray-200 bg-gray-50 flex flex-wrap items-center gap-1
         ${sizeConfig.toolbar} ${toolbarClassName}
-      `}>
+      `}
+      >
         {/* Text Formatting */}
         {enabledFeatures.bold && (
           <ToolbarButton
@@ -494,7 +539,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <Bold className={sizeConfig.icon} />
           </ToolbarButton>
         )}
-        
+
         {enabledFeatures.italic && (
           <ToolbarButton
             onClick={handleItalic}
@@ -504,7 +549,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <Italic className={sizeConfig.icon} />
           </ToolbarButton>
         )}
-        
+
         {enabledFeatures.underline && (
           <ToolbarButton
             onClick={handleUnderline}
@@ -514,7 +559,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <Underline className={sizeConfig.icon} />
           </ToolbarButton>
         )}
-        
+
         {enabledFeatures.strikethrough && (
           <ToolbarButton
             onClick={handleStrikethrough}
@@ -530,12 +575,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         {/* Font Size */}
         {enabledFeatures.fontSize && (
           <select
-            onChange={(e) => handleFontSize(e.target.value)}
+            onChange={e => handleFontSize(e.target.value)}
             className="text-sm border border-gray-300 rounded px-2 py-1"
             title="Font Size"
           >
             <option value="1">Small</option>
-            <option value="3" selected>Normal</option>
+            <option value="3" selected>
+              Normal
+            </option>
             <option value="5">Large</option>
             <option value="7">Huge</option>
           </select>
@@ -623,7 +670,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <Link className={sizeConfig.icon} />
           </ToolbarButton>
         )}
-        
+
         {enabledFeatures.images && (
           <ToolbarButton onClick={handleImage} title="Insert Image">
             <Image className={sizeConfig.icon} />
@@ -632,19 +679,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         {/* Format */}
         {enabledFeatures.code && (
-          <ToolbarButton
-            onClick={handleCode}
-            title="Code Block"
-          >
+          <ToolbarButton onClick={handleCode} title="Code Block">
             <Code className={sizeConfig.icon} />
           </ToolbarButton>
         )}
-        
+
         {enabledFeatures.quote && (
-          <ToolbarButton
-            onClick={handleQuote}
-            title="Quote"
-          >
+          <ToolbarButton onClick={handleQuote} title="Quote">
             <Quote className={sizeConfig.icon} />
           </ToolbarButton>
         )}
@@ -677,17 +718,25 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <ToolbarButton
           onClick={togglePreview}
           active={state.isPreview}
-          title={state.isPreview ? "Edit Mode" : "Preview Mode"}
+          title={state.isPreview ? 'Edit Mode' : 'Preview Mode'}
         >
-          {state.isPreview ? <EyeOff className={sizeConfig.icon} /> : <Eye className={sizeConfig.icon} />}
+          {state.isPreview ? (
+            <EyeOff className={sizeConfig.icon} />
+          ) : (
+            <Eye className={sizeConfig.icon} />
+          )}
         </ToolbarButton>
-        
+
         <ToolbarButton
           onClick={toggleFullscreen}
           active={state.isFullscreen}
-          title={state.isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+          title={state.isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
         >
-          {state.isFullscreen ? <Minimize className={sizeConfig.icon} /> : <Maximize className={sizeConfig.icon} />}
+          {state.isFullscreen ? (
+            <Minimize className={sizeConfig.icon} />
+          ) : (
+            <Maximize className={sizeConfig.icon} />
+          )}
         </ToolbarButton>
       </div>
     );
@@ -698,15 +747,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (!showStatusBar) return null;
 
     return (
-      <div className={`
+      <div
+        className={`
         border-t border-gray-200 bg-gray-50 flex items-center justify-between
         px-3 py-1 text-xs text-gray-500
-      `}>
+      `}
+      >
         <div className="flex items-center space-x-4">
           <span>{state.wordCount} words</span>
           <span>{state.charCount} characters</span>
         </div>
-        
+
         {state.isFocused && (
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-500 rounded-full" />
@@ -718,9 +769,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   const containerClasses = `
-    ${state.isFullscreen 
-      ? 'fixed inset-0 z-50 bg-white' 
-      : 'border border-gray-300 rounded-lg overflow-hidden'
+    ${
+      state.isFullscreen
+        ? 'fixed inset-0 z-50 bg-white'
+        : 'border border-gray-300 rounded-lg overflow-hidden'
     }
     ${error ? 'border-red-300' : state.isFocused ? 'border-blue-500 ring-1 ring-blue-500' : ''}
     ${className}
@@ -733,9 +785,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     ${editorClassName}
   `;
 
-  const editorHeight = state.isFullscreen 
-    ? 'calc(100vh - 120px)' 
-    : typeof height === 'number' ? `${height}px` : height;
+  const editorHeight = state.isFullscreen
+    ? 'calc(100vh - 120px)'
+    : typeof height === 'number'
+      ? `${height}px`
+      : height;
 
   return (
     <div className={`space-y-1 ${state.isFullscreen ? '' : className}`}>
@@ -743,9 +797,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       {label && !state.isFullscreen && (
         <label
           htmlFor={editorId}
-          className={`block text-sm font-medium ${
-            disabled ? 'text-gray-400' : 'text-gray-700'
-          }`}
+          className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-gray-700'}`}
         >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -754,9 +806,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       {/* Description */}
       {description && !error && !state.isFullscreen && (
-        <p className={`text-xs ${disabled ? 'text-gray-400' : 'text-gray-600'}`}>
-          {description}
-        </p>
+        <p className={`text-xs ${disabled ? 'text-gray-400' : 'text-gray-600'}`}>{description}</p>
       )}
 
       {/* Editor Container */}
@@ -772,7 +822,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               style={{
                 height: editorHeight,
                 minHeight: typeof minHeight === 'number' ? `${minHeight}px` : minHeight,
-                maxHeight: maxHeight ? (typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight) : undefined
+                maxHeight: maxHeight
+                  ? typeof maxHeight === 'number'
+                    ? `${maxHeight}px`
+                    : maxHeight
+                  : undefined,
               }}
               dangerouslySetInnerHTML={{ __html: state.content }}
             />
@@ -785,7 +839,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               style={{
                 height: editorHeight,
                 minHeight: typeof minHeight === 'number' ? `${minHeight}px` : minHeight,
-                maxHeight: maxHeight ? (typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight) : undefined
+                maxHeight: maxHeight
+                  ? typeof maxHeight === 'number'
+                    ? `${maxHeight}px`
+                    : maxHeight
+                  : undefined,
               }}
               onInput={handleInput}
               onFocus={handleFocus}
@@ -798,13 +856,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               dangerouslySetInnerHTML={{ __html: state.content }}
             />
           )}
-          
+
           {/* Placeholder */}
           {!state.content && !state.isFocused && !state.isPreview && (
-            <div className={`
+            <div
+              className={`
               absolute top-3 left-3 pointer-events-none text-gray-400
               ${sizeConfig.text}
-            `}>
+            `}
+            >
               {placeholder}
             </div>
           )}
@@ -818,16 +878,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       </div>
 
       {/* Error Message */}
-      {error && !state.isFullscreen && (
-        <p className="text-xs text-red-600">{error}</p>
-      )}
+      {error && !state.isFullscreen && <p className="text-xs text-red-600">{error}</p>}
 
       {/* Hidden input for form submission */}
-      <input
-        type="hidden"
-        name={name}
-        value={state.content}
-      />
+      <input type="hidden" name={name} value={state.content} />
     </div>
   );
 };
@@ -862,7 +916,7 @@ export const useRichTextEditor = (initialContent?: string) => {
     updateContent,
     clear,
     insertText,
-    insertHTML
+    insertHTML,
   };
 };
 
@@ -876,7 +930,7 @@ export const ExampleRichTextEditors: React.FC = () => {
     <div className="space-y-8 max-w-4xl mx-auto p-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Rich Text Editor Examples</h3>
-        
+
         <div className="space-y-8">
           {/* Full Featured Editor */}
           <div>
@@ -885,7 +939,7 @@ export const ExampleRichTextEditors: React.FC = () => {
               label="Article Content"
               description="Create your article with full formatting options"
               value={content1}
-              onChange={(html) => setContent1(html)}
+              onChange={html => setContent1(html)}
               height="400px"
               variant="full"
               showStatusBar
@@ -903,7 +957,7 @@ export const ExampleRichTextEditors: React.FC = () => {
                 quote: true,
                 undo: true,
                 colors: true,
-                fontSize: true
+                fontSize: true,
               }}
             />
           </div>
@@ -915,7 +969,7 @@ export const ExampleRichTextEditors: React.FC = () => {
               label="Simple Note"
               description="Basic text editing with minimal features"
               value={content2}
-              onChange={(html) => setContent2(html)}
+              onChange={html => setContent2(html)}
               height="200px"
               variant="minimal"
               size="sm"
@@ -932,7 +986,7 @@ export const ExampleRichTextEditors: React.FC = () => {
                 quote: false,
                 undo: true,
                 colors: false,
-                fontSize: false
+                fontSize: false,
               }}
             />
           </div>
@@ -944,7 +998,7 @@ export const ExampleRichTextEditors: React.FC = () => {
               label="Add Comment"
               placeholder="Write your comment here..."
               value={content3}
-              onChange={(html) => setContent3(html)}
+              onChange={html => setContent3(html)}
               height="150px"
               showStatusBar={false}
               toolbarPosition="bottom"
@@ -961,7 +1015,7 @@ export const ExampleRichTextEditors: React.FC = () => {
                 quote: true,
                 undo: false,
                 colors: false,
-                fontSize: false
+                fontSize: false,
               }}
             />
           </div>
@@ -976,14 +1030,14 @@ export const ExampleRichTextEditors: React.FC = () => {
                 height="120px"
                 placeholder="Small editor..."
               />
-              
+
               <RichTextEditor
                 label="Medium Editor"
                 size="md"
                 height="120px"
                 placeholder="Medium editor..."
               />
-              
+
               <RichTextEditor
                 label="Large Editor"
                 size="lg"
@@ -1003,14 +1057,14 @@ export const ExampleRichTextEditors: React.FC = () => {
                 readOnly
                 height="100px"
               />
-              
+
               <RichTextEditor
                 label="Disabled"
                 placeholder="This editor is disabled..."
                 disabled
                 height="100px"
               />
-              
+
               <RichTextEditor
                 label="Error State"
                 error="Content is required"

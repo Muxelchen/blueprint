@@ -1,20 +1,20 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { 
-  Heart, 
-  Github, 
-  Twitter, 
-  Linkedin, 
-  Mail, 
-  Phone, 
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  Heart,
+  Github,
+  Twitter,
+  Linkedin,
+  Mail,
+  Phone,
   MapPin,
   ExternalLink,
   Shield,
   Globe,
   Wifi,
-  Server
-} from 'lucide-react'
+  Server,
+} from 'lucide-react';
 
 const Footer: React.FC = () => {
   // Mock system status
@@ -22,17 +22,21 @@ const Footer: React.FC = () => {
     api: 'operational',
     database: 'operational',
     cdn: 'operational',
-    monitoring: 'operational'
-  }
+    monitoring: 'operational',
+  };
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'operational': return 'bg-success-500'
-      case 'degraded': return 'bg-warning-500'
-      case 'outage': return 'bg-error-500'
-      default: return 'bg-secondary-400'
+      case 'operational':
+        return 'bg-success-500';
+      case 'degraded':
+        return 'bg-warning-500';
+      case 'outage':
+        return 'bg-error-500';
+      default:
+        return 'bg-secondary-400';
     }
-  }
+  };
 
   const footerLinks = {
     product: [
@@ -40,39 +44,49 @@ const Footer: React.FC = () => {
       { name: 'Pricing', href: '/pricing' },
       { name: 'API Documentation', href: '/docs' },
       { name: 'Integrations', href: '/integrations' },
-      { name: 'Changelog', href: '/changelog' }
+      { name: 'Changelog', href: '/changelog' },
     ],
     company: [
       { name: 'About Us', href: '/about' },
       { name: 'Careers', href: '/careers' },
       { name: 'Blog', href: '/blog' },
       { name: 'Press Kit', href: '/press' },
-      { name: 'Contact', href: '/contact' }
+      { name: 'Contact', href: '/contact' },
     ],
     resources: [
       { name: 'Help Center', href: '/help' },
       { name: 'Community', href: '/community' },
       { name: 'Tutorials', href: '/tutorials' },
       { name: 'Status Page', href: '/status' },
-      { name: 'System Health', href: '/health' }
+      { name: 'System Health', href: '/health' },
     ],
     legal: [
       { name: 'Privacy Policy', href: '/privacy' },
       { name: 'Terms of Service', href: '/terms' },
       { name: 'Cookie Policy', href: '/cookies' },
       { name: 'GDPR', href: '/gdpr' },
-      { name: 'Security', href: '/security' }
-    ]
-  }
+      { name: 'Security', href: '/security' },
+    ],
+  };
 
   const socialLinks = [
     { name: 'GitHub', icon: Github, href: 'https://github.com', color: 'hover:text-gray-900' },
     { name: 'Twitter', icon: Twitter, href: 'https://twitter.com', color: 'hover:text-blue-500' },
-    { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com', color: 'hover:text-blue-600' },
-    { name: 'Email', icon: Mail, href: 'mailto:hello@example.com', color: 'hover:text-primary-600' }
-  ]
+    {
+      name: 'LinkedIn',
+      icon: Linkedin,
+      href: 'https://linkedin.com',
+      color: 'hover:text-blue-600',
+    },
+    {
+      name: 'Email',
+      icon: Mail,
+      href: 'mailto:hello@example.com',
+      color: 'hover:text-primary-600',
+    },
+  ];
 
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-white border-t border-secondary-200 mt-auto">
@@ -85,7 +99,7 @@ const Footer: React.FC = () => {
                 <Globe className="w-4 h-4 text-secondary-600" />
                 <span className="text-sm font-medium text-secondary-900">System Status</span>
               </div>
-              
+
               <div className="flex items-center space-x-4">
                 {Object.entries(systemStatus).map(([service, status]) => (
                   <div key={service} className="flex items-center space-x-2">
@@ -95,7 +109,7 @@ const Footer: React.FC = () => {
                 ))}
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4 text-xs text-secondary-600">
               <div className="flex items-center space-x-1">
                 <Wifi className="w-3 h-3" />
@@ -125,12 +139,12 @@ const Footer: React.FC = () => {
               </div>
               <span className="text-xl font-bold text-secondary-900">Blueprint</span>
             </div>
-            
+
             <p className="text-secondary-600 mb-6 max-w-md">
-              Building the future of modern web applications with cutting-edge technology 
-              and intuitive design. Empowering developers and businesses worldwide.
+              Building the future of modern web applications with cutting-edge technology and
+              intuitive design. Empowering developers and businesses worldwide.
             </p>
-            
+
             <div className="space-y-2 text-sm text-secondary-600">
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4" />
@@ -153,9 +167,9 @@ const Footer: React.FC = () => {
               Product
             </h3>
             <ul className="space-y-3">
-              {footerLinks.product.map((link) => (
+              {footerLinks.product.map(link => (
                 <li key={link.name}>
-                  <Link 
+                  <Link
                     to={link.href}
                     className="text-secondary-600 hover:text-primary-600 transition-colors text-sm flex items-center group"
                   >
@@ -173,9 +187,9 @@ const Footer: React.FC = () => {
               Company
             </h3>
             <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
+              {footerLinks.company.map(link => (
                 <li key={link.name}>
-                  <Link 
+                  <Link
                     to={link.href}
                     className="text-secondary-600 hover:text-primary-600 transition-colors text-sm"
                   >
@@ -192,9 +206,9 @@ const Footer: React.FC = () => {
               Resources
             </h3>
             <ul className="space-y-3">
-              {footerLinks.resources.map((link) => (
+              {footerLinks.resources.map(link => (
                 <li key={link.name}>
-                  <Link 
+                  <Link
                     to={link.href}
                     className="text-secondary-600 hover:text-primary-600 transition-colors text-sm"
                   >
@@ -210,14 +224,12 @@ const Footer: React.FC = () => {
         <div className="mt-12 pt-8 border-t border-secondary-200">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-lg font-semibold text-secondary-900 mb-2">
-                Stay updated
-              </h3>
+              <h3 className="text-lg font-semibold text-secondary-900 mb-2">Stay updated</h3>
               <p className="text-secondary-600">
                 Get the latest news, updates, and insights delivered to your inbox.
               </p>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="email"
@@ -244,9 +256,9 @@ const Footer: React.FC = () => {
               <p className="text-secondary-600 text-sm">
                 © {currentYear} Blueprint. All rights reserved.
               </p>
-              
+
               <div className="flex items-center space-x-6">
-                {footerLinks.legal.map((link) => (
+                {footerLinks.legal.map(link => (
                   <Link
                     key={link.name}
                     to={link.href}
@@ -260,7 +272,7 @@ const Footer: React.FC = () => {
 
             {/* Social Links */}
             <div className="flex items-center space-x-4">
-              {socialLinks.map((social) => (
+              {socialLinks.map(social => (
                 <motion.a
                   key={social.name}
                   href={social.href}
@@ -278,7 +290,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

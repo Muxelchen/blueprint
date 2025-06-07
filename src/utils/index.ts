@@ -13,12 +13,7 @@ export * from './ExportFunctions';
 export * from './exportHelpers';
 
 // Formatting utilities (avoiding conflicts with dateUtils)
-export { 
-  formatCurrency,
-  formatNumber,
-  formatFileSize,
-  formatPercentage 
-} from './formatters';
+export { formatCurrency, formatNumber, formatFileSize, formatPercentage } from './formatters';
 
 // Map utilities
 export * from './mapUtils';

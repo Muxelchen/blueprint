@@ -22,7 +22,7 @@ const PrintButton: React.FC<PrintButtonProps> = ({
 
   const handlePrint = async () => {
     setIsPrinting(true);
-    
+
     try {
       if (printableElementId) {
         // Print specific element
@@ -87,9 +87,9 @@ const PrintButton: React.FC<PrintButtonProps> = ({
                 </body>
               </html>
             `);
-            
+
             printWindow.document.close();
-            
+
             // Wait for content to load then print
             printWindow.onload = () => {
               printWindow.print();

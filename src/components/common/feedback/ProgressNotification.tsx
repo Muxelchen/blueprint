@@ -54,7 +54,9 @@ interface ProgressNotificationContextType {
   clearAll: () => void;
 }
 
-const ProgressNotificationContext = createContext<ProgressNotificationContextType | undefined>(undefined);
+const ProgressNotificationContext = createContext<ProgressNotificationContextType | undefined>(
+  undefined
+);
 
 export const useProgressNotification = () => {
   const context = useContext(ProgressNotificationContext);
@@ -64,8 +66,12 @@ export const useProgressNotification = () => {
   return context;
 };
 
-export const ProgressNotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<(ProgressNotificationProps & { id: string; state: ProgressState })[]>([]);
+export const ProgressNotificationProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [notifications, setNotifications] = useState<
+    (ProgressNotificationProps & { id: string; state: ProgressState })[]
+  >([]);
 
   // Load notifications from localStorage
   useEffect(() => {
@@ -86,68 +92,74 @@ export const ProgressNotificationProvider: React.FC<{ children: React.ReactNode 
     localStorage.setItem('progress-notifications', JSON.stringify(persistentNotifications));
   }, [notifications]);
 
-  const addProgressNotification = useCallback((notificationData: Omit<ProgressNotificationProps, 'id'>) => {
-    const id = `progress-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const newNotification = {
-      ...notificationData,
-      id,
-      state: {
-        startTime: Date.now(),
-        pausedTime: 0,
-        totalPausedDuration: 0,
-        estimatedTimeRemaining: 0,
-        speed: 0,
-        bytesProcessed: 0
-      }
-    };
-
-    setNotifications(prev => [...prev, newNotification]);
-    return id;
-  }, []);
-
-  const updateProgress = useCallback((id: string, progress: number, status?: ProgressStatus) => {
-    setNotifications(prev => prev.map(notification => {
-      if (notification.id !== id) return notification;
-
-      const now = Date.now();
-      const updatedNotification = { 
-        ...notification, 
-        progress: Math.max(0, Math.min(100, progress))
+  const addProgressNotification = useCallback(
+    (notificationData: Omit<ProgressNotificationProps, 'id'>) => {
+      const id = `progress-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const newNotification = {
+        ...notificationData,
+        id,
+        state: {
+          startTime: Date.now(),
+          pausedTime: 0,
+          totalPausedDuration: 0,
+          estimatedTimeRemaining: 0,
+          speed: 0,
+          bytesProcessed: 0,
+        },
       };
 
-      if (status) {
-        updatedNotification.status = status;
-      }
+      setNotifications(prev => [...prev, newNotification]);
+      return id;
+    },
+    []
+  );
 
-      // Update state calculations
-      const elapsedTime = now - notification.state.startTime - notification.state.totalPausedDuration;
-      const progressPercentage = updatedNotification.progress / 100;
-      
-      if (progressPercentage > 0 && elapsedTime > 0) {
-        const estimatedTotalTime = elapsedTime / progressPercentage;
-        const estimatedTimeRemaining = estimatedTotalTime - elapsedTime;
-        const speed = (notification.state.bytesProcessed / elapsedTime) * 1000; // bytes per second
+  const updateProgress = useCallback((id: string, progress: number, status?: ProgressStatus) => {
+    setNotifications(prev =>
+      prev.map(notification => {
+        if (notification.id !== id) return notification;
 
-        updatedNotification.state = {
-          ...notification.state,
-          estimatedTimeRemaining: Math.max(0, estimatedTimeRemaining),
-          speed
+        const now = Date.now();
+        const updatedNotification = {
+          ...notification,
+          progress: Math.max(0, Math.min(100, progress)),
         };
-      }
 
-      // Handle completion
-      if (updatedNotification.progress >= 100 && updatedNotification.status === 'running') {
-        updatedNotification.status = 'completed';
-        setTimeout(() => {
-          updatedNotification.onComplete?.();
-          if (updatedNotification.autoClose) {
-            removeProgressNotification(id);
-          }
-        }, 1000);
-      }
+        if (status) {
+          updatedNotification.status = status;
+        }
 
-      return updatedNotification;
-    }));
+        // Update state calculations
+        const elapsedTime =
+          now - notification.state.startTime - notification.state.totalPausedDuration;
+        const progressPercentage = updatedNotification.progress / 100;
+
+        if (progressPercentage > 0 && elapsedTime > 0) {
+          const estimatedTotalTime = elapsedTime / progressPercentage;
+          const estimatedTimeRemaining = estimatedTotalTime - elapsedTime;
+          const speed = (notification.state.bytesProcessed / elapsedTime) * 1000; // bytes per second
+
+          updatedNotification.state = {
+            ...notification.state,
+            estimatedTimeRemaining: Math.max(0, estimatedTimeRemaining),
+            speed,
+          };
+        }
+
+        // Handle completion
+        if (updatedNotification.progress >= 100 && updatedNotification.status === 'running') {
+          updatedNotification.status = 'completed';
+          setTimeout(() => {
+            updatedNotification.onComplete?.();
+            if (updatedNotification.autoClose) {
+              removeProgressNotification(id);
+            }
+          }, 1000);
+        }
+
+        return updatedNotification;
+      })
+    );
   }, []);
 
   const removeProgressNotification = useCallback((id: string) => {
@@ -163,13 +175,13 @@ export const ProgressNotificationProvider: React.FC<{ children: React.ReactNode 
   }, []);
 
   return (
-    <ProgressNotificationContext.Provider 
-      value={{ 
-        notifications, 
-        addProgressNotification, 
-        updateProgress, 
-        removeProgressNotification, 
-        clearAll 
+    <ProgressNotificationContext.Provider
+      value={{
+        notifications,
+        addProgressNotification,
+        updateProgress,
+        removeProgressNotification,
+        clearAll,
       }}
     >
       {children}
@@ -194,7 +206,9 @@ interface ProgressNotificationComponentProps {
   notification: ProgressNotificationProps & { id: string; state: ProgressState };
 }
 
-const ProgressNotificationComponent: React.FC<ProgressNotificationComponentProps> = ({ notification }) => {
+const ProgressNotificationComponent: React.FC<ProgressNotificationComponentProps> = ({
+  notification,
+}) => {
   const { removeProgressNotification } = useProgressNotification();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -253,7 +267,7 @@ const ProgressNotificationComponent: React.FC<ProgressNotificationComponentProps
 
   const getVariantStyles = () => {
     const baseStyles = 'bg-white border shadow-lg rounded-lg p-4';
-    
+
     switch (notification.variant) {
       case 'primary':
         return `${baseStyles} border-blue-200`;
@@ -272,12 +286,18 @@ const ProgressNotificationComponent: React.FC<ProgressNotificationComponentProps
 
   const getProgressBarColor = () => {
     switch (notification.variant) {
-      case 'primary': return 'bg-blue-500';
-      case 'success': return 'bg-green-500';
-      case 'warning': return 'bg-yellow-500';
-      case 'error': return 'bg-red-500';
-      case 'info': return 'bg-blue-400';
-      default: return 'bg-gray-500';
+      case 'primary':
+        return 'bg-blue-500';
+      case 'success':
+        return 'bg-green-500';
+      case 'warning':
+        return 'bg-yellow-500';
+      case 'error':
+        return 'bg-red-500';
+      case 'info':
+        return 'bg-blue-400';
+      default:
+        return 'bg-gray-500';
     }
   };
 
@@ -315,16 +335,20 @@ const ProgressNotificationComponent: React.FC<ProgressNotificationComponentProps
           <div className="space-y-2">
             {notification.steps?.map((step, index) => (
               <div key={index} className="flex items-center gap-2">
-                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-xs ${
-                  step.completed 
-                    ? 'bg-green-500 text-white' 
-                    : step.active 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-gray-200'
-                }`}>
+                <div
+                  className={`w-4 h-4 rounded-full flex items-center justify-center text-xs ${
+                    step.completed
+                      ? 'bg-green-500 text-white'
+                      : step.active
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200'
+                  }`}
+                >
                   {step.completed ? <Check className="w-3 h-3" /> : index + 1}
                 </div>
-                <span className={`text-sm ${step.completed ? 'text-green-600' : step.active ? 'text-blue-600' : 'text-gray-500'}`}>
+                <span
+                  className={`text-sm ${step.completed ? 'text-green-600' : step.active ? 'text-blue-600' : 'text-gray-500'}`}
+                >
                   {step.label}
                 </span>
               </div>
@@ -335,14 +359,17 @@ const ProgressNotificationComponent: React.FC<ProgressNotificationComponentProps
       case 'indeterminate':
         return (
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className={`h-2 rounded-full ${getProgressBarColor()} animate-pulse`} style={{ width: '60%' }} />
+            <div
+              className={`h-2 rounded-full ${getProgressBarColor()} animate-pulse`}
+              style={{ width: '60%' }}
+            />
           </div>
         );
 
       default: // linear
         return (
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className={`h-2 rounded-full transition-all duration-300 ${getProgressBarColor()}`}
               style={{ width: `${notification.progress}%` }}
             />
@@ -383,20 +410,18 @@ const ProgressNotificationComponent: React.FC<ProgressNotificationComponentProps
       </div>
 
       {/* Progress Display */}
-      <div className="mb-3">
-        {renderProgress()}
-      </div>
+      <div className="mb-3">{renderProgress()}</div>
 
       {/* Progress Info */}
       <div className="flex items-center justify-between text-xs text-gray-600 mb-3">
         {notification.showPercentage && notification.type !== 'circular' && (
           <span>{Math.round(notification.progress)}%</span>
         )}
-        
+
         {notification.showETA && notification.state.estimatedTimeRemaining > 0 && (
           <span>ETA: {formatTime(notification.state.estimatedTimeRemaining)}</span>
         )}
-        
+
         {notification.showSpeed && notification.state.speed > 0 && (
           <span>{formatSpeed(notification.state.speed)}</span>
         )}
@@ -411,9 +436,10 @@ const ProgressNotificationComponent: React.FC<ProgressNotificationComponentProps
               onClick={action.onClick}
               className={`
                 flex items-center gap-1 px-3 py-1 text-xs rounded-md transition-colors
-                ${action.variant === 'primary' 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ${
+                  action.variant === 'primary'
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }
               `}
             >
@@ -429,93 +455,98 @@ const ProgressNotificationComponent: React.FC<ProgressNotificationComponentProps
 
 // Hook for easy progress notification management
 export const useProgressActions = () => {
-  const { addProgressNotification, updateProgress, removeProgressNotification } = useProgressNotification();
+  const { addProgressNotification, updateProgress, removeProgressNotification } =
+    useProgressNotification();
 
-  const startDownload = useCallback((filename: string, totalBytes?: number) => {
-    return addProgressNotification({
-      title: `Downloading ${filename}`,
-      description: totalBytes ? `${(totalBytes / 1024 / 1024).toFixed(1)} MB` : undefined,
-      type: 'linear',
-      variant: 'info',
-      progress: 0,
-      status: 'running',
-      showPercentage: true,
-      showETA: true,
-      showSpeed: true,
-      dismissible: false,
-      autoClose: true,
-      actions: [
-        {
-          label: 'Cancel',
-          icon: <X className="w-3 h-3" />,
-          onClick: () => {},
-          variant: 'secondary'
-        }
-      ]
-    });
-  }, [addProgressNotification]);
+  const startDownload = useCallback(
+    (filename: string, totalBytes?: number) => {
+      return addProgressNotification({
+        title: `Downloading ${filename}`,
+        description: totalBytes ? `${(totalBytes / 1024 / 1024).toFixed(1)} MB` : undefined,
+        type: 'linear',
+        variant: 'info',
+        progress: 0,
+        status: 'running',
+        showPercentage: true,
+        showETA: true,
+        showSpeed: true,
+        dismissible: false,
+        autoClose: true,
+        actions: [
+          {
+            label: 'Cancel',
+            icon: <X className="w-3 h-3" />,
+            onClick: () => {},
+            variant: 'secondary',
+          },
+        ],
+      });
+    },
+    [addProgressNotification]
+  );
 
-  const startUpload = useCallback((filename: string, totalBytes?: number) => {
-    return addProgressNotification({
-      title: `Uploading ${filename}`,
-      description: totalBytes ? `${(totalBytes / 1024 / 1024).toFixed(1)} MB` : undefined,
-      type: 'linear',
-      variant: 'primary',
-      progress: 0,
-      status: 'running',
-      showPercentage: true,
-      showETA: true,
-      showSpeed: true,
-      dismissible: false,
-      autoClose: true,
-      actions: [
-        {
-          label: 'Pause',
-          icon: <Pause className="w-3 h-3" />,
-          onClick: () => {},
-          variant: 'secondary'
-        },
-        {
-          label: 'Cancel',
-          icon: <X className="w-3 h-3" />,
-          onClick: () => {},
-          variant: 'secondary'
-        }
-      ]
-    });
-  }, [addProgressNotification]);
+  const startUpload = useCallback(
+    (filename: string, totalBytes?: number) => {
+      return addProgressNotification({
+        title: `Uploading ${filename}`,
+        description: totalBytes ? `${(totalBytes / 1024 / 1024).toFixed(1)} MB` : undefined,
+        type: 'linear',
+        variant: 'primary',
+        progress: 0,
+        status: 'running',
+        showPercentage: true,
+        showETA: true,
+        showSpeed: true,
+        dismissible: false,
+        autoClose: true,
+        actions: [
+          {
+            label: 'Pause',
+            icon: <Pause className="w-3 h-3" />,
+            onClick: () => {},
+            variant: 'secondary',
+          },
+          {
+            label: 'Cancel',
+            icon: <X className="w-3 h-3" />,
+            onClick: () => {},
+            variant: 'secondary',
+          },
+        ],
+      });
+    },
+    [addProgressNotification]
+  );
 
-  const startProcessing = useCallback((taskName: string, steps?: string[]) => {
-    return addProgressNotification({
-      title: `Processing ${taskName}`,
-      type: steps ? 'step' : 'linear',
-      variant: 'success',
-      progress: 0,
-      status: 'running',
-      showPercentage: !steps,
-      dismissible: false,
-      autoClose: true,
-      steps: steps?.map(step => ({ label: step, completed: false }))
-    });
-  }, [addProgressNotification]);
+  const startProcessing = useCallback(
+    (taskName: string, steps?: string[]) => {
+      return addProgressNotification({
+        title: `Processing ${taskName}`,
+        type: steps ? 'step' : 'linear',
+        variant: 'success',
+        progress: 0,
+        status: 'running',
+        showPercentage: !steps,
+        dismissible: false,
+        autoClose: true,
+        steps: steps?.map(step => ({ label: step, completed: false })),
+      });
+    },
+    [addProgressNotification]
+  );
 
   return {
     startDownload,
     startUpload,
     startProcessing,
     updateProgress,
-    removeProgress: removeProgressNotification
+    removeProgress: removeProgressNotification,
   };
 };
 
 // Example usage component
 export const ExampleProgressNotifications: React.FC = () => {
-  const { 
-    startDownload, 
-    startUpload, 
-    startProcessing, 
-    updateProgress 
-  } = useProgressActions();
+  const { startDownload, startUpload, startProcessing, updateProgress } = useProgressActions();
   const { clearAll } = useProgressNotification();
 
   const [activeProgresses, setActiveProgresses] = useState<string[]>([]);
@@ -523,12 +554,12 @@ export const ExampleProgressNotifications: React.FC = () => {
   const simulateDownload = () => {
     const id = startDownload('large-file.zip', 50 * 1024 * 1024); // 50MB
     setActiveProgresses(prev => [...prev, id]);
-    
+
     let progress = 0;
     const interval = setInterval(() => {
       progress += Math.random() * 10;
       updateProgress(id, progress);
-      
+
       if (progress >= 100) {
         clearInterval(interval);
         setActiveProgresses(prev => prev.filter(p => p !== id));
@@ -539,12 +570,12 @@ export const ExampleProgressNotifications: React.FC = () => {
   const simulateUpload = () => {
     const id = startUpload('document.pdf', 10 * 1024 * 1024); // 10MB
     setActiveProgresses(prev => [...prev, id]);
-    
+
     let progress = 0;
     const interval = setInterval(() => {
       progress += Math.random() * 8;
       updateProgress(id, progress);
-      
+
       if (progress >= 100) {
         clearInterval(interval);
         setActiveProgresses(prev => prev.filter(p => p !== id));
@@ -553,21 +584,16 @@ export const ExampleProgressNotifications: React.FC = () => {
   };
 
   const simulateProcessing = () => {
-    const steps = [
-      'Analyzing data',
-      'Processing images',
-      'Generating report',
-      'Saving results'
-    ];
-    
+    const steps = ['Analyzing data', 'Processing images', 'Generating report', 'Saving results'];
+
     const id = startProcessing('Data Analysis', steps);
     setActiveProgresses(prev => [...prev, id]);
-    
+
     let progress = 0;
     const interval = setInterval(() => {
       progress += Math.random() * 5;
       updateProgress(id, progress);
-      
+
       if (progress >= 100) {
         clearInterval(interval);
         setActiveProgresses(prev => prev.filter(p => p !== id));
@@ -586,7 +612,7 @@ export const ExampleProgressNotifications: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Progress Notifications</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
           <button
             onClick={simulateDownload}
@@ -595,7 +621,7 @@ export const ExampleProgressNotifications: React.FC = () => {
             <Download className="w-4 h-4" />
             Download File
           </button>
-          
+
           <button
             onClick={simulateUpload}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
@@ -603,7 +629,7 @@ export const ExampleProgressNotifications: React.FC = () => {
             <Upload className="w-4 h-4" />
             Upload File
           </button>
-          
+
           <button
             onClick={simulateProcessing}
             className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
@@ -611,7 +637,7 @@ export const ExampleProgressNotifications: React.FC = () => {
             <Loader2 className="w-4 h-4" />
             Process Data
           </button>
-          
+
           <button
             onClick={simulateMultipleProgress}
             className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
@@ -628,7 +654,7 @@ export const ExampleProgressNotifications: React.FC = () => {
           >
             Clear All
           </button>
-          
+
           <div className="text-sm text-gray-600 flex items-center">
             Active: {activeProgresses.length}
           </div>

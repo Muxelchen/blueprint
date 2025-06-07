@@ -1,12 +1,12 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Search, 
-  X, 
-  Clock, 
-  TrendingUp, 
-  Star, 
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Search,
+  X,
+  Clock,
+  TrendingUp,
+  Star,
   ArrowUpRight,
   Filter,
   Command,
@@ -18,46 +18,46 @@ import {
   BarChart3,
   Map,
   Calendar,
-  Mail
-} from 'lucide-react'
+  Mail,
+} from 'lucide-react';
 
 interface SearchResult {
-  id: string
-  title: string
-  description: string
-  type: 'page' | 'user' | 'document' | 'project' | 'command'
-  href: string
-  icon: React.ComponentType<any>
-  category: string
-  score: number
-  recentlyViewed?: boolean
-  trending?: boolean
+  id: string;
+  title: string;
+  description: string;
+  type: 'page' | 'user' | 'document' | 'project' | 'command';
+  href: string;
+  icon: React.ComponentType<any>;
+  category: string;
+  score: number;
+  recentlyViewed?: boolean;
+  trending?: boolean;
 }
 
 interface SearchBarProps {
-  className?: string
-  placeholder?: string
-  showFilters?: boolean
-  onSearch?: (query: string, results: SearchResult[]) => void
+  className?: string;
+  placeholder?: string;
+  showFilters?: boolean;
+  onSearch?: (query: string, results: SearchResult[]) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ 
-  className = '', 
+const SearchBar: React.FC<SearchBarProps> = ({
+  className = '',
   placeholder = 'Search...',
   showFilters = true,
-  onSearch
+  onSearch,
 }) => {
-  const [query, setQuery] = useState('')
-  const [isOpen, setIsOpen] = useState(false)
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const [recentSearches, setRecentSearches] = useState<string[]>([])
-  const [activeFilter, setActiveFilter] = useState<string>('all')
-  const [isLoading, setIsLoading] = useState(false)
-  
-  const searchRef = useRef<HTMLInputElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const navigate = useNavigate()
+  const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const searchRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   // Mock data for search results
   const mockData: SearchResult[] = [
@@ -70,7 +70,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       icon: BarChart3,
       category: 'Pages',
       score: 0.9,
-      trending: true
+      trending: true,
     },
     {
       id: '2',
@@ -80,7 +80,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       href: '/map',
       icon: Map,
       category: 'Pages',
-      score: 0.8
+      score: 0.8,
     },
     {
       id: '3',
@@ -91,7 +91,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       icon: User,
       category: 'Users',
       score: 0.7,
-      recentlyViewed: true
+      recentlyViewed: true,
     },
     {
       id: '4',
@@ -101,7 +101,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       href: '/settings',
       icon: Settings,
       category: 'Pages',
-      score: 0.6
+      score: 0.6,
     },
     {
       id: '5',
@@ -111,7 +111,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       href: '/calendar',
       icon: Calendar,
       category: 'Pages',
-      score: 0.5
+      score: 0.5,
     },
     {
       id: '6',
@@ -122,7 +122,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       icon: Folder,
       category: 'Projects',
       score: 0.8,
-      trending: true
+      trending: true,
     },
     {
       id: '7',
@@ -132,7 +132,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       href: '/docs/api',
       icon: FileText,
       category: 'Documents',
-      score: 0.7
+      score: 0.7,
     },
     {
       id: '8',
@@ -142,9 +142,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
       href: '/messages',
       icon: Mail,
       category: 'Pages',
-      score: 0.6
-    }
-  ]
+      score: 0.6,
+    },
+  ];
 
   // Filter options
   const filters = [
@@ -152,132 +152,134 @@ const SearchBar: React.FC<SearchBarProps> = ({
     { key: 'pages', label: 'Pages', icon: Hash },
     { key: 'users', label: 'Users', icon: User },
     { key: 'documents', label: 'Docs', icon: FileText },
-    { key: 'projects', label: 'Projects', icon: Folder }
-  ]
+    { key: 'projects', label: 'Projects', icon: Folder },
+  ];
 
   // Search function with debouncing
-  const performSearch = useCallback((searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setResults([])
-      return
-    }
+  const performSearch = useCallback(
+    (searchQuery: string) => {
+      if (!searchQuery.trim()) {
+        setResults([]);
+        return;
+      }
 
-    setIsLoading(true)
-    
-    // Simulate API delay
-    setTimeout(() => {
-      const filteredResults = mockData
-        .filter(item => {
-          const matchesQuery = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             item.description.toLowerCase().includes(searchQuery.toLowerCase())
-          const matchesFilter = activeFilter === 'all' || 
-                               (activeFilter === 'pages' && item.type === 'page') ||
-                               (activeFilter === 'users' && item.type === 'user') ||
-                               (activeFilter === 'documents' && item.type === 'document') ||
-                               (activeFilter === 'projects' && item.type === 'project')
-          return matchesQuery && matchesFilter
-        })
-        .sort((a, b) => {
-          // Sort by score, trending, and recently viewed
-          if (a.trending && !b.trending) return -1
-          if (!a.trending && b.trending) return 1
-          if (a.recentlyViewed && !b.recentlyViewed) return -1
-          if (!a.recentlyViewed && b.recentlyViewed) return 1
-          return b.score - a.score
-        })
-        .slice(0, 8)
+      setIsLoading(true);
 
-      setResults(filteredResults)
-      setSelectedIndex(0)
-      setIsLoading(false)
-      
-      // Call onSearch callback if provided
-      onSearch?.(searchQuery, filteredResults)
-    }, 300)
-  }, [activeFilter, onSearch])
+      // Simulate API delay
+      setTimeout(() => {
+        const filteredResults = mockData
+          .filter(item => {
+            const matchesQuery =
+              item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              item.description.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesFilter =
+              activeFilter === 'all' ||
+              (activeFilter === 'pages' && item.type === 'page') ||
+              (activeFilter === 'users' && item.type === 'user') ||
+              (activeFilter === 'documents' && item.type === 'document') ||
+              (activeFilter === 'projects' && item.type === 'project');
+            return matchesQuery && matchesFilter;
+          })
+          .sort((a, b) => {
+            // Sort by score, trending, and recently viewed
+            if (a.trending && !b.trending) return -1;
+            if (!a.trending && b.trending) return 1;
+            if (a.recentlyViewed && !b.recentlyViewed) return -1;
+            if (!a.recentlyViewed && b.recentlyViewed) return 1;
+            return b.score - a.score;
+          })
+          .slice(0, 8);
+
+        setResults(filteredResults);
+        setSelectedIndex(0);
+        setIsLoading(false);
+
+        // Call onSearch callback if provided
+        onSearch?.(searchQuery, filteredResults);
+      }, 300);
+    },
+    [activeFilter, onSearch]
+  );
 
   // Handle input change with debouncing
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      performSearch(query)
-    }, 150)
+      performSearch(query);
+    }, 150);
 
-    return () => clearTimeout(timeoutId)
-  }, [query, performSearch])
+    return () => clearTimeout(timeoutId);
+  }, [query, performSearch]);
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault()
-        setSelectedIndex(prev => (prev + 1) % Math.max(results.length, 1))
-        break
+        e.preventDefault();
+        setSelectedIndex(prev => (prev + 1) % Math.max(results.length, 1));
+        break;
       case 'ArrowUp':
-        e.preventDefault()
-        setSelectedIndex(prev => prev === 0 ? Math.max(results.length - 1, 0) : prev - 1)
-        break
+        e.preventDefault();
+        setSelectedIndex(prev => (prev === 0 ? Math.max(results.length - 1, 0) : prev - 1));
+        break;
       case 'Enter':
-        e.preventDefault()
+        e.preventDefault();
         if (results[selectedIndex]) {
-          handleResultClick(results[selectedIndex])
+          handleResultClick(results[selectedIndex]);
         }
-        break
+        break;
       case 'Escape':
-        setIsOpen(false)
-        searchRef.current?.blur()
-        break
+        setIsOpen(false);
+        searchRef.current?.blur();
+        break;
     }
-  }
+  };
 
   // Handle result click
   const handleResultClick = (result: SearchResult) => {
     // Add to recent searches
-    setRecentSearches(prev => [
-      query,
-      ...prev.filter(item => item !== query).slice(0, 4)
-    ])
-    
-    setQuery('')
-    setIsOpen(false)
-    navigate(result.href)
-  }
+    setRecentSearches(prev => [query, ...prev.filter(item => item !== query).slice(0, 4)]);
+
+    setQuery('');
+    setIsOpen(false);
+    navigate(result.href);
+  };
 
   // Handle recent search click
   const handleRecentSearchClick = (searchTerm: string) => {
-    setQuery(searchTerm)
-    performSearch(searchTerm)
-  }
+    setQuery(searchTerm);
+    performSearch(searchTerm);
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Keyboard shortcut to focus search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        searchRef.current?.focus()
-        setIsOpen(true)
+        e.preventDefault();
+        searchRef.current?.focus();
+        setIsOpen(true);
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
-  const hasResults = results.length > 0
-  const showRecentSearches = !query && recentSearches.length > 0
+  const hasResults = results.length > 0;
+  const showRecentSearches = !query && recentSearches.length > 0;
 
   return (
     <div ref={containerRef} className={`relative w-full max-w-2xl ${className}`}>
@@ -288,26 +290,26 @@ const SearchBar: React.FC<SearchBarProps> = ({
           ref={searchRef}
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={e => setQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className="w-full pl-10 pr-20 py-3 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white shadow-sm"
         />
-        
+
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
           {query && (
             <button
               onClick={() => {
-                setQuery('')
-                setResults([])
+                setQuery('');
+                setResults([]);
               }}
               className="p-1 rounded-lg text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100"
             >
               <X className="w-4 h-4" />
             </button>
           )}
-          
+
           <div className="hidden sm:flex items-center space-x-1 text-xs text-secondary-500 border border-secondary-200 rounded px-2 py-1">
             <Command className="w-3 h-3" />
             <span>K</span>
@@ -331,7 +333,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 <div className="flex items-center space-x-2">
                   <Filter className="w-4 h-4 text-secondary-500" />
                   <div className="flex items-center space-x-1">
-                    {filters.map((filter) => (
+                    {filters.map(filter => (
                       <button
                         key={filter.key}
                         onClick={() => setActiveFilter(filter.key)}
@@ -394,12 +396,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     }`}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className={`p-2 rounded-lg ${
-                        selectedIndex === index ? 'bg-primary-100' : 'bg-secondary-100'
-                      }`}>
+                      <div
+                        className={`p-2 rounded-lg ${
+                          selectedIndex === index ? 'bg-primary-100' : 'bg-secondary-100'
+                        }`}
+                      >
                         <result.icon className="w-4 h-4 text-secondary-600" />
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2">
                           <h4 className="text-sm font-medium text-secondary-900 truncate">
@@ -417,9 +421,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                             </div>
                           )}
                         </div>
-                        <p className="text-xs text-secondary-500 truncate">
-                          {result.description}
-                        </p>
+                        <p className="text-xs text-secondary-500 truncate">{result.description}</p>
                         <div className="flex items-center justify-between mt-1">
                           <span className="text-xs text-secondary-400">{result.category}</span>
                           <ArrowUpRight className="w-3 h-3 text-secondary-400" />
@@ -447,7 +449,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         )}
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};
 
-export default SearchBar
+export default SearchBar;

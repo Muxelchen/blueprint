@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Menu, Home, User, Settings, FileText, BarChart3, Mail, Calendar, ShoppingCart, Users } from 'lucide-react';
+import {
+  X,
+  Menu,
+  Home,
+  User,
+  Settings,
+  FileText,
+  BarChart3,
+  Mail,
+  Calendar,
+  ShoppingCart,
+  Users,
+} from 'lucide-react';
 import Button from '../../common/buttons/Button';
 
 export interface DrawerNavItem {
@@ -35,7 +47,7 @@ const DrawerNav: React.FC<DrawerNavProps> = ({
   title = 'Navigation',
   footer,
   overlay = true,
-  className = ''
+  className = '',
 }) => {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -71,18 +83,18 @@ const DrawerNav: React.FC<DrawerNavProps> = ({
   const sizeClasses = {
     sm: 'w-64',
     md: 'w-80',
-    lg: 'w-96'
+    lg: 'w-96',
   };
 
   const positionClasses = {
     left: {
       drawer: 'left-0',
-      transform: isOpen ? 'translate-x-0' : '-translate-x-full'
+      transform: isOpen ? 'translate-x-0' : '-translate-x-full',
     },
     right: {
       drawer: 'right-0',
-      transform: isOpen ? 'translate-x-0' : 'translate-x-full'
-    }
+      transform: isOpen ? 'translate-x-0' : 'translate-x-full',
+    },
   };
 
   const handleItemClick = (item: DrawerNavItem) => {
@@ -109,7 +121,7 @@ const DrawerNav: React.FC<DrawerNavProps> = ({
     return (
       <div key={item.id}>
         {item.divider && <div className="border-t border-gray-200 my-2" />}
-        
+
         <button
           onClick={() => handleItemClick(item)}
           disabled={item.disabled}
@@ -121,9 +133,7 @@ const DrawerNav: React.FC<DrawerNavProps> = ({
           `}
         >
           <div className="flex items-center gap-3">
-            {item.icon && (
-              <span className="w-5 h-5 text-gray-600">{item.icon}</span>
-            )}
+            {item.icon && <span className="w-5 h-5 text-gray-600">{item.icon}</span>}
             <span className="text-gray-900 font-medium">{item.label}</span>
             {item.badge && (
               <span className="ml-auto px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">
@@ -131,7 +141,7 @@ const DrawerNav: React.FC<DrawerNavProps> = ({
               </span>
             )}
           </div>
-          
+
           {hasChildren && (
             <svg
               className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
@@ -186,16 +196,10 @@ const DrawerNav: React.FC<DrawerNavProps> = ({
         </div>
 
         {/* Navigation Items */}
-        <div className="flex-1 overflow-y-auto py-2">
-          {items.map(item => renderNavItem(item))}
-        </div>
+        <div className="flex-1 overflow-y-auto py-2">{items.map(item => renderNavItem(item))}</div>
 
         {/* Footer */}
-        {footer && (
-          <div className="border-t border-gray-200 p-4">
-            {footer}
-          </div>
-        )}
+        {footer && <div className="border-t border-gray-200 p-4">{footer}</div>}
       </div>
     </>
   );
@@ -213,7 +217,7 @@ export const useDrawer = (defaultOpen = false) => {
     isOpen,
     openDrawer,
     closeDrawer,
-    toggleDrawer
+    toggleDrawer,
   };
 };
 
@@ -227,7 +231,7 @@ export const ExampleDrawerNav: React.FC = () => {
       id: 'dashboard',
       label: 'Dashboard',
       icon: <Home />,
-      onClick: () => console.log('Dashboard clicked')
+      onClick: () => console.log('Dashboard clicked'),
     },
     {
       id: 'analytics',
@@ -239,19 +243,19 @@ export const ExampleDrawerNav: React.FC = () => {
           id: 'reports',
           label: 'Reports',
           icon: <FileText />,
-          onClick: () => console.log('Reports clicked')
+          onClick: () => console.log('Reports clicked'),
         },
         {
           id: 'metrics',
           label: 'Metrics',
-          onClick: () => console.log('Metrics clicked')
+          onClick: () => console.log('Metrics clicked'),
         },
         {
           id: 'insights',
           label: 'Insights',
-          onClick: () => console.log('Insights clicked')
-        }
-      ]
+          onClick: () => console.log('Insights clicked'),
+        },
+      ],
     },
     {
       id: 'users',
@@ -261,55 +265,55 @@ export const ExampleDrawerNav: React.FC = () => {
         {
           id: 'all-users',
           label: 'All Users',
-          onClick: () => console.log('All Users clicked')
+          onClick: () => console.log('All Users clicked'),
         },
         {
           id: 'user-roles',
           label: 'Roles & Permissions',
-          onClick: () => console.log('Roles clicked')
+          onClick: () => console.log('Roles clicked'),
         },
         {
           id: 'user-groups',
           label: 'User Groups',
-          onClick: () => console.log('Groups clicked')
-        }
-      ]
+          onClick: () => console.log('Groups clicked'),
+        },
+      ],
     },
     {
       id: 'divider1',
       label: '',
-      divider: true
+      divider: true,
     },
     {
       id: 'profile',
       label: 'Profile',
       icon: <User />,
-      onClick: () => console.log('Profile clicked')
+      onClick: () => console.log('Profile clicked'),
     },
     {
       id: 'messages',
       label: 'Messages',
       icon: <Mail />,
       badge: '12',
-      onClick: () => console.log('Messages clicked')
+      onClick: () => console.log('Messages clicked'),
     },
     {
       id: 'calendar',
       label: 'Calendar',
       icon: <Calendar />,
-      onClick: () => console.log('Calendar clicked')
+      onClick: () => console.log('Calendar clicked'),
     },
     {
       id: 'orders',
       label: 'Orders',
       icon: <ShoppingCart />,
       disabled: true,
-      onClick: () => console.log('Orders clicked')
+      onClick: () => console.log('Orders clicked'),
     },
     {
       id: 'divider2',
       label: '',
-      divider: true
+      divider: true,
     },
     {
       id: 'settings',
@@ -319,55 +323,48 @@ export const ExampleDrawerNav: React.FC = () => {
         {
           id: 'general',
           label: 'General',
-          onClick: () => console.log('General settings clicked')
+          onClick: () => console.log('General settings clicked'),
         },
         {
           id: 'security',
           label: 'Security',
-          onClick: () => console.log('Security settings clicked')
+          onClick: () => console.log('Security settings clicked'),
         },
         {
           id: 'notifications',
           label: 'Notifications',
-          onClick: () => console.log('Notification settings clicked')
-        }
-      ]
-    }
+          onClick: () => console.log('Notification settings clicked'),
+        },
+      ],
+    },
   ];
 
   const quickActions: DrawerNavItem[] = [
     {
       id: 'new-project',
       label: 'New Project',
-      onClick: () => console.log('New project')
+      onClick: () => console.log('New project'),
     },
     {
       id: 'import-data',
       label: 'Import Data',
-      onClick: () => console.log('Import data')
+      onClick: () => console.log('Import data'),
     },
     {
       id: 'export-report',
       label: 'Export Report',
-      onClick: () => console.log('Export report')
-    }
+      onClick: () => console.log('Export report'),
+    },
   ];
 
   return (
     <div className="p-6 space-y-4">
       <div className="flex gap-4">
-        <Button
-          onClick={leftDrawer.toggleDrawer}
-          leftIcon={<Menu />}
-        >
+        <Button onClick={leftDrawer.toggleDrawer} leftIcon={<Menu />}>
           Left Navigation
         </Button>
-        
-        <Button
-          onClick={rightDrawer.toggleDrawer}
-          variant="secondary"
-          leftIcon={<Menu />}
-        >
+
+        <Button onClick={rightDrawer.toggleDrawer} variant="secondary" leftIcon={<Menu />}>
           Right Quick Actions
         </Button>
       </div>

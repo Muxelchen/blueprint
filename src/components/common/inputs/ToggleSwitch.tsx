@@ -51,14 +51,14 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   id,
   required = false,
   loading = false,
-  animate = true
+  animate = true,
 }) => {
   const isControlled = controlledChecked !== undefined;
-  
+
   const [state, setState] = useState<ToggleSwitchState>({
     isChecked: controlledChecked ?? defaultChecked,
     isFocused: false,
-    isPressed: false
+    isPressed: false,
   });
 
   // Update state when controlled value changes
@@ -68,30 +68,39 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
     }
   }, [controlledChecked, isControlled]);
 
-  const handleToggle = useCallback((event: React.MouseEvent | React.KeyboardEvent) => {
-    if (disabled || loading) return;
+  const handleToggle = useCallback(
+    (event: React.MouseEvent | React.KeyboardEvent) => {
+      if (disabled || loading) return;
 
-    const newChecked = !state.isChecked;
-    
-    if (!isControlled) {
-      setState(prev => ({ ...prev, isChecked: newChecked }));
-    }
+      const newChecked = !state.isChecked;
 
-    onChange?.(newChecked);
-    onToggle?.(newChecked, event);
-  }, [disabled, loading, state.isChecked, isControlled, onChange, onToggle]);
+      if (!isControlled) {
+        setState(prev => ({ ...prev, isChecked: newChecked }));
+      }
 
-  const handleClick = useCallback((event: React.MouseEvent) => {
-    handleToggle(event);
-  }, [handleToggle]);
+      onChange?.(newChecked);
+      onToggle?.(newChecked, event);
+    },
+    [disabled, loading, state.isChecked, isControlled, onChange, onToggle]
+  );
 
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      setState(prev => ({ ...prev, isPressed: true }));
+  const handleClick = useCallback(
+    (event: React.MouseEvent) => {
       handleToggle(event);
-    }
-  }, [handleToggle]);
+    },
+    [handleToggle]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        setState(prev => ({ ...prev, isPressed: true }));
+        handleToggle(event);
+      }
+    },
+    [handleToggle]
+  );
 
   const handleKeyUp = useCallback((event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -126,7 +135,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         translate: 'translate-x-4',
         padding: 'p-0.5',
         iconSize: 'w-2.5 h-2.5',
-        labelText: 'text-sm'
+        labelText: 'text-sm',
       },
       md: {
         container: 'w-11 h-6',
@@ -134,7 +143,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         translate: 'translate-x-5',
         padding: 'p-0.5',
         iconSize: 'w-3 h-3',
-        labelText: 'text-base'
+        labelText: 'text-base',
       },
       lg: {
         container: 'w-14 h-7',
@@ -142,8 +151,8 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         translate: 'translate-x-7',
         padding: 'p-0.5',
         iconSize: 'w-4 h-4',
-        labelText: 'text-lg'
-      }
+        labelText: 'text-lg',
+      },
     };
     return configs[size];
   };
@@ -156,29 +165,29 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         uncheckedBg: 'bg-gray-200',
         checkedHover: 'hover:bg-blue-700',
         uncheckedHover: 'hover:bg-gray-300',
-        focusRing: 'focus:ring-blue-500'
+        focusRing: 'focus:ring-blue-500',
       },
       success: {
         checkedBg: 'bg-green-600',
         uncheckedBg: 'bg-gray-200',
         checkedHover: 'hover:bg-green-700',
         uncheckedHover: 'hover:bg-gray-300',
-        focusRing: 'focus:ring-green-500'
+        focusRing: 'focus:ring-green-500',
       },
       warning: {
         checkedBg: 'bg-yellow-500',
         uncheckedBg: 'bg-gray-200',
         checkedHover: 'hover:bg-yellow-600',
         uncheckedHover: 'hover:bg-gray-300',
-        focusRing: 'focus:ring-yellow-500'
+        focusRing: 'focus:ring-yellow-500',
       },
       danger: {
         checkedBg: 'bg-red-600',
         uncheckedBg: 'bg-gray-200',
         checkedHover: 'hover:bg-red-700',
         uncheckedHover: 'hover:bg-gray-300',
-        focusRing: 'focus:ring-red-500'
-      }
+        focusRing: 'focus:ring-red-500',
+      },
     };
     return configs[variant];
   };
@@ -254,9 +263,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
       >
         {/* Background Icon */}
         {(showIcons || customIcons) && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            {getIcon()}
-          </div>
+          <div className="absolute inset-0 flex items-center justify-center">{getIcon()}</div>
         )}
 
         {/* Thumb */}
@@ -310,24 +317,21 @@ export const ToggleGroup: React.FC<ToggleGroupProps> = ({
   children,
   orientation = 'vertical',
   className = '',
-  spacing = 'md'
+  spacing = 'md',
 }) => {
   const getSpacingClass = () => {
     const spacings = {
       sm: orientation === 'horizontal' ? 'space-x-4' : 'space-y-2',
       md: orientation === 'horizontal' ? 'space-x-6' : 'space-y-4',
-      lg: orientation === 'horizontal' ? 'space-x-8' : 'space-y-6'
+      lg: orientation === 'horizontal' ? 'space-x-8' : 'space-y-6',
     };
     return spacings[spacing];
   };
 
-  const orientationClass = orientation === 'horizontal' ? 'flex flex-wrap items-center' : 'space-y-0';
+  const orientationClass =
+    orientation === 'horizontal' ? 'flex flex-wrap items-center' : 'space-y-0';
 
-  return (
-    <div className={`${orientationClass} ${getSpacingClass()} ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`${orientationClass} ${getSpacingClass()} ${className}`}>{children}</div>;
 };
 
 // Hook for managing multiple toggles
@@ -346,16 +350,19 @@ export const useToggleGroup = (initialState: Record<string, boolean> = {}) => {
     setToggles(newState);
   }, []);
 
-  const getToggleValue = useCallback((key: string) => {
-    return toggles[key] ?? false;
-  }, [toggles]);
+  const getToggleValue = useCallback(
+    (key: string) => {
+      return toggles[key] ?? false;
+    },
+    [toggles]
+  );
 
   return {
     toggles,
     updateToggle,
     toggleValue,
     resetToggles,
-    getToggleValue
+    getToggleValue,
   };
 };
 
@@ -370,7 +377,7 @@ export const ExampleToggleSwitches: React.FC = () => {
     feature1: true,
     feature2: false,
     feature3: true,
-    feature4: false
+    feature4: false,
   });
 
   const handleAsyncToggle = async (checked: boolean) => {
@@ -385,7 +392,7 @@ export const ExampleToggleSwitches: React.FC = () => {
     <div className="space-y-8 max-w-2xl mx-auto p-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Toggle Switch Examples</h3>
-        
+
         {/* Basic Toggles */}
         <div className="space-y-6">
           <div>
@@ -399,7 +406,7 @@ export const ExampleToggleSwitches: React.FC = () => {
                 size="md"
                 variant="default"
               />
-              
+
               <ToggleSwitch
                 checked={marketing}
                 onChange={setMarketing}
@@ -409,7 +416,7 @@ export const ExampleToggleSwitches: React.FC = () => {
                 variant="success"
                 showIcons
               />
-              
+
               <ToggleSwitch
                 checked={analytics}
                 onChange={handleAsyncToggle}
@@ -427,26 +434,11 @@ export const ExampleToggleSwitches: React.FC = () => {
           <div>
             <h4 className="font-medium mb-4">Size Variants</h4>
             <ToggleGroup orientation="horizontal" spacing="lg">
-              <ToggleSwitch
-                defaultChecked={true}
-                label="Small"
-                size="sm"
-                variant="default"
-              />
-              
-              <ToggleSwitch
-                defaultChecked={true}
-                label="Medium"
-                size="md"
-                variant="default"
-              />
-              
-              <ToggleSwitch
-                defaultChecked={true}
-                label="Large"
-                size="lg"
-                variant="default"
-              />
+              <ToggleSwitch defaultChecked={true} label="Small" size="sm" variant="default" />
+
+              <ToggleSwitch defaultChecked={true} label="Medium" size="md" variant="default" />
+
+              <ToggleSwitch defaultChecked={true} label="Large" size="lg" variant="default" />
             </ToggleGroup>
           </div>
 
@@ -454,33 +446,13 @@ export const ExampleToggleSwitches: React.FC = () => {
           <div>
             <h4 className="font-medium mb-4">Color Variants</h4>
             <ToggleGroup orientation="horizontal" spacing="lg">
-              <ToggleSwitch
-                defaultChecked={true}
-                label="Default"
-                variant="default"
-                showIcons
-              />
-              
-              <ToggleSwitch
-                defaultChecked={true}
-                label="Success"
-                variant="success"
-                showIcons
-              />
-              
-              <ToggleSwitch
-                defaultChecked={true}
-                label="Warning"
-                variant="warning"
-                showIcons
-              />
-              
-              <ToggleSwitch
-                defaultChecked={true}
-                label="Danger"
-                variant="danger"
-                showIcons
-              />
+              <ToggleSwitch defaultChecked={true} label="Default" variant="default" showIcons />
+
+              <ToggleSwitch defaultChecked={true} label="Success" variant="success" showIcons />
+
+              <ToggleSwitch defaultChecked={true} label="Warning" variant="warning" showIcons />
+
+              <ToggleSwitch defaultChecked={true} label="Danger" variant="danger" showIcons />
             </ToggleGroup>
           </div>
 
@@ -494,18 +466,18 @@ export const ExampleToggleSwitches: React.FC = () => {
                 description="Switch to dark theme"
                 customIcons={{
                   checked: <span className="text-yellow-400">🌙</span>,
-                  unchecked: <span className="text-yellow-400">☀️</span>
+                  unchecked: <span className="text-yellow-400">☀️</span>,
                 }}
                 variant="default"
               />
-              
+
               <ToggleSwitch
                 defaultChecked={true}
                 label="Sound Effects"
                 description="Enable audio feedback"
                 customIcons={{
                   checked: <span className="text-blue-400">🔊</span>,
-                  unchecked: <span className="text-gray-400">🔇</span>
+                  unchecked: <span className="text-gray-400">🔇</span>,
                 }}
                 variant="default"
               />
@@ -518,31 +490,31 @@ export const ExampleToggleSwitches: React.FC = () => {
             <ToggleGroup spacing="md">
               <ToggleSwitch
                 checked={toggles.feature1}
-                onChange={(checked) => updateToggle('feature1', checked)}
+                onChange={checked => updateToggle('feature1', checked)}
                 label="Advanced Search"
                 description="Enable enhanced search capabilities"
                 variant="success"
               />
-              
+
               <ToggleSwitch
                 checked={toggles.feature2}
-                onChange={(checked) => updateToggle('feature2', checked)}
+                onChange={checked => updateToggle('feature2', checked)}
                 label="Beta Features"
                 description="Access experimental features (may be unstable)"
                 variant="warning"
               />
-              
+
               <ToggleSwitch
                 checked={toggles.feature3}
-                onChange={(checked) => updateToggle('feature3', checked)}
+                onChange={checked => updateToggle('feature3', checked)}
                 label="Auto-Save"
                 description="Automatically save your work"
                 variant="success"
               />
-              
+
               <ToggleSwitch
                 checked={toggles.feature4}
-                onChange={(checked) => updateToggle('feature4', checked)}
+                onChange={checked => updateToggle('feature4', checked)}
                 label="Collaborative Mode"
                 description="Enable real-time collaboration"
                 variant="default"
@@ -560,7 +532,7 @@ export const ExampleToggleSwitches: React.FC = () => {
                 description="This toggle is enabled and checked"
                 disabled={true}
               />
-              
+
               <ToggleSwitch
                 checked={false}
                 label="Enabled & Unchecked"
@@ -576,12 +548,20 @@ export const ExampleToggleSwitches: React.FC = () => {
           <h4 className="font-medium mb-2">Current State</h4>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p><strong>Notifications:</strong> {notifications ? 'Enabled' : 'Disabled'}</p>
-              <p><strong>Marketing:</strong> {marketing ? 'Enabled' : 'Disabled'}</p>
-              <p><strong>Analytics:</strong> {analytics ? 'Enabled' : 'Disabled'}</p>
+              <p>
+                <strong>Notifications:</strong> {notifications ? 'Enabled' : 'Disabled'}
+              </p>
+              <p>
+                <strong>Marketing:</strong> {marketing ? 'Enabled' : 'Disabled'}
+              </p>
+              <p>
+                <strong>Analytics:</strong> {analytics ? 'Enabled' : 'Disabled'}
+              </p>
             </div>
             <div>
-              <p><strong>Feature Toggles:</strong></p>
+              <p>
+                <strong>Feature Toggles:</strong>
+              </p>
               <pre className="text-xs bg-white p-2 rounded border mt-1">
                 {JSON.stringify(toggles, null, 2)}
               </pre>

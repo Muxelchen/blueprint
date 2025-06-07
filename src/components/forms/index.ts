@@ -9,5 +9,5 @@ export {
   useFormContext,
   useFormValidation,
   useFormState,
-  useFormActions
+  useFormActions,
 } from './Form';

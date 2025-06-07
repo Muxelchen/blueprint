@@ -15,3 +15,4 @@ export * from './useTheme';
 
 // Notification management hooks
 export * from './useNotifications';
+export * from './useNotificationCenter';

@@ -10,13 +10,13 @@ const NotFoundComponent = () => <div>Page Not Found</div>;
 const mockRoutes: RouteConfig[] = [
   { path: '/', component: TestComponent },
   { path: '/about', component: () => <div>About Page</div> },
-  { path: '/contact', component: () => <div>Contact Page</div> }
+  { path: '/contact', component: () => <div>Contact Page</div> },
 ];
 
 // Test component that uses navigation
 const NavigationTestComponent = () => {
   const { navigate, currentRoute, params, query } = useNavigation();
-  
+
   return (
     <div>
       <div data-testid="current-path">{currentRoute?.path || 'No route'}</div>
@@ -33,9 +33,9 @@ describe('Routing Components', () => {
       value: {
         pathname: '/',
         search: '',
-        hash: ''
+        hash: '',
       },
-      writable: true
+      writable: true,
     });
   });
 
@@ -54,11 +54,11 @@ describe('Routing Components', () => {
     it('throws error when used outside provider', () => {
       // Mock console.error to prevent test output noise
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       expect(() => {
         render(<NavigationTestComponent />);
       }).toThrow('useNavigation must be used within a RouteProvider');
-      
+
       consoleSpy.mockRestore();
     });
   });
@@ -78,7 +78,7 @@ describe('Routing Components', () => {
 
     it('handles click navigation', () => {
       const mockNavigate = vi.fn();
-      
+
       render(
         <RouteProvider routes={mockRoutes}>
           <div>
@@ -90,14 +90,14 @@ describe('Routing Components', () => {
 
       const link = screen.getByRole('link');
       fireEvent.click(link);
-      
+
       // The link should prevent default and handle navigation
       expect(link).toBeInTheDocument();
     });
 
     it('calls custom onClick handler', () => {
       const mockClick = vi.fn();
-      
+
       render(
         <RouteProvider routes={mockRoutes}>
           <Link to="/about" onClick={mockClick}>
@@ -108,7 +108,7 @@ describe('Routing Components', () => {
 
       const link = screen.getByRole('link');
       fireEvent.click(link);
-      
+
       expect(mockClick).toHaveBeenCalled();
     });
   });
@@ -127,13 +127,10 @@ describe('Routing Components', () => {
 
     it('renders fallback when no route matches', () => {
       const emptyRoutes: RouteConfig[] = [];
-      
+
       render(
         <RouteProvider routes={emptyRoutes}>
-          <RouteMapping 
-            routes={emptyRoutes} 
-            fallback={NotFoundComponent}
-          />
+          <RouteMapping routes={emptyRoutes} fallback={NotFoundComponent} />
         </RouteProvider>
       );
 
@@ -142,7 +139,7 @@ describe('Routing Components', () => {
 
     it('renders default fallback when no custom fallback provided', () => {
       const emptyRoutes: RouteConfig[] = [];
-      
+
       render(
         <RouteProvider routes={emptyRoutes}>
           <RouteMapping routes={emptyRoutes} />
@@ -163,7 +160,7 @@ describe('Routing Components', () => {
 
       const aboutButton = screen.getByText('Go to About');
       const replaceButton = screen.getByText('Replace with Contact');
-      
+
       expect(aboutButton).toBeInTheDocument();
       expect(replaceButton).toBeInTheDocument();
     });

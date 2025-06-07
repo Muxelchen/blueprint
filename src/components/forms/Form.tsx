@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef, FormEvent } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  FormEvent,
+} from 'react';
 import { AlertCircle } from 'lucide-react';
 
 // Form Context Types
@@ -45,14 +53,19 @@ export interface ValidationRule {
   url?: boolean | string;
   number?: boolean | string;
   integer?: boolean | string;
-  custom?: (value: any, formValues: Record<string, any>) => string | Promise<string> | null | undefined;
+  custom?: (
+    value: any,
+    formValues: Record<string, any>
+  ) => string | Promise<string> | null | undefined;
 }
 
 export interface FormProps {
   initialValues?: Record<string, any>;
   validationSchema?: Record<string, ValidationRule>;
   onSubmit?: (values: Record<string, any>, actions: FormActions) => void | Promise<void>;
-  onValidate?: (values: Record<string, any>) => Record<string, string> | Promise<Record<string, string>>;
+  onValidate?: (
+    values: Record<string, any>
+  ) => Record<string, string> | Promise<Record<string, string>>;
   validateOnChange?: boolean;
   validateOnBlur?: boolean;
   validateOnMount?: boolean;
@@ -104,7 +117,7 @@ export const Form: React.FC<FormProps> = ({
   enableReinitialize = false,
   children,
   className = '',
-  noValidate = true
+  noValidate = true,
 }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const [state, setState] = useState<FormState>(() => {
@@ -115,7 +128,7 @@ export const Form: React.FC<FormProps> = ({
         value,
         touched: false,
         dirty: false,
-        valid: true
+        valid: true,
       };
     });
 
@@ -125,127 +138,152 @@ export const Form: React.FC<FormProps> = ({
       isDirty: false,
       isSubmitting: false,
       submitCount: 0,
-      errors: {}
+      errors: {},
     };
   });
 
   // Validation helper
-  const validateValue = useCallback(async (name: string, value: any, allValues: Record<string, any>): Promise<string | undefined> => {
-    const rules = validationSchema[name];
-    if (!rules) return undefined;
+  const validateValue = useCallback(
+    async (
+      name: string,
+      value: any,
+      allValues: Record<string, any>
+    ): Promise<string | undefined> => {
+      const rules = validationSchema[name];
+      if (!rules) return undefined;
 
-    // Required validation
-    if (rules.required) {
-      const isEmpty = value === null || value === undefined || value === '' || 
-                     (Array.isArray(value) && value.length === 0);
-      if (isEmpty) {
-        const message = typeof rules.required === 'string' ? rules.required : `${name} is required`;
+      // Required validation
+      if (rules.required) {
+        const isEmpty =
+          value === null ||
+          value === undefined ||
+          value === '' ||
+          (Array.isArray(value) && value.length === 0);
+        if (isEmpty) {
+          const message =
+            typeof rules.required === 'string' ? rules.required : `${name} is required`;
+          return message;
+        }
+      }
+
+      // Skip other validations if value is empty and not required
+      if (value === null || value === undefined || value === '') {
+        return undefined;
+      }
+
+      // String length validations
+      if (typeof value === 'string') {
+        if (rules.minLength) {
+          const config =
+            typeof rules.minLength === 'number'
+              ? {
+                  value: rules.minLength,
+                  message: `${name} must be at least ${rules.minLength} characters`,
+                }
+              : rules.minLength;
+          if (value.length < config.value) {
+            return config.message;
+          }
+        }
+
+        if (rules.maxLength) {
+          const config =
+            typeof rules.maxLength === 'number'
+              ? {
+                  value: rules.maxLength,
+                  message: `${name} must be no more than ${rules.maxLength} characters`,
+                }
+              : rules.maxLength;
+          if (value.length > config.value) {
+            return config.message;
+          }
+        }
+      }
+
+      // Number validations
+      if (typeof value === 'number' || !isNaN(Number(value))) {
+        const numValue = Number(value);
+
+        if (rules.min) {
+          const config =
+            typeof rules.min === 'number'
+              ? { value: rules.min, message: `${name} must be at least ${rules.min}` }
+              : rules.min;
+          if (numValue < config.value) {
+            return config.message;
+          }
+        }
+
+        if (rules.max) {
+          const config =
+            typeof rules.max === 'number'
+              ? { value: rules.max, message: `${name} must be no more than ${rules.max}` }
+              : rules.max;
+          if (numValue > config.value) {
+            return config.message;
+          }
+        }
+      }
+
+      // Pattern validation
+      if (rules.pattern && typeof value === 'string') {
+        const config =
+          rules.pattern instanceof RegExp
+            ? { value: rules.pattern, message: `${name} format is invalid` }
+            : rules.pattern;
+        if (!config.value.test(value)) {
+          return config.message;
+        }
+      }
+
+      // Email validation
+      if (rules.email && typeof value === 'string') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          const message =
+            typeof rules.email === 'string' ? rules.email : 'Please enter a valid email address';
+          return message;
+        }
+      }
+
+      // URL validation
+      if (rules.url && typeof value === 'string') {
+        try {
+          new URL(value);
+        } catch {
+          const message = typeof rules.url === 'string' ? rules.url : 'Please enter a valid URL';
+          return message;
+        }
+      }
+
+      // Number validation
+      if (rules.number && isNaN(Number(value))) {
+        const message =
+          typeof rules.number === 'string' ? rules.number : 'Please enter a valid number';
         return message;
       }
-    }
 
-    // Skip other validations if value is empty and not required
-    if (value === null || value === undefined || value === '') {
+      // Integer validation
+      if (rules.integer && (!Number.isInteger(Number(value)) || isNaN(Number(value)))) {
+        const message =
+          typeof rules.integer === 'string' ? rules.integer : 'Please enter a valid integer';
+        return message;
+      }
+
+      // Custom validation
+      if (rules.custom) {
+        try {
+          const result = await rules.custom(value, allValues);
+          if (result) return result;
+        } catch (error) {
+          return `Validation error: ${error}`;
+        }
+      }
+
       return undefined;
-    }
-
-    // String length validations
-    if (typeof value === 'string') {
-      if (rules.minLength) {
-        const config = typeof rules.minLength === 'number' ? 
-          { value: rules.minLength, message: `${name} must be at least ${rules.minLength} characters` } :
-          rules.minLength;
-        if (value.length < config.value) {
-          return config.message;
-        }
-      }
-
-      if (rules.maxLength) {
-        const config = typeof rules.maxLength === 'number' ? 
-          { value: rules.maxLength, message: `${name} must be no more than ${rules.maxLength} characters` } :
-          rules.maxLength;
-        if (value.length > config.value) {
-          return config.message;
-        }
-      }
-    }
-
-    // Number validations
-    if (typeof value === 'number' || !isNaN(Number(value))) {
-      const numValue = Number(value);
-      
-      if (rules.min) {
-        const config = typeof rules.min === 'number' ? 
-          { value: rules.min, message: `${name} must be at least ${rules.min}` } :
-          rules.min;
-        if (numValue < config.value) {
-          return config.message;
-        }
-      }
-
-      if (rules.max) {
-        const config = typeof rules.max === 'number' ? 
-          { value: rules.max, message: `${name} must be no more than ${rules.max}` } :
-          rules.max;
-        if (numValue > config.value) {
-          return config.message;
-        }
-      }
-    }
-
-    // Pattern validation
-    if (rules.pattern && typeof value === 'string') {
-      const config = rules.pattern instanceof RegExp ? 
-        { value: rules.pattern, message: `${name} format is invalid` } :
-        rules.pattern;
-      if (!config.value.test(value)) {
-        return config.message;
-      }
-    }
-
-    // Email validation
-    if (rules.email && typeof value === 'string') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value)) {
-        const message = typeof rules.email === 'string' ? rules.email : 'Please enter a valid email address';
-        return message;
-      }
-    }
-
-    // URL validation
-    if (rules.url && typeof value === 'string') {
-      try {
-        new URL(value);
-      } catch {
-        const message = typeof rules.url === 'string' ? rules.url : 'Please enter a valid URL';
-        return message;
-      }
-    }
-
-    // Number validation
-    if (rules.number && isNaN(Number(value))) {
-      const message = typeof rules.number === 'string' ? rules.number : 'Please enter a valid number';
-      return message;
-    }
-
-    // Integer validation
-    if (rules.integer && (!Number.isInteger(Number(value)) || isNaN(Number(value)))) {
-      const message = typeof rules.integer === 'string' ? rules.integer : 'Please enter a valid integer';
-      return message;
-    }
-
-    // Custom validation
-    if (rules.custom) {
-      try {
-        const result = await rules.custom(value, allValues);
-        if (result) return result;
-      } catch (error) {
-        return `Validation error: ${error}`;
-      }
-    }
-
-    return undefined;
-  }, [validationSchema]);
+    },
+    [validationSchema]
+  );
 
   // Register field
   const registerField = useCallback((name: string, value: any) => {
@@ -258,9 +296,9 @@ export const Form: React.FC<FormProps> = ({
           value,
           touched: false,
           dirty: false,
-          valid: true
-        }
-      }
+          valid: true,
+        },
+      },
     }));
   }, []);
 
@@ -272,69 +310,72 @@ export const Form: React.FC<FormProps> = ({
       return {
         ...prev,
         fields: restFields,
-        errors: restErrors
+        errors: restErrors,
       };
     });
   }, []);
 
   // Set field value
-  const setFieldValue = useCallback(async (name: string, value: any) => {
-    setState(prev => {
-      const updatedFields = {
-        ...prev.fields,
-        [name]: {
-          ...prev.fields[name],
-          value,
-          dirty: true
-        }
-      };
-      
-      let newState = {
-        ...prev,
-        fields: updatedFields,
-        isDirty: true
-      };
+  const setFieldValue = useCallback(
+    async (name: string, value: any) => {
+      setState(prev => {
+        const updatedFields = {
+          ...prev.fields,
+          [name]: {
+            ...prev.fields[name],
+            value,
+            dirty: true,
+          },
+        };
 
-      // If validateOnChange is enabled, validate synchronously within the same state update
-      if (validateOnChange) {
-        // We can't use async validation here, so we'll handle it differently
-        // Schedule validation after state update
-        setTimeout(async () => {
-          const allValues = Object.fromEntries(
-            Object.entries(updatedFields).map(([k, v]) => [k, v.value])
-          );
-          
-          const error = await validateValue(name, value, allValues);
-          
-          // Update state with validation result
-          setState(currentState => {
-            // Only update if the field value hasn't changed since validation started
-            if (currentState.fields[name]?.value === value) {
-              return {
-                ...currentState,
-                fields: {
-                  ...currentState.fields,
-                  [name]: {
-                    ...currentState.fields[name],
-                    valid: !error
-                  }
-                },
-                errors: error 
-                  ? { ...currentState.errors, [name]: error }
-                  : (() => {
-                      const { [name]: removed, ...rest } = currentState.errors;
-                      return rest;
-                    })()
-              };
-            }
-            return currentState;
-          });
-        }, 0);
-      }
-      
-      return newState;
-    });
-  }, [validateOnChange, validateValue]);
+        let newState = {
+          ...prev,
+          fields: updatedFields,
+          isDirty: true,
+        };
+
+        // If validateOnChange is enabled, validate synchronously within the same state update
+        if (validateOnChange) {
+          // We can't use async validation here, so we'll handle it differently
+          // Schedule validation after state update
+          setTimeout(async () => {
+            const allValues = Object.fromEntries(
+              Object.entries(updatedFields).map(([k, v]) => [k, v.value])
+            );
+
+            const error = await validateValue(name, value, allValues);
+
+            // Update state with validation result
+            setState(currentState => {
+              // Only update if the field value hasn't changed since validation started
+              if (currentState.fields[name]?.value === value) {
+                return {
+                  ...currentState,
+                  fields: {
+                    ...currentState.fields,
+                    [name]: {
+                      ...currentState.fields[name],
+                      valid: !error,
+                    },
+                  },
+                  errors: error
+                    ? { ...currentState.errors, [name]: error }
+                    : (() => {
+                        const { [name]: removed, ...rest } = currentState.errors;
+                        return rest;
+                      })(),
+                };
+              }
+              return currentState;
+            });
+          }, 0);
+        }
+
+        return newState;
+      });
+    },
+    [validateOnChange, validateValue]
+  );
 
   // Set field error
   const setFieldError = useCallback((name: string, error?: string) => {
@@ -344,59 +385,73 @@ export const Form: React.FC<FormProps> = ({
         ...prev.fields,
         [name]: {
           ...prev.fields[name],
-          valid: !error
-        }
+          valid: !error,
+        },
       },
-      errors: error ? { ...prev.errors, [name]: error } : (() => {
-        const { [name]: removed, ...rest } = prev.errors;
-        return rest;
-      })()
+      errors: error
+        ? { ...prev.errors, [name]: error }
+        : (() => {
+            const { [name]: removed, ...rest } = prev.errors;
+            return rest;
+          })(),
     }));
   }, []);
 
   // Set field touched
-  const setFieldTouched = useCallback(async (name: string, touched: boolean = true) => {
-    setState(prev => ({
-      ...prev,
-      fields: {
-        ...prev.fields,
-        [name]: {
-          ...prev.fields[name],
-          touched
+  const setFieldTouched = useCallback(
+    async (name: string, touched: boolean = true) => {
+      setState(prev => ({
+        ...prev,
+        fields: {
+          ...prev.fields,
+          [name]: {
+            ...prev.fields[name],
+            touched,
+          },
+        },
+      }));
+
+      // Validate on blur if enabled
+      if (validateOnBlur && touched) {
+        const field = state.fields[name];
+        if (field) {
+          const allValues = Object.fromEntries(
+            Object.entries(state.fields).map(([k, v]) => [k, v.value])
+          );
+          const error = await validateValue(name, field.value, allValues);
+          setFieldError(name, error);
         }
       }
-    }));
-
-    // Validate on blur if enabled
-    if (validateOnBlur && touched) {
-      const field = state.fields[name];
-      if (field) {
-        const allValues = Object.fromEntries(Object.entries(state.fields).map(([k, v]) => [k, v.value]));
-        const error = await validateValue(name, field.value, allValues);
-        setFieldError(name, error);
-      }
-    }
-  }, [state.fields, validateOnBlur, validateValue]);
+    },
+    [state.fields, validateOnBlur, validateValue]
+  );
 
   // Validate single field
-  const validateField = useCallback(async (name: string): Promise<boolean> => {
-    const field = state.fields[name];
-    if (!field) return true;
+  const validateField = useCallback(
+    async (name: string): Promise<boolean> => {
+      const field = state.fields[name];
+      if (!field) return true;
 
-    const allValues = Object.fromEntries(Object.entries(state.fields).map(([k, v]) => [k, v.value]));
-    const error = await validateValue(name, field.value, allValues);
-    setFieldError(name, error);
-    return !error;
-  }, [state.fields, validateValue, setFieldError]);
+      const allValues = Object.fromEntries(
+        Object.entries(state.fields).map(([k, v]) => [k, v.value])
+      );
+      const error = await validateValue(name, field.value, allValues);
+      setFieldError(name, error);
+      return !error;
+    },
+    [state.fields, validateValue, setFieldError]
+  );
 
   // Validate entire form
   const validateForm = useCallback(async (): Promise<boolean> => {
-    const allValues = Object.fromEntries(Object.entries(state.fields).map(([k, v]) => [k, v.value]));
+    const allValues = Object.fromEntries(
+      Object.entries(state.fields).map(([k, v]) => [k, v.value])
+    );
     const errors: Record<string, string> = {};
 
     // Validate each field
     await Promise.all(
-      Object.keys(state.fields).map(async (name) => {
+      Object.keys(state.fields).map(async name => {
         const field = state.fields[name];
         const error = await validateValue(name, field.value, allValues);
         if (error) {
@@ -423,9 +478,9 @@ export const Form: React.FC<FormProps> = ({
       fields: Object.fromEntries(
         Object.entries(prev.fields).map(([name, field]) => [
           name,
-          { ...field, valid: !errors[name] }
+          { ...field, valid: !errors[name] },
         ])
-      )
+      ),
     }));
 
     return Object.keys(errors).length === 0;
@@ -437,102 +492,106 @@ export const Form: React.FC<FormProps> = ({
       fields: Object.fromEntries(
         Object.entries(initialValues).map(([name, value]) => [
           name,
-          { name, value, touched: false, dirty: false, valid: true }
+          { name, value, touched: false, dirty: false, valid: true },
         ])
       ),
       isValid: true,
       isDirty: false,
       isSubmitting: false,
       submitCount: 0,
-      errors: {}
+      errors: {},
     });
   }, [initialValues]);
 
   // Reset single field
-  const resetField = useCallback((name: string) => {
-    const initialValue = initialValues[name];
-    setState(prev => ({
-      ...prev,
-      fields: {
-        ...prev.fields,
-        [name]: {
-          name,
-          value: initialValue,
-          touched: false,
-          dirty: false,
-          valid: true
-        }
-      },
-      errors: (() => {
-        const { [name]: removed, ...rest } = prev.errors;
-        return rest;
-      })()
-    }));
-  }, [initialValues]);
-
-  // Get field props
-  const getFieldProps = useCallback((name: string): FormFieldProps => {
-    const field = state.fields[name] || {
-      name,
-      value: '',
-      touched: false,
-      dirty: false,
-      valid: true
-    };
-
-    return {
-      ...field,
-      error: state.errors[name],
-      onChange: (value: any) => setFieldValue(name, value),
-      onBlur: () => setFieldTouched(name, true)
-    };
-  }, [state.fields, state.errors, setFieldValue, setFieldTouched]);
-
-  // Handle form submission
-  const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    if (state.isSubmitting) return;
-
-    setState(prev => ({ ...prev, isSubmitting: true, submitCount: prev.submitCount + 1 }));
-
-    try {
-      // Mark all fields as touched
+  const resetField = useCallback(
+    (name: string) => {
+      const initialValue = initialValues[name];
       setState(prev => ({
         ...prev,
-        fields: Object.fromEntries(
-          Object.entries(prev.fields).map(([name, field]) => [
+        fields: {
+          ...prev.fields,
+          [name]: {
             name,
-            { ...field, touched: true }
-          ])
-        )
+            value: initialValue,
+            touched: false,
+            dirty: false,
+            valid: true,
+          },
+        },
+        errors: (() => {
+          const { [name]: removed, ...rest } = prev.errors;
+          return rest;
+        })(),
       }));
+    },
+    [initialValues]
+  );
 
-      // Validate form
-      const isValid = await validateForm();
-      
-      if (isValid && onSubmit) {
-        const values = Object.fromEntries(
-          Object.entries(state.fields).map(([name, field]) => [name, field.value])
-        );
+  // Get field props
+  const getFieldProps = useCallback(
+    (name: string): FormFieldProps => {
+      const field = state.fields[name] || {
+        name,
+        value: '',
+        touched: false,
+        dirty: false,
+        valid: true,
+      };
 
-        const actions: FormActions = {
-          setSubmitting: (isSubmitting: boolean) => 
-            setState(prev => ({ ...prev, isSubmitting })),
-          setFieldError,
-          setErrors: (errors: Record<string, string>) =>
-            setState(prev => ({ ...prev, errors })),
-          resetForm
-        };
+      return {
+        ...field,
+        error: state.errors[name],
+        onChange: (value: any) => setFieldValue(name, value),
+        onBlur: () => setFieldTouched(name, true),
+      };
+    },
+    [state.fields, state.errors, setFieldValue, setFieldTouched]
+  );
 
-        await onSubmit(values, actions);
+  // Handle form submission
+  const handleSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      if (state.isSubmitting) return;
+
+      setState(prev => ({ ...prev, isSubmitting: true, submitCount: prev.submitCount + 1 }));
+
+      try {
+        // Mark all fields as touched
+        setState(prev => ({
+          ...prev,
+          fields: Object.fromEntries(
+            Object.entries(prev.fields).map(([name, field]) => [name, { ...field, touched: true }])
+          ),
+        }));
+
+        // Validate form
+        const isValid = await validateForm();
+
+        if (isValid && onSubmit) {
+          const values = Object.fromEntries(
+            Object.entries(state.fields).map(([name, field]) => [name, field.value])
+          );
+
+          const actions: FormActions = {
+            setSubmitting: (isSubmitting: boolean) => setState(prev => ({ ...prev, isSubmitting })),
+            setFieldError,
+            setErrors: (errors: Record<string, string>) => setState(prev => ({ ...prev, errors })),
+            resetForm,
+          };
+
+          await onSubmit(values, actions);
+        }
+      } catch (error) {
+        console.error('Form submission error:', error);
+      } finally {
+        setState(prev => ({ ...prev, isSubmitting: false }));
       }
-    } catch (error) {
-      console.error('Form submission error:', error);
-    } finally {
-      setState(prev => ({ ...prev, isSubmitting: false }));
-    }
-  }, [state.isSubmitting, state.fields, validateForm, onSubmit, setFieldError, resetForm]);
+    },
+    [state.isSubmitting, state.fields, validateForm, onSubmit, setFieldError, resetForm]
+  );
 
   // Validate on mount
   useEffect(() => {
@@ -552,11 +611,11 @@ export const Form: React.FC<FormProps> = ({
   useEffect(() => {
     const isValid = Object.keys(state.errors).length === 0;
     const isDirty = Object.values(state.fields).some(field => field.dirty);
-    
+
     setState(prev => ({
       ...prev,
       isValid,
-      isDirty
+      isDirty,
     }));
   }, [state.errors, state.fields]);
 
@@ -571,17 +630,12 @@ export const Form: React.FC<FormProps> = ({
     validateForm,
     resetForm,
     resetField,
-    getFieldProps
+    getFieldProps,
   };
 
   return (
     <FormContext.Provider value={contextValue}>
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        noValidate={noValidate}
-        className={className}
-      >
+      <form ref={formRef} onSubmit={handleSubmit} noValidate={noValidate} className={className}>
         {children}
       </form>
     </FormContext.Provider>
@@ -606,7 +660,7 @@ export const FormField: React.FC<FormFieldWrapperProps> = ({
   required = false,
   children,
   className = '',
-  showError = true
+  showError = true,
 }) => {
   const { getFieldProps } = useFormContext();
   const fieldProps = getFieldProps(name);
@@ -619,13 +673,11 @@ export const FormField: React.FC<FormFieldWrapperProps> = ({
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      
-      {description && (
-        <p className="text-sm text-gray-600">{description}</p>
-      )}
-      
+
+      {description && <p className="text-sm text-gray-600">{description}</p>}
+
       {children(fieldProps)}
-      
+
       {showError && fieldProps.error && fieldProps.touched && (
         <div className="flex items-center space-x-1 text-red-600">
           <AlertCircle className="w-4 h-4" />
@@ -646,13 +698,13 @@ export interface FormActionsProps {
 export const FormActions: React.FC<FormActionsProps> = ({
   children,
   className = '',
-  align = 'right'
+  align = 'right',
 }) => {
   const alignClasses = {
     left: 'justify-start',
     center: 'justify-center',
     right: 'justify-end',
-    between: 'justify-between'
+    between: 'justify-between',
   };
 
   return (
@@ -680,7 +732,9 @@ export const FormStatus: React.FC<FormStatusProps> = ({ className = '' }) => {
         <AlertCircle className="h-5 w-5 text-red-400" />
         <div className="ml-3">
           <h3 className="text-sm font-medium text-red-800">
-            There {Object.keys(state.errors).length === 1 ? 'is' : 'are'} {Object.keys(state.errors).length} error{Object.keys(state.errors).length !== 1 ? 's' : ''} with your submission
+            There {Object.keys(state.errors).length === 1 ? 'is' : 'are'}{' '}
+            {Object.keys(state.errors).length} error
+            {Object.keys(state.errors).length !== 1 ? 's' : ''} with your submission
           </h3>
           <div className="mt-2 text-sm text-red-700">
             <ul className="list-disc space-y-1 pl-5">
@@ -698,13 +752,13 @@ export const FormStatus: React.FC<FormStatusProps> = ({ className = '' }) => {
 // Form validation hooks
 export const useFormValidation = () => {
   const { validateForm, validateField, state } = useFormContext();
-  
+
   return {
     validateForm,
     validateField,
     isValid: state.isValid,
     errors: state.errors,
-    hasErrors: Object.keys(state.errors).length > 0
+    hasErrors: Object.keys(state.errors).length > 0,
   };
 };
 
@@ -715,13 +769,13 @@ export const useFormState = () => {
 
 export const useFormActions = () => {
   const { setFieldValue, setFieldError, setFieldTouched, resetForm, resetField } = useFormContext();
-  
+
   return {
     setFieldValue,
     setFieldError,
     setFieldTouched,
     resetForm,
-    resetField
+    resetField,
   };
 };
 

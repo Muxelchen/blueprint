@@ -48,15 +48,15 @@ export function useDashboard() {
   const [settings, setSettings] = useLocalStorage<DashboardSettings>('dashboard-settings', {
     theme: 'light',
     autoRefresh: true,
-    refreshInterval: 30000
+    refreshInterval: 30000,
   });
 
   const addWidget = (widget: Partial<DashboardWidget>) => {
-    setWidgets((prev) => [...prev, { ...widget, id: Date.now() } as DashboardWidget]);
+    setWidgets(prev => [...prev, { ...widget, id: Date.now() } as DashboardWidget]);
   };
 
   const removeWidget = (id: string | number) => {
-    setWidgets((prev) => prev.filter(w => w.id !== id));
+    setWidgets(prev => prev.filter(w => w.id !== id));
   };
 
   const resetDashboard = () => {
@@ -73,7 +73,7 @@ export function useDashboard() {
     setSettings,
     addWidget,
     removeWidget,
-    resetDashboard
+    resetDashboard,
   };
 }
 

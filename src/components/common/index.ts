@@ -7,7 +7,7 @@ export { default as ErrorBoundary } from './ErrorBoundary';
 // Buttons
 export * from './buttons';
 
-// Inputs  
+// Inputs
 export * from './inputs';
 
 // Display
@@ -27,8 +27,4 @@ export { default as Modal } from './overlays/Modal';
 export { default as ToastNotification } from './feedback/ToastNotification';
 
 // Re-export theme types for convenience
-export type { 
-  Theme, 
-  ThemeColors, 
-  ThemeContextValue 
-} from './AdvancedThemeProvider';
+export type { Theme, ThemeColors, ThemeContextValue } from './AdvancedThemeProvider';

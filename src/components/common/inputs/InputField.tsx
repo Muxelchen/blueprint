@@ -75,18 +75,18 @@ const InputField: React.FC<InputFieldProps> = ({
   className = '',
   inputClassName = '',
   name,
-  id
+  id,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const isControlled = controlledValue !== undefined;
-  
+
   const [state, setState] = useState<InputFieldState>({
     value: controlledValue || defaultValue,
     isFocused: false,
     isDirty: false,
     isValid: true,
     errors: [],
-    showPassword: false
+    showPassword: false,
   });
 
   // Update state when controlled value changes
@@ -97,72 +97,78 @@ const InputField: React.FC<InputFieldProps> = ({
   }, [controlledValue, isControlled]);
 
   // Validation function
-  const validateValue = useCallback((value: string) => {
-    const errors: string[] = [];
+  const validateValue = useCallback(
+    (value: string) => {
+      const errors: string[] = [];
 
-    if (validation.required && !value.trim()) {
-      errors.push('This field is required');
-    }
-
-    if (value.trim() && validation.minLength && value.length < validation.minLength) {
-      errors.push(`Minimum length is ${validation.minLength} characters`);
-    }
-
-    if (value.trim() && validation.maxLength && value.length > validation.maxLength) {
-      errors.push(`Maximum length is ${validation.maxLength} characters`);
-    }
-
-    if (value.trim() && validation.email) {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(value)) {
-        errors.push('Please enter a valid email address');
+      if (validation.required && !value.trim()) {
+        errors.push('This field is required');
       }
-    }
 
-    if (value.trim() && validation.number) {
-      const numValue = Number(value);
-      if (isNaN(numValue)) {
-        errors.push('Please enter a valid number');
-      } else {
-        if (validation.min !== undefined && numValue < validation.min) {
-          errors.push(`Value must be at least ${validation.min}`);
-        }
-        if (validation.max !== undefined && numValue > validation.max) {
-          errors.push(`Value must be at most ${validation.max}`);
+      if (value.trim() && validation.minLength && value.length < validation.minLength) {
+        errors.push(`Minimum length is ${validation.minLength} characters`);
+      }
+
+      if (value.trim() && validation.maxLength && value.length > validation.maxLength) {
+        errors.push(`Maximum length is ${validation.maxLength} characters`);
+      }
+
+      if (value.trim() && validation.email) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(value)) {
+          errors.push('Please enter a valid email address');
         }
       }
-    }
 
-    if (value.trim() && validation.pattern && !validation.pattern.test(value)) {
-      errors.push('Please enter a value in the correct format');
-    }
-
-    if (validation.custom) {
-      const customError = validation.custom(value);
-      if (customError) {
-        errors.push(customError);
+      if (value.trim() && validation.number) {
+        const numValue = Number(value);
+        if (isNaN(numValue)) {
+          errors.push('Please enter a valid number');
+        } else {
+          if (validation.min !== undefined && numValue < validation.min) {
+            errors.push(`Value must be at least ${validation.min}`);
+          }
+          if (validation.max !== undefined && numValue > validation.max) {
+            errors.push(`Value must be at most ${validation.max}`);
+          }
+        }
       }
-    }
 
-    const isValid = errors.length === 0;
-    return { isValid, errors };
-  }, [validation]);
+      if (value.trim() && validation.pattern && !validation.pattern.test(value)) {
+        errors.push('Please enter a value in the correct format');
+      }
+
+      if (validation.custom) {
+        const customError = validation.custom(value);
+        if (customError) {
+          errors.push(customError);
+        }
+      }
+
+      const isValid = errors.length === 0;
+      return { isValid, errors };
+    },
+    [validation]
+  );
 
   // Handle value change
-  const handleValueChange = useCallback((newValue: string) => {
-    const { isValid, errors } = validateValue(newValue);
-    
-    setState(prev => ({
-      ...prev,
-      value: newValue,
-      isDirty: true,
-      isValid,
-      errors
-    }));
+  const handleValueChange = useCallback(
+    (newValue: string) => {
+      const { isValid, errors } = validateValue(newValue);
 
-    onChange?.(newValue);
-    onValidation?.(isValid, errors);
-  }, [onChange, onValidation, validateValue]);
+      setState(prev => ({
+        ...prev,
+        value: newValue,
+        isDirty: true,
+        isValid,
+        errors,
+      }));
+
+      onChange?.(newValue);
+      onValidation?.(isValid, errors);
+    },
+    [onChange, onValidation, validateValue]
+  );
 
   const handleFocus = useCallback(() => {
     setState(prev => ({ ...prev, isFocused: true }));
@@ -188,16 +194,17 @@ const InputField: React.FC<InputFieldProps> = ({
     const sizes = {
       sm: 'px-3 py-1.5 text-sm',
       md: 'px-3 py-2 text-base',
-      lg: 'px-4 py-3 text-lg'
+      lg: 'px-4 py-3 text-lg',
     };
     return sizes[size];
   };
 
   const getVariantClasses = () => {
     const variants = {
-      default: 'border border-gray-300 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500',
+      default:
+        'border border-gray-300 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500',
       outline: 'border-2 border-gray-300 bg-transparent focus:border-blue-500',
-      ghost: 'border-0 bg-gray-50 focus:bg-white focus:ring-1 focus:ring-blue-500'
+      ghost: 'border-0 bg-gray-50 focus:bg-white focus:ring-1 focus:ring-blue-500',
     };
     return variants[variant];
   };
@@ -205,8 +212,10 @@ const InputField: React.FC<InputFieldProps> = ({
   const getStateClasses = () => {
     if (disabled) return 'bg-gray-100 text-gray-500 cursor-not-allowed';
     if (readOnly) return 'bg-gray-50 cursor-default';
-    if (state.isDirty && !state.isValid) return 'border-red-500 focus:border-red-500 focus:ring-red-500';
-    if (state.isDirty && state.isValid && state.value.trim()) return 'border-green-500 focus:border-green-500 focus:ring-green-500';
+    if (state.isDirty && !state.isValid)
+      return 'border-red-500 focus:border-red-500 focus:ring-red-500';
+    if (state.isDirty && state.isValid && state.value.trim())
+      return 'border-green-500 focus:border-green-500 focus:ring-green-500';
     return '';
   };
 
@@ -222,9 +231,7 @@ const InputField: React.FC<InputFieldProps> = ({
       {label && (
         <label
           htmlFor={inputId}
-          className={`block text-sm font-medium ${
-            disabled ? 'text-gray-400' : 'text-gray-700'
-          }`}
+          className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-gray-700'}`}
         >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -232,9 +239,7 @@ const InputField: React.FC<InputFieldProps> = ({
       )}
 
       {/* Description */}
-      {description && (
-        <p className="text-sm text-gray-600">{description}</p>
-      )}
+      {description && <p className="text-sm text-gray-600">{description}</p>}
 
       {/* Input Container */}
       <div className="relative">
@@ -257,7 +262,7 @@ const InputField: React.FC<InputFieldProps> = ({
           readOnly={readOnly}
           autoComplete={autoComplete}
           required={required}
-          onChange={(e) => handleValueChange(e.target.value)}
+          onChange={e => handleValueChange(e.target.value)}
           onFocus={handleFocus}
           onBlur={handleBlur}
           className={`
@@ -266,7 +271,7 @@ const InputField: React.FC<InputFieldProps> = ({
             ${getVariantClasses()}
             ${getStateClasses()}
             ${leftIcon ? 'pl-10' : ''}
-            ${(showPasswordToggle || showClearButton || showValidationIcon || rightIcon) ? 'pr-10' : ''}
+            ${showPasswordToggle || showClearButton || showValidationIcon || rightIcon ? 'pr-10' : ''}
             ${inputClassName}
           `}
         />
@@ -309,11 +314,7 @@ const InputField: React.FC<InputFieldProps> = ({
               className="text-gray-400 hover:text-gray-600 focus:outline-none"
               tabIndex={-1}
             >
-              {state.showPassword ? (
-                <EyeOff className="w-4 h-4" />
-              ) : (
-                <Eye className="w-4 h-4" />
-              )}
+              {state.showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           )}
         </div>
@@ -322,13 +323,15 @@ const InputField: React.FC<InputFieldProps> = ({
       {/* Character Count */}
       {showCharCount && validation.maxLength && (
         <div className="flex justify-end">
-          <span className={`text-xs ${
-            state.value.length > validation.maxLength 
-              ? 'text-red-500' 
-              : state.value.length > validation.maxLength * 0.8 
-                ? 'text-yellow-500' 
-                : 'text-gray-500'
-          }`}>
+          <span
+            className={`text-xs ${
+              state.value.length > validation.maxLength
+                ? 'text-red-500'
+                : state.value.length > validation.maxLength * 0.8
+                  ? 'text-yellow-500'
+                  : 'text-gray-500'
+            }`}
+          >
             {state.value.length}/{validation.maxLength}
           </span>
         </div>
@@ -351,14 +354,19 @@ const InputField: React.FC<InputFieldProps> = ({
 
 // Form validation hook
 export const useFormValidation = () => {
-  const [formState, setFormState] = useState<Record<string, { isValid: boolean; errors: string[] }>>({});
+  const [formState, setFormState] = useState<
+    Record<string, { isValid: boolean; errors: string[] }>
+  >({});
 
-  const updateFieldValidation = useCallback((fieldName: string, isValid: boolean, errors: string[]) => {
-    setFormState(prev => ({
-      ...prev,
-      [fieldName]: { isValid, errors }
-    }));
-  }, []);
+  const updateFieldValidation = useCallback(
+    (fieldName: string, isValid: boolean, errors: string[]) => {
+      setFormState(prev => ({
+        ...prev,
+        [fieldName]: { isValid, errors },
+      }));
+    },
+    []
+  );
 
   const isFormValid = Object.values(formState).every(field => field.isValid);
   const getFieldErrors = (fieldName: string) => formState[fieldName]?.errors || [];
@@ -369,7 +377,7 @@ export const useFormValidation = () => {
     isFormValid,
     getFieldErrors,
     isFieldValid,
-    updateFieldValidation
+    updateFieldValidation,
   };
 };
 
@@ -381,7 +389,7 @@ export const ExampleInputFields: React.FC = () => {
     username: '',
     age: '',
     website: '',
-    search: ''
+    search: '',
   });
 
   const { isFormValid, updateFieldValidation } = useFormValidation();
@@ -394,7 +402,7 @@ export const ExampleInputFields: React.FC = () => {
     <div className="space-y-8 max-w-2xl mx-auto p-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Input Field Examples</h3>
-        
+
         <div className="space-y-6">
           {/* Email Input */}
           <InputField
@@ -406,7 +414,7 @@ export const ExampleInputFields: React.FC = () => {
             onValidation={(isValid, errors) => updateFieldValidation('email', isValid, errors)}
             validation={{
               required: true,
-              email: true
+              email: true,
             }}
             clearable
             required
@@ -423,12 +431,12 @@ export const ExampleInputFields: React.FC = () => {
             validation={{
               required: true,
               minLength: 8,
-              custom: (value) => {
+              custom: value => {
                 if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
                   return 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
                 }
                 return null;
-              }
+              },
             }}
             description="Password must be at least 8 characters with uppercase, lowercase, and number"
             required
@@ -447,12 +455,12 @@ export const ExampleInputFields: React.FC = () => {
               minLength: 3,
               maxLength: 20,
               pattern: /^[a-zA-Z0-9_]+$/,
-              custom: (value) => {
+              custom: value => {
                 if (value.toLowerCase() === 'admin' || value.toLowerCase() === 'root') {
                   return 'This username is not allowed';
                 }
                 return null;
-              }
+              },
             }}
             showCharCount
             clearable
@@ -471,7 +479,7 @@ export const ExampleInputFields: React.FC = () => {
               required: true,
               number: true,
               min: 13,
-              max: 120
+              max: 120,
             }}
             size="sm"
             required
@@ -485,7 +493,7 @@ export const ExampleInputFields: React.FC = () => {
             value={formData.website}
             onChange={handleFieldChange('website')}
             validation={{
-              pattern: /^https?:\/\/.+\..+/
+              pattern: /^https?:\/\/.+\..+/,
             }}
             variant="outline"
           />
@@ -508,7 +516,7 @@ export const ExampleInputFields: React.FC = () => {
           <p className={`text-sm ${isFormValid ? 'text-green-600' : 'text-red-600'}`}>
             Form is {isFormValid ? 'valid' : 'invalid'}
           </p>
-          
+
           <div className="mt-4">
             <h5 className="text-sm font-medium mb-2">Form Data:</h5>
             <pre className="text-xs bg-white p-2 rounded border overflow-auto">

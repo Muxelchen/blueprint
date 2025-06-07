@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  FileText, 
+import {
+  FileText,
   Image,
-  FileJson // Replace File component with FileJson for JSON files
+  FileJson, // Replace File component with FileJson for JSON files
 } from 'lucide-react';
 
 interface ExportFunctionsProps {
@@ -19,16 +19,18 @@ export const exportToCSV = (data: any[], filename: string = 'export.csv') => {
   const headers = Object.keys(data[0]);
   const csvContent = [
     headers.join(','),
-    ...data.map(row => 
-      headers.map(header => {
-        const value = row[header];
-        // Handle values that might contain commas or quotes
-        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        return value;
-      }).join(',')
-    )
+    ...data.map(row =>
+      headers
+        .map(header => {
+          const value = row[header];
+          // Handle values that might contain commas or quotes
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        })
+        .join(',')
+    ),
   ].join('\n');
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -78,10 +80,10 @@ export const exportToPDF = async (elementId: string, filename: string = 'export.
         <body>${element.innerHTML}</body>
       </html>
     `);
-    
+
     printWindow.document.close();
     printWindow.focus();
-    
+
     setTimeout(() => {
       printWindow.print();
       printWindow.close();
@@ -91,7 +93,11 @@ export const exportToPDF = async (elementId: string, filename: string = 'export.
   }
 };
 
-export const exportToImage = async (elementId: string, filename: string = 'export.png', format: 'png' | 'jpeg' = 'png') => {
+export const exportToImage = async (
+  elementId: string,
+  filename: string = 'export.png',
+  format: 'png' | 'jpeg' = 'png'
+) => {
   try {
     const element = document.getElementById(elementId);
     if (!element) {
@@ -129,7 +135,7 @@ const ExportFunctions: React.FC<ExportFunctionsProps> = ({
   data,
   filename = 'export',
   onExport,
-  className = ''
+  className = '',
 }) => {
   const handleExport = (format: string) => {
     if (onExport) {
@@ -212,7 +218,7 @@ export const ExportExample: React.FC = () => {
   const sampleData = [
     { id: 1, name: 'John Doe', email: 'john@example.com', age: 30 },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', age: 25 },
-    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', age: 35 }
+    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', age: 35 },
   ];
 
   const handleCustomExport = (format: string, data: any) => {
@@ -224,25 +230,35 @@ export const ExportExample: React.FC = () => {
     <div className="space-y-6 p-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Export Functions Demo</h3>
-        
+
         {/* Content to export */}
         <div id="export-content" className="mb-6 p-4 border border-gray-200 rounded-lg bg-white">
           <h4 className="font-medium mb-3">Sample Data Table</h4>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Age
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {sampleData.map((item) => (
+              {sampleData.map(item => (
                 <tr key={item.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {item.email}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.age}</td>
                 </tr>
               ))}

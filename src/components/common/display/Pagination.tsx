@@ -1,5 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, MoreHorizontal, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
 import Button from '../buttons/Button';
 
 export interface PaginationProps {
@@ -35,7 +41,7 @@ const Pagination: React.FC<PaginationProps> = ({
   variant = 'default',
   size = 'md',
   className = '',
-  disabled = false
+  disabled = false,
 }) => {
   const [internalPage, setInternalPage] = useState(currentPage);
   const [internalItemsPerPage, setInternalItemsPerPage] = useState(itemsPerPage);
@@ -50,20 +56,20 @@ const Pagination: React.FC<PaginationProps> = ({
   const paginationInfo = useMemo(() => {
     const startItem = (activePage - 1) * activeItemsPerPage + 1;
     const endItem = Math.min(activePage * activeItemsPerPage, totalItems);
-    
+
     return {
       startItem,
       endItem,
       totalPages,
       hasPrevious: activePage > 1,
-      hasNext: activePage < totalPages
+      hasNext: activePage < totalPages,
     };
   }, [activePage, activeItemsPerPage, totalItems, totalPages]);
 
   // Calculate visible page numbers
   const visiblePages = useMemo(() => {
     const pages: (number | 'ellipsis')[] = [];
-    
+
     if (totalPages <= maxVisiblePages) {
       // Show all pages if total is less than max visible
       for (let i = 1; i <= totalPages; i++) {
@@ -109,7 +115,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
   const handlePageChange = (page: number) => {
     if (disabled || page < 1 || page > totalPages || page === activePage) return;
-    
+
     if (onPageChange) {
       onPageChange(page);
     } else {
@@ -131,18 +137,20 @@ const Pagination: React.FC<PaginationProps> = ({
   const sizeClasses = {
     sm: 'text-xs',
     md: 'text-sm',
-    lg: 'text-base'
+    lg: 'text-base',
   };
 
   const buttonSizeMap = {
     sm: 'sm' as const,
     md: 'sm' as const,
-    lg: 'md' as const
+    lg: 'md' as const,
   };
 
   if (totalItems === 0) {
     return (
-      <div className={`flex items-center justify-center text-gray-500 ${sizeClasses[size]} ${className}`}>
+      <div
+        className={`flex items-center justify-center text-gray-500 ${sizeClasses[size]} ${className}`}
+      >
         No items to display
       </div>
     );
@@ -151,10 +159,7 @@ const Pagination: React.FC<PaginationProps> = ({
   const renderPageButton = (page: number | 'ellipsis', index: number) => {
     if (page === 'ellipsis') {
       return (
-        <span
-          key={`ellipsis-${index}`}
-          className="px-3 py-2 text-gray-400 flex items-center"
-        >
+        <span key={`ellipsis-${index}`} className="px-3 py-2 text-gray-400 flex items-center">
           <MoreHorizontal className="w-4 h-4" />
         </span>
       );
@@ -320,7 +325,7 @@ const Pagination: React.FC<PaginationProps> = ({
           <span className="text-gray-600">Items per page:</span>
           <select
             value={activeItemsPerPage}
-            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+            onChange={e => handleItemsPerPageChange(Number(e.target.value))}
             disabled={disabled}
             className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
@@ -337,11 +342,7 @@ const Pagination: React.FC<PaginationProps> = ({
 };
 
 // Hook for pagination state management
-export const usePagination = (
-  totalItems: number,
-  initialItemsPerPage = 10,
-  initialPage = 1
-) => {
+export const usePagination = (totalItems: number, initialItemsPerPage = 10, initialPage = 1) => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage);
 
@@ -374,7 +375,7 @@ export const usePagination = (
     handlePageChange,
     handleItemsPerPageChange,
     getPageData,
-    reset
+    reset,
   };
 };
 
@@ -386,7 +387,7 @@ export const ExamplePagination: React.FC = () => {
     name: `Item ${i + 1}`,
     category: ['Electronics', 'Clothing', 'Books', 'Sports'][i % 4],
     price: Math.floor(Math.random() * 1000) + 10,
-    status: ['Active', 'Inactive'][i % 2]
+    status: ['Active', 'Inactive'][i % 2],
   }));
 
   const pagination = usePagination(mockData.length, 10, 1);
@@ -404,7 +405,9 @@ export const ExamplePagination: React.FC = () => {
                 <tr>
                   <th className="px-4 py-2 text-left text-sm font-medium text-gray-900">ID</th>
                   <th className="px-4 py-2 text-left text-sm font-medium text-gray-900">Name</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-900">Category</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-900">
+                    Category
+                  </th>
                   <th className="px-4 py-2 text-left text-sm font-medium text-gray-900">Price</th>
                   <th className="px-4 py-2 text-left text-sm font-medium text-gray-900">Status</th>
                 </tr>
@@ -417,11 +420,13 @@ export const ExamplePagination: React.FC = () => {
                     <td className="px-4 py-2 text-sm text-gray-500">{item.category}</td>
                     <td className="px-4 py-2 text-sm text-gray-900">${item.price}</td>
                     <td className="px-4 py-2">
-                      <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                        item.status === 'Active' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs rounded-full ${
+                          item.status === 'Active'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
                         {item.status}
                       </span>
                     </td>
@@ -453,7 +458,7 @@ export const ExamplePagination: React.FC = () => {
           totalItems={mockData.length}
           variant="simple"
           currentPage={5}
-          onPageChange={(page) => console.log('Simple pagination page:', page)}
+          onPageChange={page => console.log('Simple pagination page:', page)}
         />
       </div>
 
@@ -466,7 +471,7 @@ export const ExamplePagination: React.FC = () => {
           currentPage={3}
           showItemsInfo={false}
           showItemsPerPageSelector={false}
-          onPageChange={(page) => console.log('Compact pagination page:', page)}
+          onPageChange={page => console.log('Compact pagination page:', page)}
         />
       </div>
 
@@ -477,7 +482,7 @@ export const ExamplePagination: React.FC = () => {
           size="lg"
           maxVisiblePages={7}
           currentPage={10}
-          onPageChange={(page) => console.log('Large pagination page:', page)}
+          onPageChange={page => console.log('Large pagination page:', page)}
         />
       </div>
 
@@ -487,7 +492,7 @@ export const ExamplePagination: React.FC = () => {
           totalItems={mockData.length}
           currentPage={5}
           disabled={true}
-          onPageChange={(page) => console.log('Disabled pagination page:', page)}
+          onPageChange={page => console.log('Disabled pagination page:', page)}
         />
       </div>
 

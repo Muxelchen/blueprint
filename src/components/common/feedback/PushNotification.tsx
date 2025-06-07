@@ -45,7 +45,7 @@ const PushNotification: React.FC<{
     permission: {
       granted: false,
       denied: false,
-      default: true
+      default: true,
     },
     supported: false,
     notifications: [],
@@ -53,8 +53,8 @@ const PushNotification: React.FC<{
       enabled: true,
       sound: true,
       desktop: true,
-      frequency: 'all'
-    }
+      frequency: 'all',
+    },
   });
 
   // Check browser support and permission status
@@ -70,14 +70,14 @@ const PushNotification: React.FC<{
           permission: {
             granted: permission === 'granted',
             denied: permission === 'denied',
-            default: permission === 'default'
-          }
+            default: permission === 'default',
+          },
         }));
       }
     };
 
     checkSupport();
-    
+
     // Load settings from localStorage
     const savedSettings = localStorage.getItem('notification-settings');
     if (savedSettings) {
@@ -107,10 +107,10 @@ const PushNotification: React.FC<{
         permission: {
           granted: permission === 'granted',
           denied: permission === 'denied',
-          default: permission === 'default'
-        }
+          default: permission === 'default',
+        },
       }));
-      
+
       return permission === 'granted';
     } catch (error) {
       console.error('Failed to request notification permission:', error);
@@ -118,73 +118,83 @@ const PushNotification: React.FC<{
     }
   }, [state.supported]);
 
-  const sendNotification = useCallback((notificationData: PushNotificationProps) => {
-    const id = `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    // Add to local notifications list
-    setState(prev => ({
-      ...prev,
-      notifications: [...prev.notifications, {
-        id,
-        notification: notificationData,
-        timestamp: Date.now(),
-        active: true
-      }]
-    }));
+  const sendNotification = useCallback(
+    (notificationData: PushNotificationProps) => {
+      const id = `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Send browser notification if supported and permitted
-    if (state.supported && state.permission.granted && state.settings.enabled && state.settings.desktop) {
-      try {
-        const notification = new Notification(notificationData.title, {
-          body: notificationData.body,
-          icon: notificationData.icon || '/favicon.ico',
-          badge: notificationData.badge,
-          tag: notificationData.tag || id,
-          requireInteraction: notificationData.requireInteraction,
-          silent: notificationData.silent || !state.settings.sound
-          // Note: actions are not supported in standard browser notifications
-        });
+      // Add to local notifications list
+      setState(prev => ({
+        ...prev,
+        notifications: [
+          ...prev.notifications,
+          {
+            id,
+            notification: notificationData,
+            timestamp: Date.now(),
+            active: true,
+          },
+        ],
+      }));
 
-        notification.onclick = () => {
-          notificationData.onClick?.();
-          notification.close();
-        };
+      // Send browser notification if supported and permitted
+      if (
+        state.supported &&
+        state.permission.granted &&
+        state.settings.enabled &&
+        state.settings.desktop
+      ) {
+        try {
+          const notification = new Notification(notificationData.title, {
+            body: notificationData.body,
+            icon: notificationData.icon || '/favicon.ico',
+            badge: notificationData.badge,
+            tag: notificationData.tag || id,
+            requireInteraction: notificationData.requireInteraction,
+            silent: notificationData.silent || !state.settings.sound,
+            // Note: actions are not supported in standard browser notifications
+          });
 
-        notification.onclose = () => {
-          notificationData.onClose?.();
-          setState(prev => ({
-            ...prev,
-            notifications: prev.notifications.map(n =>
-              n.id === id ? { ...n, active: false } : n
-            )
-          }));
-        };
-
-        notification.onerror = () => {
-          const error = new Error('Notification failed to display');
-          notificationData.onError?.(error);
-        };
-
-        // Auto-close after 5 seconds unless requireInteraction is true
-        if (!notificationData.requireInteraction) {
-          setTimeout(() => {
+          notification.onclick = () => {
+            notificationData.onClick?.();
             notification.close();
-          }, 5000);
+          };
+
+          notification.onclose = () => {
+            notificationData.onClose?.();
+            setState(prev => ({
+              ...prev,
+              notifications: prev.notifications.map(n =>
+                n.id === id ? { ...n, active: false } : n
+              ),
+            }));
+          };
+
+          notification.onerror = () => {
+            const error = new Error('Notification failed to display');
+            notificationData.onError?.(error);
+          };
+
+          // Auto-close after 5 seconds unless requireInteraction is true
+          if (!notificationData.requireInteraction) {
+            setTimeout(() => {
+              notification.close();
+            }, 5000);
+          }
+        } catch (error) {
+          console.error('Failed to create notification:', error);
+          notificationData.onError?.(error as Error);
         }
-
-      } catch (error) {
-        console.error('Failed to create notification:', error);
-        notificationData.onError?.(error as Error);
       }
-    }
 
-    // Play sound if enabled
-    if (state.settings.sound && !notificationData.silent) {
-      playNotificationSound();
-    }
+      // Play sound if enabled
+      if (state.settings.sound && !notificationData.silent) {
+        playNotificationSound();
+      }
 
-    return id;
-  }, [state.supported, state.permission.granted, state.settings]);
+      return id;
+    },
+    [state.supported, state.permission.granted, state.settings]
+  );
 
   const playNotificationSound = useCallback(() => {
     try {
@@ -198,7 +208,7 @@ const PushNotification: React.FC<{
 
       oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
       oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
-      
+
       gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
 
@@ -212,21 +222,21 @@ const PushNotification: React.FC<{
   const clearNotification = useCallback((id: string) => {
     setState(prev => ({
       ...prev,
-      notifications: prev.notifications.filter(n => n.id !== id)
+      notifications: prev.notifications.filter(n => n.id !== id),
     }));
   }, []);
 
   const clearAllNotifications = useCallback(() => {
     setState(prev => ({
       ...prev,
-      notifications: []
+      notifications: [],
     }));
   }, []);
 
   const updateSettings = useCallback((newSettings: Partial<typeof state.settings>) => {
     setState(prev => ({
       ...prev,
-      settings: { ...prev.settings, ...newSettings }
+      settings: { ...prev.settings, ...newSettings },
     }));
   }, []);
 
@@ -261,7 +271,7 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
   onSendNotification,
   onClearNotification,
   onClearAll,
-  onUpdateSettings
+  onUpdateSettings,
 }) => {
   return (
     <div className="space-y-6">
@@ -271,12 +281,9 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
         onSendNotification={onSendNotification}
         onClearAll={onClearAll}
       />
-      
-      <NotificationSettings
-        settings={state.settings}
-        onUpdateSettings={onUpdateSettings}
-      />
-      
+
+      <NotificationSettings settings={state.settings} onUpdateSettings={onUpdateSettings} />
+
       <NotificationHistory
         notifications={state.notifications}
         onClearNotification={onClearNotification}
@@ -311,7 +318,7 @@ const NotificationControls: React.FC<{
       body: 'This is a test notification to verify everything is working correctly.',
       icon: '/favicon.ico',
       onClick: () => console.log('Test notification clicked'),
-      onClose: () => console.log('Test notification closed')
+      onClose: () => console.log('Test notification closed'),
     });
   };
 
@@ -320,7 +327,7 @@ const NotificationControls: React.FC<{
       title: 'Important Alert',
       body: 'This is an important notification that requires your attention.',
       requireInteraction: true,
-      onClick: () => console.log('Important notification clicked')
+      onClick: () => console.log('Important notification clicked'),
     });
   };
 
@@ -329,7 +336,7 @@ const NotificationControls: React.FC<{
       title: 'Silent Update',
       body: 'This notification was sent silently without sound.',
       silent: true,
-      onClick: () => console.log('Silent notification clicked')
+      onClick: () => console.log('Silent notification clicked'),
     });
   };
 
@@ -347,10 +354,14 @@ const NotificationControls: React.FC<{
         <div>
           <div className="font-medium">Permission Status</div>
           <div className="text-sm text-gray-600">
-            {state.supported ? 'Browser supports notifications' : 'Browser does not support notifications'}
+            {state.supported
+              ? 'Browser supports notifications'
+              : 'Browser does not support notifications'}
           </div>
         </div>
-        <div className={`px-3 py-1 rounded-full text-sm font-medium ${status.color} ${status.bgColor}`}>
+        <div
+          className={`px-3 py-1 rounded-full text-sm font-medium ${status.color} ${status.bgColor}`}
+        >
           {status.text}
         </div>
       </div>
@@ -374,14 +385,14 @@ const NotificationControls: React.FC<{
           >
             Send Test
           </button>
-          
+
           <button
             onClick={sendImportantNotification}
             className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
           >
             Send Important
           </button>
-          
+
           <button
             onClick={sendSilentNotification}
             className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
@@ -423,7 +434,7 @@ const NotificationSettings: React.FC<{
             <input
               type="checkbox"
               checked={settings.enabled}
-              onChange={(e) => onUpdateSettings({ enabled: e.target.checked })}
+              onChange={e => onUpdateSettings({ enabled: e.target.checked })}
               className="rounded"
             />
           </div>
@@ -436,7 +447,7 @@ const NotificationSettings: React.FC<{
             <input
               type="checkbox"
               checked={settings.sound}
-              onChange={(e) => onUpdateSettings({ sound: e.target.checked })}
+              onChange={e => onUpdateSettings({ sound: e.target.checked })}
               className="rounded"
             />
           </div>
@@ -449,7 +460,7 @@ const NotificationSettings: React.FC<{
             <input
               type="checkbox"
               checked={settings.desktop}
-              onChange={(e) => onUpdateSettings({ desktop: e.target.checked })}
+              onChange={e => onUpdateSettings({ desktop: e.target.checked })}
               className="rounded"
             />
           </div>
@@ -460,7 +471,7 @@ const NotificationSettings: React.FC<{
             <label className="text-sm font-medium block mb-2">Notification Frequency</label>
             <select
               value={settings.frequency}
-              onChange={(e) => onUpdateSettings({ frequency: e.target.value as any })}
+              onChange={e => onUpdateSettings({ frequency: e.target.value as any })}
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
             >
               <option value="all">All notifications</option>
@@ -491,9 +502,9 @@ const NotificationHistory: React.FC<{
   return (
     <div className="space-y-4">
       <h4 className="font-medium">Notification History ({notifications.length})</h4>
-      
+
       <div className="space-y-2 max-h-64 overflow-y-auto">
-        {notifications.map((item) => (
+        {notifications.map(item => (
           <div
             key={item.id}
             className={`p-3 border rounded-lg flex items-start justify-between ${
@@ -508,7 +519,7 @@ const NotificationHistory: React.FC<{
                 {item.active && <span className="ml-2 text-blue-600">• Active</span>}
               </div>
             </div>
-            
+
             <button
               onClick={() => onClearNotification(item.id)}
               className="p-1 rounded-md hover:bg-gray-200 transition-colors"
@@ -529,7 +540,7 @@ export const usePushNotification = () => {
   const [permission, setPermission] = useState<NotificationPermission>(() => ({
     granted: Notification.permission === 'granted',
     denied: Notification.permission === 'denied',
-    default: Notification.permission === 'default'
+    default: Notification.permission === 'default',
   }));
 
   const requestPermission = useCallback(async () => {
@@ -540,7 +551,7 @@ export const usePushNotification = () => {
       const newPermission = {
         granted: result === 'granted',
         denied: result === 'denied',
-        default: result === 'default'
+        default: result === 'default',
       };
       setPermission(newPermission);
       return newPermission.granted;
@@ -550,76 +561,74 @@ export const usePushNotification = () => {
     }
   }, [isSupported]);
 
-  const sendNotification = useCallback((data: PushNotificationProps) => {
-    if (!isSupported || !permission.granted) {
-      console.warn('Notifications not supported or permission not granted');
-      return null;
-    }
+  const sendNotification = useCallback(
+    (data: PushNotificationProps) => {
+      if (!isSupported || !permission.granted) {
+        console.warn('Notifications not supported or permission not granted');
+        return null;
+      }
 
-    try {
-      const notification = new Notification(data.title, {
-        body: data.body,
-        icon: data.icon || '/favicon.ico',
-        badge: data.badge,
-        tag: data.tag,
-        requireInteraction: data.requireInteraction,
-        silent: data.silent
-        // Note: actions are not supported in standard browser notifications
-      });
+      try {
+        const notification = new Notification(data.title, {
+          body: data.body,
+          icon: data.icon || '/favicon.ico',
+          badge: data.badge,
+          tag: data.tag,
+          requireInteraction: data.requireInteraction,
+          silent: data.silent,
+          // Note: actions are not supported in standard browser notifications
+        });
 
-      notification.onclick = () => {
-        data.onClick?.();
-        notification.close();
-      };
+        notification.onclick = () => {
+          data.onClick?.();
+          notification.close();
+        };
 
-      notification.onclose = () => {
-        data.onClose?.();
-      };
+        notification.onclose = () => {
+          data.onClose?.();
+        };
 
-      notification.onerror = () => {
-        const error = new Error('Notification failed');
-        data.onError?.(error);
-      };
+        notification.onerror = () => {
+          const error = new Error('Notification failed');
+          data.onError?.(error);
+        };
 
-      return notification;
-    } catch (error) {
-      console.error('Failed to create notification:', error);
-      data.onError?.(error as Error);
-      return null;
-    }
-  }, [isSupported, permission.granted]);
+        return notification;
+      } catch (error) {
+        console.error('Failed to create notification:', error);
+        data.onError?.(error as Error);
+        return null;
+      }
+    },
+    [isSupported, permission.granted]
+  );
 
   return {
     isSupported,
     permission,
     requestPermission,
-    sendNotification
+    sendNotification,
   };
 };
 
 // Example usage component
 export const ExamplePushNotifications: React.FC = () => {
-  const {
-    isSupported,
-    permission,
-    requestPermission,
-    sendNotification
-  } = usePushNotification();
+  const { isSupported, permission, requestPermission, sendNotification } = usePushNotification();
 
   const sendRandomNotification = () => {
     const notifications = [
       { title: 'New Message', body: 'You have received a new message from John.' },
       { title: 'Task Completed', body: 'Your background task has finished successfully.' },
-      { title: 'Reminder', body: 'Don\'t forget about your meeting at 3 PM.' },
+      { title: 'Reminder', body: "Don't forget about your meeting at 3 PM." },
       { title: 'Update Available', body: 'A new version of the app is ready to install.' },
-      { title: 'Sale Alert', body: 'Your favorite item is now 50% off!' }
+      { title: 'Sale Alert', body: 'Your favorite item is now 50% off!' },
     ];
 
     const random = notifications[Math.floor(Math.random() * notifications.length)];
     sendNotification({
       ...random,
       onClick: () => console.log(`Clicked: ${random.title}`),
-      onClose: () => console.log(`Closed: ${random.title}`)
+      onClose: () => console.log(`Closed: ${random.title}`),
     });
   };
 
@@ -628,7 +637,7 @@ export const ExamplePushNotifications: React.FC = () => {
       <PushNotification>
         <div className="text-center space-y-4">
           <h3 className="text-lg font-semibold">Browser Push Notifications</h3>
-          
+
           <div className="text-sm text-gray-600">
             Status: {!isSupported ? 'Not Supported' : permission.granted ? 'Enabled' : 'Disabled'}
           </div>

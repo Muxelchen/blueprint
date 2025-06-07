@@ -1,5 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { NavigationProps, NavigationItem, DrawerNavigationProps, SidebarNavigationProps, SidebarNavigationItem } from '../../types/navigation';
+import {
+  NavigationProps,
+  NavigationItem,
+  DrawerNavigationProps,
+  SidebarNavigationProps,
+  SidebarNavigationItem,
+} from '../../types/navigation';
 
 // NavBar Component
 export interface NavBarProps extends NavigationProps {
@@ -33,25 +39,17 @@ export const NavBar: React.FC<NavBarProps> = ({
   return (
     <nav className={`${baseClasses} ${className}`} {...props}>
       {/* Brand */}
-      {brand && (
-        <div className="flex-shrink-0">
-          {brand}
-        </div>
-      )}
+      {brand && <div className="flex-shrink-0">{brand}</div>}
 
       {/* Desktop Navigation Items */}
       <div className="hidden md:flex items-center space-x-6">
-        {items.map((item) => (
+        {items.map(item => (
           <NavItem key={item.id} item={item} />
         ))}
       </div>
 
       {/* Actions */}
-      {actions && (
-        <div className="flex items-center space-x-4">
-          {actions}
-        </div>
-      )}
+      {actions && <div className="flex items-center space-x-4">{actions}</div>}
 
       {/* Mobile Menu Button */}
       <button
@@ -59,7 +57,12 @@ export const NavBar: React.FC<NavBarProps> = ({
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
 
@@ -67,7 +70,7 @@ export const NavBar: React.FC<NavBarProps> = ({
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 md:hidden">
           <div className="px-4 py-2 space-y-2">
-            {items.map((item) => (
+            {items.map(item => (
               <NavItem key={item.id} item={item} mobile />
             ))}
           </div>
@@ -84,17 +87,17 @@ interface NavItemProps {
 }
 
 const NavItem: React.FC<NavItemProps> = ({ item, mobile = false }) => {
-  const baseClasses = mobile 
-    ? "block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700"
-    : "px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700";
+  const baseClasses = mobile
+    ? 'block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700'
+    : 'px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700';
 
-  const activeClasses = item.active 
-    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-    : "text-gray-700 dark:text-gray-300";
+  const activeClasses = item.active
+    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+    : 'text-gray-700 dark:text-gray-300';
 
-  const disabledClasses = item.disabled 
-    ? "opacity-50 cursor-not-allowed pointer-events-none"
-    : "cursor-pointer";
+  const disabledClasses = item.disabled
+    ? 'opacity-50 cursor-not-allowed pointer-events-none'
+    : 'cursor-pointer';
 
   const handleClick = (e: React.MouseEvent) => {
     if (item.disabled) return;
@@ -203,9 +206,10 @@ export const DrawerNav: React.FC<DrawerNavigationProps> = ({
   };
 
   const getDrawerClasses = () => {
-    const baseClasses = "fixed bg-white dark:bg-gray-800 shadow-lg z-50 transition-transform duration-300";
+    const baseClasses =
+      'fixed bg-white dark:bg-gray-800 shadow-lg z-50 transition-transform duration-300';
     const sizeValue = getDrawerSize();
-    
+
     switch (placement) {
       case 'left':
         return `${baseClasses} top-0 left-0 h-full transform ${open ? 'translate-x-0' : '-translate-x-full'}`;
@@ -268,7 +272,7 @@ export const NavigationSystem: React.FC<NavigationSystemProps> = ({
   navbarProps,
   sidebarProps,
   drawerProps,
-  responsive = true
+  responsive = true,
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -294,16 +298,17 @@ export const NavigationSystem: React.FC<NavigationSystemProps> = ({
               className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             </button>
           }
         />
-        <DrawerNav
-          {...drawerProps}
-          open={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
-        >
+        <DrawerNav {...drawerProps} open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           <SidebarNavigation {...sidebarProps} items={sidebarProps?.items || []} />
         </DrawerNav>
       </>
@@ -347,9 +352,10 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     setExpandedItems(newExpanded);
   };
 
-  const themeClasses = theme === 'dark' 
-    ? 'bg-gray-900 text-white border-gray-700'
-    : 'bg-white text-gray-900 border-gray-200';
+  const themeClasses =
+    theme === 'dark'
+      ? 'bg-gray-900 text-white border-gray-700'
+      : 'bg-white text-gray-900 border-gray-200';
 
   const currentWidth = collapsed ? collapsedWidth : width;
 
@@ -366,13 +372,18 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
             onClick={() => onToggle?.(!collapsed)}
             className="w-full flex items-center justify-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            <svg 
-              className={`w-5 h-5 transform transition-transform ${collapsed ? 'rotate-180' : ''}`} 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className={`w-5 h-5 transform transition-transform ${collapsed ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+              />
             </svg>
           </button>
         </div>
@@ -380,7 +391,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 
       {/* Navigation Items */}
       <div className="flex-1 overflow-y-auto">
-        {items.map((item) => (
+        {items.map(item => (
           <SidebarItem
             key={item.id}
             item={item}
@@ -412,7 +423,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   expanded,
   onToggleExpanded,
   onSelect,
-  level
+  level,
 }) => {
   const hasChildren = item.children && item.children.length > 0;
   const paddingLeft = collapsed ? 0 : level * 16 + 16;
@@ -445,17 +456,17 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
             <i className={item.icon} />
           </span>
         )}
-        
+
         {!collapsed && (
           <>
             <span className="flex-1 text-left">{item.label}</span>
-            
+
             {item.badge && (
               <span className="ml-2 px-2 py-1 text-xs bg-red-500 text-white rounded-full">
                 {item.badge}
               </span>
             )}
-            
+
             {hasChildren && (
               <svg
                 className={`w-4 h-4 ml-2 transform transition-transform ${expanded ? 'rotate-90' : ''}`}
@@ -463,7 +474,12 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             )}
           </>
@@ -473,7 +489,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
       {/* Children */}
       {hasChildren && expanded && !collapsed && (
         <div>
-          {item.children!.map((child) => (
+          {item.children!.map(child => (
             <SidebarItem
               key={child.id}
               item={child}

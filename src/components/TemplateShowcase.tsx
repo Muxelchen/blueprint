@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { DashboardTemplate, DataTableTemplate, AnalyticsTemplate, MapDashboardTemplate } from '../templates';
+import {
+  DashboardTemplate,
+  DataTableTemplate,
+  AnalyticsTemplate,
+  MapDashboardTemplate,
+} from '../templates';
 import { Button } from './common';
 
 // Live Template Preview & Generator
@@ -12,25 +17,35 @@ export const TemplateShowcase: React.FC = () => {
       id: 'dashboard',
       name: 'Dashboard Template',
       description: 'Complete business dashboard with KPI cards, charts, and data tables',
-      features: ['Real-time updates', 'Dark mode support', 'Responsive design', 'Export capabilities'],
+      features: [
+        'Real-time updates',
+        'Dark mode support',
+        'Responsive design',
+        'Export capabilities',
+      ],
       useCase: 'Perfect for admin dashboards, business intelligence, and monitoring systems',
-      component: DashboardTemplate
+      component: DashboardTemplate,
     },
     {
-      id: 'datatable', 
+      id: 'datatable',
       name: 'Data Table Template',
       description: 'Advanced data management with filtering, sorting, and pagination',
       features: ['Advanced filtering', 'Column sorting', 'Row selection', 'Export to CSV/PDF'],
       useCase: 'Ideal for data management, reporting systems, and content administration',
-      component: DataTableTemplate
+      component: DataTableTemplate,
     },
     {
       id: 'analytics',
-      name: 'Analytics Template', 
+      name: 'Analytics Template',
       description: 'Comprehensive analytics dashboard with multiple chart types',
-      features: ['Interactive charts', 'Real-time data', 'Multiple visualizations', 'Drill-down capability'],
+      features: [
+        'Interactive charts',
+        'Real-time data',
+        'Multiple visualizations',
+        'Drill-down capability',
+      ],
       useCase: 'Great for performance monitoring, metrics visualization, and data analysis',
-      component: AnalyticsTemplate
+      component: AnalyticsTemplate,
     },
     {
       id: 'map',
@@ -38,8 +53,8 @@ export const TemplateShowcase: React.FC = () => {
       description: 'Interactive geographic data visualization with maps and location widgets',
       features: ['Interactive maps', 'Marker clustering', 'Heatmap overlays', 'Location analytics'],
       useCase: 'Perfect for logistics, location analytics, and geographic data visualization',
-      component: MapDashboardTemplate
-    }
+      component: MapDashboardTemplate,
+    },
   ];
 
   const currentTemplate = templates.find(t => t.id === activeTemplate);
@@ -52,7 +67,7 @@ import { ${templateId.charAt(0).toUpperCase() + templateId.slice(1)}Template } f
 export const My${templateId.charAt(0).toUpperCase() + templateId.slice(1)}App = () => {
   return <${templateId.charAt(0).toUpperCase() + templateId.slice(1)}Template />;
 };`;
-    
+
     navigator.clipboard.writeText(codeSnippet);
     alert('Code snippet copied to clipboard!');
   };
@@ -82,14 +97,14 @@ export const My${templateId.charAt(0).toUpperCase() + templateId.slice(1)}App = 
             Blueprint Template Showcase
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Explore our pre-built templates designed for rapid application development. 
-            Each template is production-ready and fully customizable.
+            Explore our pre-built templates designed for rapid application development. Each
+            template is production-ready and fully customizable.
           </p>
         </div>
 
         {/* Template Selector */}
         <div className="flex flex-wrap justify-center gap-4 mb-8">
-          {templates.map((template) => (
+          {templates.map(template => (
             <button
               key={template.id}
               onClick={() => setActiveTemplate(template.id)}
@@ -119,7 +134,7 @@ export const My${templateId.charAt(0).toUpperCase() + templateId.slice(1)}App = 
                   {currentTemplate.useCase}
                 </p>
               </div>
-              
+
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                   Key Features
@@ -134,7 +149,7 @@ export const My${templateId.charAt(0).toUpperCase() + templateId.slice(1)}App = 
                 </ul>
               </div>
             </div>
-            
+
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-4 mt-6 pt-6 border-t dark:border-gray-700">
               <Button
@@ -172,11 +187,9 @@ export const My${templateId.charAt(0).toUpperCase() + templateId.slice(1)}App = 
                 {currentTemplate?.name} Preview
               </span>
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              Live Template Rendering
-            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Live Template Rendering</div>
           </div>
-          
+
           <div className="h-96 overflow-auto border-t dark:border-gray-700">
             <div className="transform scale-75 origin-top-left w-[133.33%] h-[133.33%]">
               <ActiveComponent />

@@ -32,13 +32,16 @@ export const calculateDistance = (
   const R = unit === 'km' ? 6371 : 3959; // Earth's radius
   const dLat = toRadians(point2.latitude - point1.latitude);
   const dLon = toRadians(point2.longitude - point1.longitude);
-  
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(point1.latitude)) * Math.cos(toRadians(point2.latitude)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(point1.latitude)) *
+      Math.cos(toRadians(point2.latitude)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  
+
   return R * c;
 };
 
@@ -47,10 +50,10 @@ export const calculateBearing = (point1: Coordinates, point2: Coordinates): numb
   const dLon = toRadians(point2.longitude - point1.longitude);
   const lat1 = toRadians(point1.latitude);
   const lat2 = toRadians(point2.latitude);
-  
+
   const y = Math.sin(dLon) * Math.cos(lat2);
   const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
-  
+
   const bearing = toDegrees(Math.atan2(y, x));
   return (bearing + 360) % 360;
 };
@@ -67,19 +70,21 @@ export const calculateDestination = (
   const brng = toRadians(bearing);
   const lat1 = toRadians(point.latitude);
   const lon1 = toRadians(point.longitude);
-  
+
   const lat2 = Math.asin(
     Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) * Math.sin(d) * Math.cos(brng)
   );
-  
-  const lon2 = lon1 + Math.atan2(
-    Math.sin(brng) * Math.sin(d) * Math.cos(lat1),
-    Math.cos(d) - Math.sin(lat1) * Math.sin(lat2)
-  );
-  
+
+  const lon2 =
+    lon1 +
+    Math.atan2(
+      Math.sin(brng) * Math.sin(d) * Math.cos(lat1),
+      Math.cos(d) - Math.sin(lat1) * Math.sin(lat2)
+    );
+
   return {
     latitude: toDegrees(lat2),
-    longitude: toDegrees(lon2)
+    longitude: toDegrees(lon2),
   };
 };
 
@@ -87,18 +92,18 @@ export const calculateDestination = (
 export const calculateCenter = (points: Coordinates[]): Coordinates => {
   if (points.length === 0) return { latitude: 0, longitude: 0 };
   if (points.length === 1) return points[0];
-  
+
   const sum = points.reduce(
     (acc, point) => ({
       latitude: acc.latitude + point.latitude,
-      longitude: acc.longitude + point.longitude
+      longitude: acc.longitude + point.longitude,
     }),
     { latitude: 0, longitude: 0 }
   );
-  
+
   return {
     latitude: sum.latitude / points.length,
-    longitude: sum.longitude / points.length
+    longitude: sum.longitude / points.length,
   };
 };
 
@@ -108,19 +113,19 @@ export const calculateBounds = (points: Coordinates[]): Bounds | null => {
     // Return null to indicate no bounds available
     return null;
   }
-  
+
   const latitudes = points.map(p => p.latitude);
   const longitudes = points.map(p => p.longitude);
-  
+
   return {
     northeast: {
       latitude: Math.max(...latitudes),
-      longitude: Math.max(...longitudes)
+      longitude: Math.max(...longitudes),
     },
     southwest: {
       latitude: Math.min(...latitudes),
-      longitude: Math.min(...longitudes)
-    }
+      longitude: Math.min(...longitudes),
+    },
   };
 };
 
@@ -128,16 +133,16 @@ export const calculateBounds = (points: Coordinates[]): Bounds | null => {
 export const isPointInPolygon = (point: Coordinates, polygon: Coordinates[]): boolean => {
   let inside = false;
   const { latitude: x, longitude: y } = point;
-  
+
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     const { latitude: xi, longitude: yi } = polygon[i];
     const { latitude: xj, longitude: yj } = polygon[j];
-    
-    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
       inside = !inside;
     }
   }
-  
+
   return inside;
 };
 
@@ -151,10 +156,10 @@ export const getCircleBounds = (
   const south = calculateDestination(center, radius, 180, unit);
   const east = calculateDestination(center, radius, 90, unit);
   const west = calculateDestination(center, radius, 270, unit);
-  
+
   return {
     northeast: { latitude: north.latitude, longitude: east.longitude },
-    southwest: { latitude: south.latitude, longitude: west.longitude }
+    southwest: { latitude: south.latitude, longitude: west.longitude },
   };
 };
 
@@ -166,39 +171,39 @@ export const clusterMarkers = (
 ): Array<{ center: Coordinates; markers: MapMarker[]; count: number }> => {
   const clusters: Array<{ center: Coordinates; markers: MapMarker[]; count: number }> = [];
   const processed = new Set<string>();
-  
+
   markers.forEach(marker => {
     if (processed.has(marker.id)) return;
-    
+
     const cluster = {
       center: { latitude: marker.latitude, longitude: marker.longitude },
       markers: [marker],
-      count: 1
+      count: 1,
     };
-    
+
     processed.add(marker.id);
-    
+
     markers.forEach(otherMarker => {
       if (processed.has(otherMarker.id)) return;
-      
+
       const dist = calculateDistance(
         { latitude: marker.latitude, longitude: marker.longitude },
         { latitude: otherMarker.latitude, longitude: otherMarker.longitude },
         unit
       );
-      
+
       if (dist <= distance) {
         cluster.markers.push(otherMarker);
         cluster.count++;
         processed.add(otherMarker.id);
       }
     });
-    
+
     // Recalculate center
     cluster.center = calculateCenter(cluster.markers);
     clusters.push(cluster);
   });
-  
+
   return clusters;
 };
 
@@ -215,16 +220,16 @@ export const isPointInViewport = (point: Coordinates, bounds: Bounds): boolean =
 export const expandBounds = (bounds: Bounds, factor: number = 0.1): Bounds => {
   const latDiff = bounds.northeast.latitude - bounds.southwest.latitude;
   const lonDiff = bounds.northeast.longitude - bounds.southwest.longitude;
-  
+
   return {
     northeast: {
-      latitude: bounds.northeast.latitude + (latDiff * factor),
-      longitude: bounds.northeast.longitude + (lonDiff * factor)
+      latitude: bounds.northeast.latitude + latDiff * factor,
+      longitude: bounds.northeast.longitude + lonDiff * factor,
     },
     southwest: {
-      latitude: bounds.southwest.latitude - (latDiff * factor),
-      longitude: bounds.southwest.longitude - (lonDiff * factor)
-    }
+      latitude: bounds.southwest.latitude - latDiff * factor,
+      longitude: bounds.southwest.longitude - lonDiff * factor,
+    },
   };
 };
 
@@ -235,21 +240,21 @@ export const getCurrentLocation = (): Promise<Coordinates> => {
       reject(new Error('Geolocation is not supported'));
       return;
     }
-    
+
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      position => {
         resolve({
           latitude: position.coords.latitude,
-          longitude: position.coords.longitude
+          longitude: position.coords.longitude,
         });
       },
-      (error) => {
+      error => {
         reject(error);
       },
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 60000
+        maximumAge: 60000,
       }
     );
   });
@@ -262,19 +267,19 @@ export const watchLocation = (
   if (!navigator.geolocation) {
     throw new Error('Geolocation is not supported');
   }
-  
+
   return navigator.geolocation.watchPosition(
-    (position) => {
+    position => {
       callback({
         latitude: position.coords.latitude,
-        longitude: position.coords.longitude
+        longitude: position.coords.longitude,
       });
     },
     errorCallback,
     {
       enableHighAccuracy: true,
       timeout: 10000,
-      maximumAge: 60000
+      maximumAge: 60000,
     }
   );
 };
@@ -288,13 +293,13 @@ export const formatCoordinates = (
   switch (format) {
     case 'decimal':
       return `${coordinates.latitude.toFixed(precision)}, ${coordinates.longitude.toFixed(precision)}`;
-    
+
     case 'dms':
       return `${toDMS(coordinates.latitude, 'lat')}, ${toDMS(coordinates.longitude, 'lon')}`;
-    
+
     case 'dm':
       return `${toDM(coordinates.latitude, 'lat')}, ${toDM(coordinates.longitude, 'lon')}`;
-    
+
     default:
       return formatCoordinates(coordinates, 'decimal', precision);
   }
@@ -308,18 +313,20 @@ export const generateHeatmapData = (
 ): number[][] => {
   const latStep = (bounds.northeast.latitude - bounds.southwest.latitude) / gridSize;
   const lonStep = (bounds.northeast.longitude - bounds.southwest.longitude) / gridSize;
-  
-  const grid: number[][] = Array(gridSize).fill(null).map(() => Array(gridSize).fill(0));
-  
+
+  const grid: number[][] = Array(gridSize)
+    .fill(null)
+    .map(() => Array(gridSize).fill(0));
+
   points.forEach(point => {
     const latIndex = Math.floor((point.latitude - bounds.southwest.latitude) / latStep);
     const lonIndex = Math.floor((point.longitude - bounds.southwest.longitude) / lonStep);
-    
+
     if (latIndex >= 0 && latIndex < gridSize && lonIndex >= 0 && lonIndex < gridSize) {
       grid[latIndex][lonIndex] += point.weight;
     }
   });
-  
+
   return grid;
 };
 
@@ -333,11 +340,9 @@ const toDMS = (coordinate: number, type: 'lat' | 'lon'): string => {
   const minutesFloat = (absolute - degrees) * 60;
   const minutes = Math.floor(minutesFloat);
   const seconds = Math.round((minutesFloat - minutes) * 60);
-  
-  const direction = type === 'lat' 
-    ? (coordinate >= 0 ? 'N' : 'S')
-    : (coordinate >= 0 ? 'E' : 'W');
-  
+
+  const direction = type === 'lat' ? (coordinate >= 0 ? 'N' : 'S') : coordinate >= 0 ? 'E' : 'W';
+
   return `${degrees}°${minutes}'${seconds}"${direction}`;
 };
 
@@ -345,11 +350,9 @@ const toDM = (coordinate: number, type: 'lat' | 'lon'): string => {
   const absolute = Math.abs(coordinate);
   const degrees = Math.floor(absolute);
   const minutes = ((absolute - degrees) * 60).toFixed(3);
-  
-  const direction = type === 'lat' 
-    ? (coordinate >= 0 ? 'N' : 'S')
-    : (coordinate >= 0 ? 'E' : 'W');
-  
+
+  const direction = type === 'lat' ? (coordinate >= 0 ? 'N' : 'S') : coordinate >= 0 ? 'E' : 'W';
+
   return `${degrees}°${minutes}'${direction}`;
 };
 
@@ -367,5 +370,5 @@ export default {
   getCurrentLocation,
   watchLocation,
   formatCoordinates,
-  generateHeatmapData
+  generateHeatmapData,
 };

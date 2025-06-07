@@ -22,10 +22,10 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 // Helper function to detect system preference
 const detectSystemTheme = (): 'light' | 'dark' => {
   if (typeof window === 'undefined') return 'light';
-  
+
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   return mediaQuery.matches ? 'dark' : 'light';
-}
+};
 
 // Provider component
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -40,13 +40,13 @@ function useProvideTheme(): ThemeContextValue {
     if (typeof window === 'undefined') return 'system';
     return (localStorage.getItem(storageThemeKey) as Theme) || 'system';
   });
-  
+
   // Get initial color scheme from localStorage or default
   const [colorScheme, setColorSchemeState] = useState<ThemeColor>(() => {
     if (typeof window === 'undefined') return defaultColorScheme;
     return (localStorage.getItem(storageColorKey) as ThemeColor) || defaultColorScheme;
   });
-  
+
   // Track if dark mode is active (derived from theme)
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (theme === 'system') {
@@ -82,7 +82,7 @@ function useProvideTheme(): ThemeContextValue {
   useEffect(() => {
     // HTML element that will receive the theme classes
     const htmlElement = document.documentElement;
-    
+
     // Determine if dark mode should be active
     let newIsDarkMode: boolean;
     if (theme === 'system') {
@@ -101,7 +101,7 @@ function useProvideTheme(): ThemeContextValue {
 
     // Update state
     setIsDarkMode(newIsDarkMode);
-    
+
     // Apply theme classes
     updateThemeClasses(newIsDarkMode, colorScheme);
   }, [theme, colorScheme]);
@@ -109,7 +109,7 @@ function useProvideTheme(): ThemeContextValue {
   // Helper function to update CSS classes and variables
   function updateThemeClasses(dark: boolean, color: ThemeColor): void {
     const htmlElement = document.documentElement;
-    
+
     // Toggle dark mode class
     if (dark) {
       htmlElement.classList.add('dark');
@@ -123,17 +123,14 @@ function useProvideTheme(): ThemeContextValue {
     ['blue', 'green', 'purple', 'orange', 'red', 'gray'].forEach(c => {
       htmlElement.classList.remove(`theme-${c}`);
     });
-    
+
     // Add the current color scheme class
     htmlElement.classList.add(`theme-${color}`);
-    
+
     // Update meta theme-color for mobile devices
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      metaThemeColor.setAttribute(
-        'content', 
-        dark ? '#1f2937' : '#ffffff'
-      );
+      metaThemeColor.setAttribute('content', dark ? '#1f2937' : '#ffffff');
     }
   }
 
@@ -143,7 +140,7 @@ function useProvideTheme(): ThemeContextValue {
     isDarkMode,
     setTheme,
     setColorScheme,
-    toggleTheme
+    toggleTheme,
   };
 }
 

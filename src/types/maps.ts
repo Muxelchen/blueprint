@@ -494,7 +494,15 @@ export interface MapAnalytics {
 }
 
 export interface MapTrackingEvent {
-  type: 'view' | 'interaction' | 'marker_click' | 'popup_open' | 'zoom' | 'pan' | 'search' | 'route';
+  type:
+    | 'view'
+    | 'interaction'
+    | 'marker_click'
+    | 'popup_open'
+    | 'zoom'
+    | 'pan'
+    | 'search'
+    | 'route';
   timestamp: Date;
   userId?: string;
   sessionId?: string;

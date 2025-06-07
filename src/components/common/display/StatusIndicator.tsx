@@ -1,7 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Circle, Wifi, WifiOff, AlertTriangle, CheckCircle, Clock, Zap, Server, Database, Globe } from 'lucide-react';
+import {
+  Circle,
+  Wifi,
+  WifiOff,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Zap,
+  Server,
+  Database,
+  Globe,
+} from 'lucide-react';
 
-export type StatusType = 'online' | 'offline' | 'idle' | 'busy' | 'away' | 'connecting' | 'error' | 'maintenance';
+export type StatusType =
+  | 'online'
+  | 'offline'
+  | 'idle'
+  | 'busy'
+  | 'away'
+  | 'connecting'
+  | 'error'
+  | 'maintenance';
 
 export interface StatusIndicatorProps {
   status: StatusType;
@@ -12,13 +31,16 @@ export interface StatusIndicatorProps {
   pulse?: boolean;
   onClick?: () => void;
   className?: string;
-  customStatuses?: Record<string, {
-    color: string;
-    bgColor: string;
-    textColor: string;
-    icon?: React.ReactNode;
-    description?: string;
-  }>;
+  customStatuses?: Record<
+    string,
+    {
+      color: string;
+      bgColor: string;
+      textColor: string;
+      icon?: React.ReactNode;
+      description?: string;
+    }
+  >;
 }
 
 interface StatusState {
@@ -42,14 +64,14 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
   pulse = false,
   onClick,
   className = '',
-  customStatuses = {}
+  customStatuses = {},
 }) => {
   const [state, setState] = useState<StatusState>({
     currentStatus: status,
     lastChanged: Date.now(),
     history: [{ status, timestamp: Date.now() }],
     uptime: 0,
-    connectionQuality: 'excellent'
+    connectionQuality: 'excellent',
   });
 
   // Update status when prop changes
@@ -58,7 +80,7 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
       setState(prev => {
         const now = Date.now();
         const duration = now - prev.lastChanged;
-        
+
         return {
           ...prev,
           currentStatus: status,
@@ -68,10 +90,10 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
             {
               status: prev.currentStatus,
               timestamp: prev.lastChanged,
-              duration
+              duration,
             },
-            { status, timestamp: now }
-          ]
+            { status, timestamp: now },
+          ],
         };
       });
     }
@@ -83,7 +105,7 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
       if (state.currentStatus === 'online') {
         setState(prev => ({
           ...prev,
-          uptime: prev.uptime + 1000
+          uptime: prev.uptime + 1000,
         }));
       }
     }, 1000);
@@ -98,60 +120,62 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
         bgColor: 'bg-green-50',
         textColor: 'text-green-800',
         icon: <CheckCircle className="w-4 h-4" />,
-        description: 'System is operational'
+        description: 'System is operational',
       },
       offline: {
         color: 'bg-gray-500',
         bgColor: 'bg-gray-50',
         textColor: 'text-gray-800',
         icon: <WifiOff className="w-4 h-4" />,
-        description: 'System is offline'
+        description: 'System is offline',
       },
       idle: {
         color: 'bg-yellow-500',
         bgColor: 'bg-yellow-50',
         textColor: 'text-yellow-800',
         icon: <Clock className="w-4 h-4" />,
-        description: 'System is idle'
+        description: 'System is idle',
       },
       busy: {
         color: 'bg-red-500',
         bgColor: 'bg-red-50',
         textColor: 'text-red-800',
         icon: <Zap className="w-4 h-4" />,
-        description: 'System is busy'
+        description: 'System is busy',
       },
       away: {
         color: 'bg-orange-500',
         bgColor: 'bg-orange-50',
         textColor: 'text-orange-800',
         icon: <Circle className="w-4 h-4" />,
-        description: 'System is away'
+        description: 'System is away',
       },
       connecting: {
         color: 'bg-blue-500',
         bgColor: 'bg-blue-50',
         textColor: 'text-blue-800',
         icon: <Wifi className="w-4 h-4" />,
-        description: 'Connecting...'
+        description: 'Connecting...',
       },
       error: {
         color: 'bg-red-600',
         bgColor: 'bg-red-50',
         textColor: 'text-red-800',
         icon: <AlertTriangle className="w-4 h-4" />,
-        description: 'System error'
+        description: 'System error',
       },
       maintenance: {
         color: 'bg-purple-500',
         bgColor: 'bg-purple-50',
         textColor: 'text-purple-800',
         icon: <Server className="w-4 h-4" />,
-        description: 'Under maintenance'
-      }
+        description: 'Under maintenance',
+      },
     };
 
-    return { ...defaultStatuses, ...customStatuses }[state.currentStatus] || defaultStatuses.offline;
+    return (
+      { ...defaultStatuses, ...customStatuses }[state.currentStatus] || defaultStatuses.offline
+    );
   };
 
   const getSizeClasses = () => {
@@ -159,7 +183,7 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
       sm: 'w-2 h-2',
       md: 'w-3 h-3',
       lg: 'w-4 h-4',
-      xl: 'w-5 h-5'
+      xl: 'w-5 h-5',
     };
     return sizes[size];
   };
@@ -169,29 +193,29 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
       sm: 'gap-1.5 text-xs',
       md: 'gap-2 text-sm',
       lg: 'gap-2.5 text-base',
-      xl: 'gap-3 text-lg'
+      xl: 'gap-3 text-lg',
     };
     return sizes[size];
   };
 
   const getAnimationClasses = () => {
     let classes = 'transition-all duration-300';
-    
+
     if (animated) {
       classes += ' ease-in-out';
     }
-    
+
     if (pulse && (state.currentStatus === 'connecting' || state.currentStatus === 'busy')) {
       classes += ' animate-pulse';
     }
-    
+
     return classes;
   };
 
   const config = getStatusConfig();
 
   return (
-    <div 
+    <div
       className={`inline-flex items-center ${getContainerSizeClasses()} ${onClick ? 'cursor-pointer hover:opacity-80' : ''} ${className}`}
       onClick={onClick}
     >
@@ -217,7 +241,7 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
           />
         )}
       </div>
-      
+
       {showLabel && (
         <span className={`font-medium ${config.textColor}`}>
           {label || state.currentStatus.charAt(0).toUpperCase() + state.currentStatus.slice(1)}
@@ -243,11 +267,11 @@ export interface SystemStatusProps {
 export const SystemStatus: React.FC<SystemStatusProps> = ({
   services,
   onServiceClick,
-  className = ''
+  className = '',
 }) => {
   const getOverallStatus = (): StatusType => {
     const statuses = services.map(s => s.status);
-    
+
     if (statuses.includes('error')) return 'error';
     if (statuses.includes('maintenance')) return 'maintenance';
     if (statuses.includes('offline')) return 'offline';
@@ -256,15 +280,18 @@ export const SystemStatus: React.FC<SystemStatusProps> = ({
     if (statuses.includes('away')) return 'away';
     if (statuses.includes('idle')) return 'idle';
     if (statuses.every(s => s === 'online')) return 'online';
-    
+
     return 'idle';
   };
 
   const getStatusCounts = () => {
-    return services.reduce((acc, service) => {
-      acc[service.status] = (acc[service.status] || 0) + 1;
-      return acc;
-    }, {} as Record<StatusType, number>);
+    return services.reduce(
+      (acc, service) => {
+        acc[service.status] = (acc[service.status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<StatusType, number>
+    );
   };
 
   const overallStatus = getOverallStatus();
@@ -274,17 +301,10 @@ export const SystemStatus: React.FC<SystemStatusProps> = ({
     <div className={`space-y-4 ${className}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <StatusIndicator
-            status={overallStatus}
-            label="System Status"
-            size="lg"
-            pulse={true}
-          />
+          <StatusIndicator status={overallStatus} label="System Status" size="lg" pulse={true} />
         </div>
-        
-        <div className="text-sm text-gray-600">
-          {services.length} services
-        </div>
+
+        <div className="text-sm text-gray-600">{services.length} services</div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -299,11 +319,7 @@ export const SystemStatus: React.FC<SystemStatusProps> = ({
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                {service.icon && (
-                  <div className="text-gray-500">
-                    {service.icon}
-                  </div>
-                )}
+                {service.icon && <div className="text-gray-500">{service.icon}</div>}
                 <div>
                   <div className="font-medium text-sm">{service.name}</div>
                   {service.description && (
@@ -311,7 +327,7 @@ export const SystemStatus: React.FC<SystemStatusProps> = ({
                   )}
                 </div>
               </div>
-              
+
               <StatusIndicator
                 status={service.status}
                 showLabel={false}
@@ -326,11 +342,7 @@ export const SystemStatus: React.FC<SystemStatusProps> = ({
       <div className="flex flex-wrap gap-4 text-sm">
         {Object.entries(statusCounts).map(([status, count]) => (
           <div key={status} className="flex items-center gap-2">
-            <StatusIndicator
-              status={status as StatusType}
-              showLabel={false}
-              size="sm"
-            />
+            <StatusIndicator status={status as StatusType} showLabel={false} size="sm" />
             <span className="text-gray-600">
               {count} {status}
             </span>
@@ -354,7 +366,7 @@ export const useUserStatusManager = () => {
     userStatus: 'online',
     customMessage: '',
     autoAway: true,
-    lastActivity: Date.now()
+    lastActivity: Date.now(),
   });
 
   // Load from localStorage
@@ -383,7 +395,7 @@ export const useUserStatusManager = () => {
       setState(prev => ({
         ...prev,
         lastActivity: Date.now(),
-        userStatus: prev.userStatus === 'away' ? 'online' : prev.userStatus
+        userStatus: prev.userStatus === 'away' ? 'online' : prev.userStatus,
       }));
     };
 
@@ -433,51 +445,79 @@ export const useUserStatusManager = () => {
     lastActivity: state.lastActivity,
     setUserStatus,
     setCustomMessage,
-    setAutoAway
+    setAutoAway,
   };
 };
 
 // Example usage component
 export const ExampleStatusIndicators: React.FC = () => {
-  const {
-    userStatus,
-    customMessage,
-    autoAway,
-    setUserStatus,
-    setCustomMessage,
-    setAutoAway
-  } = useUserStatusManager();
+  const { userStatus, customMessage, autoAway, setUserStatus, setCustomMessage, setAutoAway } =
+    useUserStatusManager();
 
   const [services, setServices] = useState([
-    { name: 'API Server', status: 'online' as StatusType, description: 'REST API', icon: <Server className="w-4 h-4" /> },
-    { name: 'Database', status: 'online' as StatusType, description: 'PostgreSQL', icon: <Database className="w-4 h-4" /> },
-    { name: 'CDN', status: 'online' as StatusType, description: 'Content Delivery', icon: <Globe className="w-4 h-4" /> },
-    { name: 'Auth Service', status: 'idle' as StatusType, description: 'Authentication', icon: <CheckCircle className="w-4 h-4" /> },
-    { name: 'Email Service', status: 'maintenance' as StatusType, description: 'SMTP Server', icon: <AlertTriangle className="w-4 h-4" /> },
-    { name: 'File Storage', status: 'online' as StatusType, description: 'S3 Compatible', icon: <Circle className="w-4 h-4" /> }
+    {
+      name: 'API Server',
+      status: 'online' as StatusType,
+      description: 'REST API',
+      icon: <Server className="w-4 h-4" />,
+    },
+    {
+      name: 'Database',
+      status: 'online' as StatusType,
+      description: 'PostgreSQL',
+      icon: <Database className="w-4 h-4" />,
+    },
+    {
+      name: 'CDN',
+      status: 'online' as StatusType,
+      description: 'Content Delivery',
+      icon: <Globe className="w-4 h-4" />,
+    },
+    {
+      name: 'Auth Service',
+      status: 'idle' as StatusType,
+      description: 'Authentication',
+      icon: <CheckCircle className="w-4 h-4" />,
+    },
+    {
+      name: 'Email Service',
+      status: 'maintenance' as StatusType,
+      description: 'SMTP Server',
+      icon: <AlertTriangle className="w-4 h-4" />,
+    },
+    {
+      name: 'File Storage',
+      status: 'online' as StatusType,
+      description: 'S3 Compatible',
+      icon: <Circle className="w-4 h-4" />,
+    },
   ]);
 
   const simulateStatusChanges = () => {
     const statuses: StatusType[] = ['online', 'offline', 'idle', 'busy', 'connecting', 'error'];
-    
-    setServices(prev => prev.map(service => ({
-      ...service,
-      status: statuses[Math.floor(Math.random() * statuses.length)]
-    })));
+
+    setServices(prev =>
+      prev.map(service => ({
+        ...service,
+        status: statuses[Math.floor(Math.random() * statuses.length)],
+      }))
+    );
   };
 
   const resetServices = () => {
-    setServices(prev => prev.map(service => ({
-      ...service,
-      status: 'online' as StatusType
-    })));
+    setServices(prev =>
+      prev.map(service => ({
+        ...service,
+        status: 'online' as StatusType,
+      }))
+    );
   };
 
   return (
     <div className="space-y-8">
       <div>
         <h3 className="text-lg font-semibold mb-4">Status Indicators</h3>
-        
+
         {/* Basic Status Indicators */}
         <div className="space-y-4">
           <h4 className="font-medium">Basic Indicators</h4>
@@ -495,22 +535,17 @@ export const ExampleStatusIndicators: React.FC = () => {
         {/* User Status Manager */}
         <div className="mt-8 space-y-4">
           <h4 className="font-medium">User Status Manager</h4>
-          
+
           <div className="p-4 border rounded-lg space-y-4">
             <div className="flex items-center gap-4">
-              <StatusIndicator
-                status={userStatus}
-                label="Your Status"
-                size="lg"
-                pulse
-              />
-              
+              <StatusIndicator status={userStatus} label="Your Status" size="lg" pulse />
+
               <div className="flex-1">
                 <input
                   type="text"
                   placeholder="Custom status message..."
                   value={customMessage}
-                  onChange={(e) => setCustomMessage(e.target.value)}
+                  onChange={e => setCustomMessage(e.target.value)}
                   className="w-full px-3 py-1 border border-gray-300 rounded-md text-sm"
                 />
               </div>
@@ -521,7 +556,7 @@ export const ExampleStatusIndicators: React.FC = () => {
                 type="checkbox"
                 id="auto-away"
                 checked={autoAway}
-                onChange={(e) => setAutoAway(e.target.checked)}
+                onChange={e => setAutoAway(e.target.checked)}
                 className="rounded"
               />
               <label htmlFor="auto-away" className="text-sm">
@@ -536,9 +571,10 @@ export const ExampleStatusIndicators: React.FC = () => {
                   onClick={() => setUserStatus(status)}
                   className={`
                     px-3 py-1 text-sm rounded-md border transition-colors
-                    ${userStatus === status 
-                      ? 'bg-blue-100 border-blue-300 text-blue-800' 
-                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                    ${
+                      userStatus === status
+                        ? 'bg-blue-100 border-blue-300 text-blue-800'
+                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                     }
                   `}
                 >
@@ -552,12 +588,12 @@ export const ExampleStatusIndicators: React.FC = () => {
         {/* System Status */}
         <div className="mt-8">
           <h4 className="font-medium mb-4">System Status</h4>
-          
+
           <SystemStatus
             services={services}
-            onServiceClick={(service) => console.log(`Clicked: ${service}`)}
+            onServiceClick={service => console.log(`Clicked: ${service}`)}
           />
-          
+
           <div className="mt-4 flex gap-2">
             <button
               onClick={simulateStatusChanges}
@@ -565,7 +601,7 @@ export const ExampleStatusIndicators: React.FC = () => {
             >
               Simulate Status Changes
             </button>
-            
+
             <button
               onClick={resetServices}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"

@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { RouteConfig, NavigationContext, NavigationOptions, RouteGuard, RouteMeta } from '../../types/navigation';
+import {
+  RouteConfig,
+  NavigationContext,
+  NavigationOptions,
+  RouteGuard,
+  RouteMeta,
+} from '../../types/navigation';
 
 // Route Context
 const RouteContext = createContext<NavigationContext | null>(null);
@@ -27,7 +33,7 @@ export const RouteProvider: React.FC<RouteProviderProps> = ({
   routes,
   basePath = '',
   fallback: DefaultFallback,
-  guards = []
+  guards = [],
 }) => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [currentRoute, setCurrentRoute] = useState<RouteConfig | null>(null);
@@ -38,10 +44,10 @@ export const RouteProvider: React.FC<RouteProviderProps> = ({
   const parseUrl = useCallback((path: string) => {
     const [pathname, search] = path.split('?');
     const [, hash] = search?.split('#') || ['', ''];
-    
+
     const params: Record<string, string> = {};
     const query: Record<string, string> = {};
-    
+
     // Parse query parameters
     if (search) {
       const searchParams = new URLSearchParams(search.split('#')[0]);
@@ -49,61 +55,70 @@ export const RouteProvider: React.FC<RouteProviderProps> = ({
         query[key] = value;
       });
     }
-    
+
     return { pathname, params, query, hash: hash || '' };
   }, []);
 
   // Find matching route
-  const findRoute = useCallback((path: string): RouteConfig | null => {
-    const { pathname } = parseUrl(path);
-    
-    const findMatchingRoute = (routeList: RouteConfig[], currentPath: string): RouteConfig | null => {
-      for (const route of routeList) {
-        // Simple path matching - in a real implementation, you'd use a proper router
-        if (route.path === currentPath || (route.path === '/' && currentPath === '')) {
-          return route;
-        }
-        
-        // Check for dynamic segments
-        const routeSegments = route.path.split('/');
-        const pathSegments = currentPath.split('/');
-        
-        if (routeSegments.length === pathSegments.length) {
-          const isMatch = routeSegments.every((segment, index) => {
-            return segment.startsWith(':') || segment === pathSegments[index];
-          });
-          
-          if (isMatch) {
+  const findRoute = useCallback(
+    (path: string): RouteConfig | null => {
+      const { pathname } = parseUrl(path);
+
+      const findMatchingRoute = (
+        routeList: RouteConfig[],
+        currentPath: string
+      ): RouteConfig | null => {
+        for (const route of routeList) {
+          // Simple path matching - in a real implementation, you'd use a proper router
+          if (route.path === currentPath || (route.path === '/' && currentPath === '')) {
             return route;
           }
-        }
-        
-        // Check children routes
-        if (route.children) {
-          const childRoute = findMatchingRoute(route.children, currentPath);
-          if (childRoute) {
-            return childRoute;
+
+          // Check for dynamic segments
+          const routeSegments = route.path.split('/');
+          const pathSegments = currentPath.split('/');
+
+          if (routeSegments.length === pathSegments.length) {
+            const isMatch = routeSegments.every((segment, index) => {
+              return segment.startsWith(':') || segment === pathSegments[index];
+            });
+
+            if (isMatch) {
+              return route;
+            }
+          }
+
+          // Check children routes
+          if (route.children) {
+            const childRoute = findMatchingRoute(route.children, currentPath);
+            if (childRoute) {
+              return childRoute;
+            }
           }
         }
-      }
-      return null;
-    };
-    
-    return findMatchingRoute(routes, pathname);
-  }, [routes, parseUrl]);
+        return null;
+      };
+
+      return findMatchingRoute(routes, pathname);
+    },
+    [routes, parseUrl]
+  );
 
   // Navigation functions
-  const navigate = useCallback((path: string, options: NavigationOptions = {}) => {
-    const fullPath = basePath + path;
-    
-    if (options.replace) {
-      window.history.replaceState(options.state, '', fullPath);
-    } else {
-      window.history.pushState(options.state, '', fullPath);
-    }
-    
-    setCurrentPath(fullPath);
-  }, [basePath]);
+  const navigate = useCallback(
+    (path: string, options: NavigationOptions = {}) => {
+      const fullPath = basePath + path;
+
+      if (options.replace) {
+        window.history.replaceState(options.state, '', fullPath);
+      } else {
+        window.history.pushState(options.state, '', fullPath);
+      }
+
+      setCurrentPath(fullPath);
+    },
+    [basePath]
+  );
 
   const goBack = useCallback(() => {
     window.history.back();
@@ -113,9 +128,12 @@ export const RouteProvider: React.FC<RouteProviderProps> = ({
     window.history.forward();
   }, []);
 
-  const replace = useCallback((path: string) => {
-    navigate(path, { replace: true });
-  }, [navigate]);
+  const replace = useCallback(
+    (path: string) => {
+      navigate(path, { replace: true });
+    },
+    [navigate]
+  );
 
   // Create navigation context
   const navigationContext: NavigationContext = {
@@ -127,7 +145,7 @@ export const RouteProvider: React.FC<RouteProviderProps> = ({
     navigate,
     goBack,
     goForward,
-    replace
+    replace,
   };
 
   // Handle route changes
@@ -155,7 +173,7 @@ export const RouteProvider: React.FC<RouteProviderProps> = ({
 
     const runGuards = async () => {
       setIsLoading(true);
-      
+
       // Run global guards
       for (const guard of guards) {
         const canActivate = await guard.guard(currentRoute, navigationContext);
@@ -167,7 +185,7 @@ export const RouteProvider: React.FC<RouteProviderProps> = ({
           return;
         }
       }
-      
+
       // Run route-specific guards
       if (currentRoute.guards) {
         for (const guard of currentRoute.guards) {
@@ -181,28 +199,24 @@ export const RouteProvider: React.FC<RouteProviderProps> = ({
           }
         }
       }
-      
+
       setIsLoading(false);
     };
 
     runGuards();
   }, [currentRoute, guards, navigationContext, navigate]);
 
-  return (
-    <RouteContext.Provider value={navigationContext}>
-      {children}
-    </RouteContext.Provider>
-  );
+  return <RouteContext.Provider value={navigationContext}>{children}</RouteContext.Provider>;
 };
 
 // Route Outlet Component - renders the current route's component
 export const RouteOutlet: React.FC = () => {
   const { currentRoute } = useNavigation();
-  
+
   if (!currentRoute) {
     return <div>Route not found</div>;
   }
-  
+
   const Component = currentRoute.component;
   return <Component />;
 };
@@ -227,24 +241,19 @@ export const Link: React.FC<LinkProps> = ({
   ...props
 }) => {
   const { navigate } = useNavigation();
-  
+
   const handleClick = (event: React.MouseEvent) => {
     event.preventDefault();
-    
+
     if (onClick) {
       onClick(event);
     }
-    
+
     navigate(to, { replace, state });
   };
-  
+
   return (
-    <a
-      href={to}
-      className={className}
-      onClick={handleClick}
-      {...props}
-    >
+    <a href={to} className={className} onClick={handleClick} {...props}>
       {children}
     </a>
   );
@@ -253,14 +262,14 @@ export const Link: React.FC<LinkProps> = ({
 // Route Guard Components
 export const AuthGuard: React.FC<{ children: React.ReactNode; fallback?: React.ComponentType }> = ({
   children,
-  fallback: Fallback
+  fallback: Fallback,
 }) => {
   const { user } = useNavigation();
-  
+
   if (!user) {
     return Fallback ? <Fallback /> : <div>Please log in to access this page</div>;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -270,13 +279,13 @@ export const RoleGuard: React.FC<{
   fallback?: React.ComponentType;
 }> = ({ children, roles, fallback: Fallback }) => {
   const { user, permissions } = useNavigation();
-  
+
   const hasRequiredRole = roles.some(role => permissions.includes(role));
-  
+
   if (!hasRequiredRole) {
     return Fallback ? <Fallback /> : <div>You don't have permission to access this page</div>;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -288,19 +297,19 @@ export interface RouteMapperProps {
 
 export const RouteMapping: React.FC<RouteMapperProps> = ({ routes, fallback }) => {
   const { currentRoute } = useNavigation();
-  
+
   if (!currentRoute) {
     return fallback ? React.createElement(fallback) : <div>Page not found</div>;
   }
-  
+
   const Component = currentRoute.component;
-  
+
   // Apply layout if specified
   if (currentRoute.meta?.layout) {
     // In a real implementation, you'd resolve the layout component
     return <Component />;
   }
-  
+
   return <Component />;
 };
 
@@ -312,7 +321,7 @@ export const withRouteGuard = <P extends object>(
   return (props: P) => {
     const navigationContext = useNavigation();
     const [canRender, setCanRender] = useState(false);
-    
+
     useEffect(() => {
       const checkGuards = async () => {
         for (const guard of guards) {
@@ -326,14 +335,14 @@ export const withRouteGuard = <P extends object>(
         }
         setCanRender(true);
       };
-      
+
       checkGuards();
     }, [navigationContext]);
-    
+
     if (!canRender) {
       return <div>Loading...</div>;
     }
-    
+
     return <WrappedComponent {...props} />;
   };
 };
@@ -341,15 +350,15 @@ export const withRouteGuard = <P extends object>(
 // Breadcrumb generator based on current route
 export const useBreadcrumb = () => {
   const { currentRoute } = useNavigation();
-  
+
   const generateBreadcrumb = useCallback(() => {
     if (!currentRoute?.meta?.breadcrumb) {
       return [];
     }
-    
+
     return currentRoute.meta.breadcrumb;
   }, [currentRoute]);
-  
+
   return generateBreadcrumb();
 };
 
@@ -360,7 +369,7 @@ export const useRoutePreloader = () => {
     // This is useful for code splitting with React.lazy
     console.log(`Preloading route: ${path}`);
   }, []);
-  
+
   return { preloadRoute };
 };
 
@@ -368,19 +377,19 @@ export const useRoutePreloader = () => {
 export const useRouteTransition = () => {
   const { currentRoute, previousRoute } = useNavigation();
   const [isTransitioning, setIsTransitioning] = useState(false);
-  
+
   useEffect(() => {
     if (previousRoute && currentRoute && previousRoute !== currentRoute) {
       setIsTransitioning(true);
-      
+
       // Simulate transition duration
       const timer = setTimeout(() => {
         setIsTransitioning(false);
       }, 300);
-      
+
       return () => clearTimeout(timer);
     }
   }, [currentRoute, previousRoute]);
-  
+
   return { isTransitioning };
 };

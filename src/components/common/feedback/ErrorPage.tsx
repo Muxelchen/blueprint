@@ -1,7 +1,24 @@
 import React, { useState, useCallback } from 'react';
-import { AlertTriangle, Home, ArrowLeft, RefreshCw, Search, FileX, WifiOff, Settings, HelpCircle } from 'lucide-react';
+import {
+  AlertTriangle,
+  Home,
+  ArrowLeft,
+  RefreshCw,
+  Search,
+  FileX,
+  WifiOff,
+  Settings,
+  HelpCircle,
+} from 'lucide-react';
 
-export type ErrorType = '404' | '500' | 'network' | 'permission' | 'maintenance' | 'timeout' | 'generic';
+export type ErrorType =
+  | '404'
+  | '500'
+  | 'network'
+  | 'permission'
+  | 'maintenance'
+  | 'timeout'
+  | 'generic';
 
 export interface ErrorPageProps {
   type?: ErrorType;
@@ -52,7 +69,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
   className = '',
   showSuggestions = true,
   fullPage = true,
-  animated = true
+  animated = true,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isRetrying, setIsRetrying] = useState(false);
@@ -61,28 +78,29 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
     '404': {
       icon: <FileX className="w-16 h-16" />,
       title: 'Page Not Found',
-      message: 'The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.',
+      message:
+        'The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.',
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
       suggestions: [
         'Check the URL for typos',
         'Go back to the previous page',
         'Visit our homepage',
-        'Use the search function'
-      ]
+        'Use the search function',
+      ],
     },
     '500': {
       icon: <AlertTriangle className="w-16 h-16" />,
       title: 'Internal Server Error',
-      message: 'Something went wrong on our end. We\'re working to fix this issue.',
+      message: "Something went wrong on our end. We're working to fix this issue.",
       color: 'text-red-600',
       bgColor: 'bg-red-50',
       suggestions: [
         'Refresh the page',
         'Try again in a few minutes',
         'Clear your browser cache',
-        'Contact support if the problem persists'
-      ]
+        'Contact support if the problem persists',
+      ],
     },
     network: {
       icon: <WifiOff className="w-16 h-16" />,
@@ -94,21 +112,21 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         'Check your internet connection',
         'Try refreshing the page',
         'Disable VPN if enabled',
-        'Contact your network administrator'
-      ]
+        'Contact your network administrator',
+      ],
     },
     permission: {
       icon: <Settings className="w-16 h-16" />,
       title: 'Access Denied',
-      message: 'You don\'t have permission to access this resource.',
+      message: "You don't have permission to access this resource.",
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-50',
       suggestions: [
         'Log in with the correct account',
         'Contact an administrator',
         'Check your account permissions',
-        'Return to the homepage'
-      ]
+        'Return to the homepage',
+      ],
     },
     maintenance: {
       icon: <Settings className="w-16 h-16" />,
@@ -120,8 +138,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         'Try again later',
         'Check our status page',
         'Follow us for updates',
-        'Use alternative features'
-      ]
+        'Use alternative features',
+      ],
     },
     timeout: {
       icon: <RefreshCw className="w-16 h-16" />,
@@ -133,8 +151,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         'Refresh the page',
         'Check your connection',
         'Try again in a moment',
-        'Use a different browser'
-      ]
+        'Use a different browser',
+      ],
     },
     generic: {
       icon: <HelpCircle className="w-16 h-16" />,
@@ -146,9 +164,9 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         'Refresh the page',
         'Go back and try again',
         'Clear browser cache',
-        'Contact support'
-      ]
-    }
+        'Contact support',
+      ],
+    },
   };
 
   const config = errorConfigs[type];
@@ -196,25 +214,29 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
     }
   }, [onSearch, searchQuery]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      handleSearch();
-    }
-  }, [handleSearch, searchQuery]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && searchQuery.trim()) {
+        handleSearch();
+      }
+    },
+    [handleSearch, searchQuery]
+  );
 
   const getActionButtonClasses = (variant: 'primary' | 'secondary' | 'outline' = 'primary') => {
-    const base = 'inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
-    
+    const base =
+      'inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
+
     const variants = {
       primary: `${base} bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500`,
       secondary: `${base} bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500`,
-      outline: `${base} border-2 border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500`
+      outline: `${base} border-2 border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500`,
     };
 
     return variants[variant];
   };
 
-  const containerClasses = fullPage 
+  const containerClasses = fullPage
     ? 'min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12'
     : 'flex items-center justify-center p-8';
 
@@ -222,18 +244,16 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
     <div className={`${containerClasses} ${className}`}>
       <div className={`max-w-md w-full text-center ${animated ? 'animate-fade-in' : ''}`}>
         {/* Error Icon */}
-        <div className={`mx-auto w-24 h-24 ${config.bgColor} ${config.color} rounded-full flex items-center justify-center mb-8 ${animated ? 'animate-bounce' : ''}`}>
+        <div
+          className={`mx-auto w-24 h-24 ${config.bgColor} ${config.color} rounded-full flex items-center justify-center mb-8 ${animated ? 'animate-bounce' : ''}`}
+        >
           {config.icon}
         </div>
 
         {/* Error Message */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            {finalTitle}
-          </h1>
-          <p className="text-lg text-gray-600 leading-relaxed">
-            {finalMessage}
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{finalTitle}</h1>
+          <p className="text-lg text-gray-600 leading-relaxed">{finalMessage}</p>
         </div>
 
         {/* Search Bar (for 404 errors) */}
@@ -243,7 +263,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Search for what you're looking for..."
                 className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -262,20 +282,14 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           {showBackButton && (
-            <button
-              onClick={handleBack}
-              className={getActionButtonClasses('outline')}
-            >
+            <button onClick={handleBack} className={getActionButtonClasses('outline')}>
               <ArrowLeft className="w-5 h-5" />
               Go Back
             </button>
           )}
 
           {showHomeButton && (
-            <button
-              onClick={handleHome}
-              className={getActionButtonClasses('primary')}
-            >
+            <button onClick={handleHome} className={getActionButtonClasses('primary')}>
               <Home className="w-5 h-5" />
               Go Home
             </button>
@@ -307,9 +321,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         {/* Suggestions */}
         {showSuggestions && (
           <div className="text-left">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">
-              What you can try:
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">What you can try:</h3>
             <ul className="space-y-2">
               {config.suggestions.map((suggestion, index) => (
                 <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
@@ -327,7 +339,9 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
 
 // Hook for error handling
 export const useErrorHandler = () => {
-  const [error, setError] = useState<{ type: ErrorType; title?: string; message?: string } | null>(null);
+  const [error, setError] = useState<{ type: ErrorType; title?: string; message?: string } | null>(
+    null
+  );
 
   const showError = useCallback((type: ErrorType, title?: string, message?: string) => {
     setError({ type, title, message });
@@ -360,7 +374,7 @@ export const useErrorHandler = () => {
     handle404,
     handle500,
     handleNetworkError,
-    handlePermissionError
+    handlePermissionError,
   };
 };
 
@@ -376,7 +390,7 @@ export const ExampleErrorPages: React.FC = () => {
     { type: 'permission', label: 'Access Denied', description: 'Insufficient permissions' },
     { type: 'maintenance', label: 'Maintenance', description: 'Service temporarily unavailable' },
     { type: 'timeout', label: 'Timeout', description: 'Request took too long' },
-    { type: 'generic', label: 'Generic Error', description: 'General error state' }
+    { type: 'generic', label: 'Generic Error', description: 'General error state' },
   ];
 
   const customActions = [
@@ -384,14 +398,14 @@ export const ExampleErrorPages: React.FC = () => {
       label: 'Contact Support',
       onClick: () => alert('Contact support clicked'),
       variant: 'outline' as const,
-      icon: <HelpCircle className="w-5 h-5" />
+      icon: <HelpCircle className="w-5 h-5" />,
     },
     {
       label: 'Report Issue',
       onClick: () => alert('Report issue clicked'),
       variant: 'secondary' as const,
-      icon: <AlertTriangle className="w-5 h-5" />
-    }
+      icon: <AlertTriangle className="w-5 h-5" />,
+    },
   ];
 
   if (showDemo) {
@@ -403,10 +417,12 @@ export const ExampleErrorPages: React.FC = () => {
         >
           Close Demo
         </button>
-        
+
         <ErrorPage
           type={currentError}
-          showRefreshButton={currentError === '500' || currentError === 'network' || currentError === 'timeout'}
+          showRefreshButton={
+            currentError === '500' || currentError === 'network' || currentError === 'timeout'
+          }
           showSearchButton={currentError === '404'}
           customActions={currentError === '500' ? customActions : []}
           onBack={() => setShowDemo(false)}
@@ -427,7 +443,7 @@ export const ExampleErrorPages: React.FC = () => {
     <div className="space-y-8 p-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Error Page Types</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {errorTypes.map(({ type, label, description }) => (
             <button
@@ -474,7 +490,7 @@ export const ExampleErrorPages: React.FC = () => {
               className="bg-white border border-gray-200 rounded-lg"
             />
           </div>
-          
+
           <div className="border border-gray-200 rounded-lg p-4">
             <h5 className="text-sm font-medium text-gray-700 mb-3">Network Error</h5>
             <ErrorPage

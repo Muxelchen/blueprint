@@ -33,7 +33,7 @@ const Stepper: React.FC<StepperProps> = ({
   showStepNumbers = true,
   className = '',
   onStepChange,
-  onComplete
+  onComplete,
 }) => {
   const [activeStep, setActiveStep] = useState(currentStep);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
@@ -56,13 +56,13 @@ const Stepper: React.FC<StepperProps> = ({
     try {
       const isValid = await currentStepData.validate();
       const newErrors = new Set(validationErrors);
-      
+
       if (isValid) {
         newErrors.delete(activeStep);
       } else {
         newErrors.add(activeStep);
       }
-      
+
       setValidationErrors(newErrors);
       setIsValidating(false);
       return isValid;
@@ -71,7 +71,7 @@ const Stepper: React.FC<StepperProps> = ({
       const newErrors = new Set(validationErrors);
       newErrors.add(activeStep);
       setValidationErrors(newErrors);
-      
+
       console.error(`Error validating step ${activeStep}:`, error);
       setIsValidating(false);
       return false;
@@ -80,7 +80,7 @@ const Stepper: React.FC<StepperProps> = ({
 
   const handleNext = async () => {
     const isValid = await validateCurrentStep();
-    
+
     if (isValid) {
       const newCompleted = new Set(completedSteps);
       newCompleted.add(activeStep);
@@ -113,50 +113,51 @@ const Stepper: React.FC<StepperProps> = ({
 
   const getStepClasses = (stepIndex: number) => {
     const status = getStepStatus(stepIndex);
-    
+
     const baseClasses = 'step transition-all duration-200';
     const statusClasses = {
       completed: 'step-completed',
       active: 'step-active',
       error: 'step-error',
-      pending: 'step-pending'
+      pending: 'step-pending',
     };
 
-    const clickableClass = allowClickNavigation && stepIndex <= Math.max(...completedSteps, activeStep) 
-      ? 'cursor-pointer hover:opacity-80' 
-      : '';
+    const clickableClass =
+      allowClickNavigation && stepIndex <= Math.max(...completedSteps, activeStep)
+        ? 'cursor-pointer hover:opacity-80'
+        : '';
 
     return `${baseClasses} ${statusClasses[status]} ${clickableClass}`;
   };
 
   const renderStepIndicator = (step: Step, stepIndex: number) => {
     const status = getStepStatus(stepIndex);
-    
+
     const indicatorClasses = {
       default: {
         completed: 'bg-green-600 text-white border-green-600',
         active: 'bg-blue-600 text-white border-blue-600',
         error: 'bg-red-600 text-white border-red-600',
-        pending: 'bg-white text-gray-500 border-gray-300'
+        pending: 'bg-white text-gray-500 border-gray-300',
       },
       simple: {
         completed: 'bg-green-100 text-green-600 border-green-300',
         active: 'bg-blue-100 text-blue-600 border-blue-300',
         error: 'bg-red-100 text-red-600 border-red-300',
-        pending: 'bg-gray-100 text-gray-400 border-gray-300'
+        pending: 'bg-gray-100 text-gray-400 border-gray-300',
       },
       circles: {
         completed: 'bg-green-500 text-white',
         active: 'bg-blue-500 text-white',
         error: 'bg-red-500 text-white',
-        pending: 'bg-gray-300 text-gray-600'
+        pending: 'bg-gray-300 text-gray-600',
       },
       progress: {
         completed: 'bg-green-600 text-white',
         active: 'bg-blue-600 text-white',
         error: 'bg-red-600 text-white',
-        pending: 'bg-gray-300 text-gray-600'
-      }
+        pending: 'bg-gray-300 text-gray-600',
+      },
     };
 
     const sizeClasses = variant === 'circles' ? 'w-8 h-8' : 'w-10 h-10';
@@ -189,14 +190,10 @@ const Stepper: React.FC<StepperProps> = ({
       <div className="flex items-center gap-2 mb-1">
         <h3 className="font-semibold text-gray-900">{step.title}</h3>
         {step.optional && (
-          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-            Optional
-          </span>
+          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Optional</span>
         )}
       </div>
-      {step.description && (
-        <p className="text-sm text-gray-600">{step.description}</p>
-      )}
+      {step.description && <p className="text-sm text-gray-600">{step.description}</p>}
       {validationErrors.has(stepIndex) && (
         <p className="text-sm text-red-600 mt-1">Please complete this step</p>
       )}
@@ -205,10 +202,10 @@ const Stepper: React.FC<StepperProps> = ({
 
   const renderConnector = (stepIndex: number) => {
     if (stepIndex === steps.length - 1) return null;
-    
+
     const isCompleted = completedSteps.has(stepIndex);
     const connectorClass = isCompleted ? 'bg-green-600' : 'bg-gray-300';
-    
+
     if (orientation === 'horizontal') {
       return <div className={`flex-1 h-0.5 ${connectorClass} mx-2`} />;
     } else {
@@ -227,9 +224,7 @@ const Stepper: React.FC<StepperProps> = ({
             {renderStepIndicator(step, index)}
             <div className="ml-3">
               <div className="font-medium text-sm">{step.title}</div>
-              {step.description && (
-                <div className="text-xs text-gray-500">{step.description}</div>
-              )}
+              {step.description && <div className="text-xs text-gray-500">{step.description}</div>}
             </div>
           </div>
           {renderConnector(index)}
@@ -247,9 +242,7 @@ const Stepper: React.FC<StepperProps> = ({
             onClick={() => handleStepClick(index)}
           >
             {renderStepIndicator(step, index)}
-            <div className="ml-4 flex-1">
-              {renderStepContent(step, index)}
-            </div>
+            <div className="ml-4 flex-1">{renderStepContent(step, index)}</div>
           </div>
           {renderConnector(index)}
         </div>
@@ -258,8 +251,10 @@ const Stepper: React.FC<StepperProps> = ({
   );
 
   const renderProgressBar = () => {
-    const progress = ((completedSteps.size + (getStepStatus(activeStep) === 'active' ? 0.5 : 0)) / steps.length) * 100;
-    
+    const progress =
+      ((completedSteps.size + (getStepStatus(activeStep) === 'active' ? 0.5 : 0)) / steps.length) *
+      100;
+
     return (
       <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
         <div
@@ -273,7 +268,7 @@ const Stepper: React.FC<StepperProps> = ({
   return (
     <div className={`stepper ${className}`}>
       {variant === 'progress' && renderProgressBar()}
-      
+
       {/* Step Navigation */}
       <div className="step-navigation mb-8">
         {orientation === 'horizontal' ? renderHorizontalStepper() : renderVerticalStepper()}
@@ -281,9 +276,7 @@ const Stepper: React.FC<StepperProps> = ({
 
       {/* Current Step Content */}
       <div className="step-content mb-8">
-        <div className="bg-white rounded-lg border p-6">
-          {steps[activeStep]?.content}
-        </div>
+        <div className="bg-white rounded-lg border p-6">{steps[activeStep]?.content}</div>
       </div>
 
       {/* Navigation Controls */}
@@ -319,7 +312,7 @@ export const ExampleStepper: React.FC = () => {
   const [formData, setFormData] = useState({
     personalInfo: { name: '', email: '' },
     preferences: { notifications: false, theme: 'light' },
-    review: { confirmed: false }
+    review: { confirmed: false },
   });
 
   const steps: Step[] = [
@@ -328,44 +321,45 @@ export const ExampleStepper: React.FC = () => {
       title: 'Personal Information',
       description: 'Enter your basic details',
       validate: () => {
-        return formData.personalInfo.name.trim() !== '' && 
-               formData.personalInfo.email.trim() !== '';
+        return (
+          formData.personalInfo.name.trim() !== '' && formData.personalInfo.email.trim() !== ''
+        );
       },
       content: (
         <div className="space-y-4">
           <h2 className="text-xl font-bold mb-4">Personal Information</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
             <input
               type="text"
               value={formData.personalInfo.name}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                personalInfo: { ...prev.personalInfo, name: e.target.value }
-              }))}
+              onChange={e =>
+                setFormData(prev => ({
+                  ...prev,
+                  personalInfo: { ...prev.personalInfo, name: e.target.value },
+                }))
+              }
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your full name"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
             <input
               type="email"
               value={formData.personalInfo.email}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                personalInfo: { ...prev.personalInfo, email: e.target.value }
-              }))}
+              onChange={e =>
+                setFormData(prev => ({
+                  ...prev,
+                  personalInfo: { ...prev.personalInfo, email: e.target.value },
+                }))
+              }
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your email"
             />
           </div>
         </div>
-      )
+      ),
     },
     {
       id: 'preferences',
@@ -377,29 +371,29 @@ export const ExampleStepper: React.FC = () => {
           <h2 className="text-xl font-bold mb-4">Set Your Preferences</h2>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">
-                Email notifications
-              </label>
+              <label className="text-sm font-medium text-gray-700">Email notifications</label>
               <input
                 type="checkbox"
                 checked={formData.preferences.notifications}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  preferences: { ...prev.preferences, notifications: e.target.checked }
-                }))}
+                onChange={e =>
+                  setFormData(prev => ({
+                    ...prev,
+                    preferences: { ...prev.preferences, notifications: e.target.checked },
+                  }))
+                }
                 className="rounded"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Theme
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Theme</label>
               <select
                 value={formData.preferences.theme}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  preferences: { ...prev.preferences, theme: e.target.value }
-                }))}
+                onChange={e =>
+                  setFormData(prev => ({
+                    ...prev,
+                    preferences: { ...prev.preferences, theme: e.target.value },
+                  }))
+                }
                 className="w-full border border-gray-300 rounded-md px-3 py-2"
               >
                 <option value="light">Light</option>
@@ -409,7 +403,7 @@ export const ExampleStepper: React.FC = () => {
             </div>
           </div>
         </div>
-      )
+      ),
     },
     {
       id: 'review',
@@ -438,18 +432,20 @@ export const ExampleStepper: React.FC = () => {
               type="checkbox"
               id="confirm"
               checked={formData.review.confirmed}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                review: { confirmed: e.target.checked }
-              }))}
+              onChange={e =>
+                setFormData(prev => ({
+                  ...prev,
+                  review: { confirmed: e.target.checked },
+                }))
+              }
             />
             <label htmlFor="confirm" className="text-sm text-gray-700">
               I confirm that the information above is correct
             </label>
           </div>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   return (

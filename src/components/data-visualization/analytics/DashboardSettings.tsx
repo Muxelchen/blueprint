@@ -134,11 +134,15 @@ settings:
   snapToGrid: ${exportData.settings.snapToGrid}
 
 layouts:
-${exportData.layouts.map(layout => `  - id: "${layout.id}"
+${exportData.layouts
+  .map(
+    layout => `  - id: "${layout.id}"
     name: "${layout.name}"
     description: "${layout.description}"
     columns: ${layout.columns}
-    created: "${layout.created.toISOString()}"`).join('\n')}
+    created: "${layout.created.toISOString()}"`
+  )
+  .join('\n')}
 `;
       filename = `dashboard-config-${new Date().toISOString().split('T')[0]}.yaml`;
     }
@@ -196,22 +200,24 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
               <input
                 type="checkbox"
                 checked={localSettings.autoRefresh}
-                onChange={(e) => setLocalSettings(prev => ({ ...prev, autoRefresh: e.target.checked }))}
+                onChange={e =>
+                  setLocalSettings(prev => ({ ...prev, autoRefresh: e.target.checked }))
+                }
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </div>
 
             {localSettings.autoRefresh && (
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  Refresh Interval (seconds)
-                </label>
+                <label className="block text-sm font-medium mb-2">Refresh Interval (seconds)</label>
                 <select
                   value={localSettings.refreshInterval / 1000}
-                  onChange={(e) => setLocalSettings(prev => ({ 
-                    ...prev, 
-                    refreshInterval: parseInt(e.target.value) * 1000 
-                  }))}
+                  onChange={e =>
+                    setLocalSettings(prev => ({
+                      ...prev,
+                      refreshInterval: parseInt(e.target.value) * 1000,
+                    }))
+                  }
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                 >
                   <option value={10}>10 seconds</option>
@@ -231,7 +237,9 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
               <input
                 type="checkbox"
                 checked={localSettings.notifications}
-                onChange={(e) => setLocalSettings(prev => ({ ...prev, notifications: e.target.checked }))}
+                onChange={e =>
+                  setLocalSettings(prev => ({ ...prev, notifications: e.target.checked }))
+                }
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </div>
@@ -244,7 +252,9 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
               <input
                 type="checkbox"
                 checked={localSettings.compactMode}
-                onChange={(e) => setLocalSettings(prev => ({ ...prev, compactMode: e.target.checked }))}
+                onChange={e =>
+                  setLocalSettings(prev => ({ ...prev, compactMode: e.target.checked }))
+                }
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </div>
@@ -257,7 +267,9 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
               <input
                 type="checkbox"
                 checked={localSettings.animationsEnabled}
-                onChange={(e) => setLocalSettings(prev => ({ ...prev, animationsEnabled: e.target.checked }))}
+                onChange={e =>
+                  setLocalSettings(prev => ({ ...prev, animationsEnabled: e.target.checked }))
+                }
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </div>
@@ -275,10 +287,12 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
               <label className="block text-sm font-medium mb-2">Grid Size</label>
               <select
                 value={localSettings.gridSize}
-                onChange={(e) => setLocalSettings(prev => ({ 
-                  ...prev, 
-                  gridSize: parseInt(e.target.value) 
-                }))}
+                onChange={e =>
+                  setLocalSettings(prev => ({
+                    ...prev,
+                    gridSize: parseInt(e.target.value),
+                  }))
+                }
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
               >
                 <option value={5}>5px</option>
@@ -293,7 +307,9 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
                 type="checkbox"
                 id="snapToGrid"
                 checked={localSettings.snapToGrid}
-                onChange={(e) => setLocalSettings(prev => ({ ...prev, snapToGrid: e.target.checked }))}
+                onChange={e =>
+                  setLocalSettings(prev => ({ ...prev, snapToGrid: e.target.checked }))
+                }
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
               />
               <label htmlFor="snapToGrid" className="text-sm font-medium">
@@ -305,8 +321,11 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
           <div>
             <h3 className="text-lg font-semibold mb-4">Saved Layouts</h3>
             <div className="space-y-3">
-              {layouts.map((layout) => (
-                <div key={layout.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+              {layouts.map(layout => (
+                <div
+                  key={layout.id}
+                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                >
                   <div>
                     <h4 className="font-medium">{layout.name}</h4>
                     <p className="text-sm text-gray-500">{layout.description}</p>
@@ -315,11 +334,7 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
                     </p>
                   </div>
                   <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onLayoutLoad(layout.id)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => onLayoutLoad(layout.id)}>
                       Load
                     </Button>
                     <Button
@@ -342,13 +357,13 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
                   type="text"
                   placeholder="Layout name"
                   value={newLayoutName}
-                  onChange={(e) => setNewLayoutName(e.target.value)}
+                  onChange={e => setNewLayoutName(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                 />
                 <textarea
                   placeholder="Description (optional)"
                   value={newLayoutDescription}
-                  onChange={(e) => setNewLayoutDescription(e.target.value)}
+                  onChange={e => setNewLayoutDescription(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                   rows={2}
                 />
@@ -377,7 +392,7 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
                 <label className="block text-sm font-medium mb-2">Export Format</label>
                 <select
                   value={exportFormat}
-                  onChange={(e) => setExportFormat(e.target.value as 'json' | 'yaml')}
+                  onChange={e => setExportFormat(e.target.value as 'json' | 'yaml')}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="json">JSON</option>
@@ -396,7 +411,7 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
               <textarea
                 placeholder="Paste your configuration data here (JSON format)"
                 value={importData}
-                onChange={(e) => setImportData(e.target.value)}
+                onChange={e => setImportData(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                 rows={6}
               />
@@ -413,8 +428,8 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <h4 className="font-medium text-yellow-800 mb-2">⚠️ Import Warning</h4>
             <p className="text-sm text-yellow-700">
-              Importing will overwrite your current settings and may add new layouts. 
-              Consider exporting your current configuration first as a backup.
+              Importing will overwrite your current settings and may add new layouts. Consider
+              exporting your current configuration first as a backup.
             </p>
           </div>
         </div>
@@ -423,12 +438,7 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
   ];
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Dashboard Settings"
-      size="xl"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="Dashboard Settings" size="xl">
       <div className="space-y-6">
         <TabNavigation tabs={tabs} />
 
@@ -440,9 +450,7 @@ ${exportData.layouts.map(layout => `  - id: "${layout.id}"
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button onClick={handleSave}>
-              Save Settings
-            </Button>
+            <Button onClick={handleSave}>Save Settings</Button>
           </div>
         </div>
       </div>

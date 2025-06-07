@@ -52,7 +52,7 @@ const Slider: React.FC<SliderProps> = ({
   showTicks = false,
   showMinMax = false,
   marks = [],
-  formatValue = (value) => value.toString(),
+  formatValue = value => value.toString(),
   onChange,
   onChangeStart,
   onChangeEnd,
@@ -62,17 +62,17 @@ const Slider: React.FC<SliderProps> = ({
   thumbClassName = '',
   name,
   id,
-  required = false
+  required = false,
 }) => {
   const sliderRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const isControlled = controlledValue !== undefined;
-  
+
   const [state, setState] = useState<SliderState>({
     currentValue: controlledValue ?? defaultValue,
     isDragging: false,
     isFocused: false,
-    isHovered: false
+    isHovered: false,
   });
 
   // Update state when controlled value changes
@@ -83,134 +83,152 @@ const Slider: React.FC<SliderProps> = ({
   }, [controlledValue, isControlled]);
 
   // Clamp value to valid range
-  const clampValue = useCallback((value: number) => {
-    const clampedValue = Math.max(min, Math.min(max, value));
-    return Math.round(clampedValue / step) * step;
-  }, [min, max, step]);
+  const clampValue = useCallback(
+    (value: number) => {
+      const clampedValue = Math.max(min, Math.min(max, value));
+      return Math.round(clampedValue / step) * step;
+    },
+    [min, max, step]
+  );
 
   // Convert pixel position to value
-  const positionToValue = useCallback((clientX: number, clientY: number) => {
-    if (!sliderRef.current) return state.currentValue;
+  const positionToValue = useCallback(
+    (clientX: number, clientY: number) => {
+      if (!sliderRef.current) return state.currentValue;
 
-    const rect = sliderRef.current.getBoundingClientRect();
-    const isHorizontal = orientation === 'horizontal';
-    
-    const position = isHorizontal 
-      ? (clientX - rect.left) / rect.width
-      : 1 - (clientY - rect.top) / rect.height;
-    
-    const rawValue = min + position * (max - min);
-    return clampValue(rawValue);
-  }, [min, max, orientation, clampValue, state.currentValue]);
+      const rect = sliderRef.current.getBoundingClientRect();
+      const isHorizontal = orientation === 'horizontal';
+
+      const position = isHorizontal
+        ? (clientX - rect.left) / rect.width
+        : 1 - (clientY - rect.top) / rect.height;
+
+      const rawValue = min + position * (max - min);
+      return clampValue(rawValue);
+    },
+    [min, max, orientation, clampValue, state.currentValue]
+  );
 
   // Update value
-  const updateValue = useCallback((newValue: number, triggerChange = true) => {
-    const clampedValue = clampValue(newValue);
-    
-    if (!isControlled) {
-      setState(prev => ({ ...prev, currentValue: clampedValue }));
-    }
+  const updateValue = useCallback(
+    (newValue: number, triggerChange = true) => {
+      const clampedValue = clampValue(newValue);
 
-    if (triggerChange) {
-      onChange?.(clampedValue);
-    }
-  }, [clampValue, isControlled, onChange]);
+      if (!isControlled) {
+        setState(prev => ({ ...prev, currentValue: clampedValue }));
+      }
+
+      if (triggerChange) {
+        onChange?.(clampedValue);
+      }
+    },
+    [clampValue, isControlled, onChange]
+  );
 
   // Handle mouse events
-  const handleMouseDown = useCallback((event: React.MouseEvent) => {
-    if (disabled) return;
+  const handleMouseDown = useCallback(
+    (event: React.MouseEvent) => {
+      if (disabled) return;
 
-    event.preventDefault();
-    const newValue = positionToValue(event.clientX, event.clientY);
-    
-    setState(prev => ({ ...prev, isDragging: true }));
-    updateValue(newValue);
-    onChangeStart?.(newValue);
+      event.preventDefault();
+      const newValue = positionToValue(event.clientX, event.clientY);
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const value = positionToValue(e.clientX, e.clientY);
-      updateValue(value);
-    };
+      setState(prev => ({ ...prev, isDragging: true }));
+      updateValue(newValue);
+      onChangeStart?.(newValue);
 
-    const handleMouseUp = () => {
-      setState(prev => ({ ...prev, isDragging: false }));
-      onChangeEnd?.(state.currentValue);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
+      const handleMouseMove = (e: MouseEvent) => {
+        const value = positionToValue(e.clientX, e.clientY);
+        updateValue(value);
+      };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, [disabled, positionToValue, updateValue, onChangeStart, onChangeEnd, state.currentValue]);
+      const handleMouseUp = () => {
+        setState(prev => ({ ...prev, isDragging: false }));
+        onChangeEnd?.(state.currentValue);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    },
+    [disabled, positionToValue, updateValue, onChangeStart, onChangeEnd, state.currentValue]
+  );
 
   // Handle touch events
-  const handleTouchStart = useCallback((event: React.TouchEvent) => {
-    if (disabled) return;
+  const handleTouchStart = useCallback(
+    (event: React.TouchEvent) => {
+      if (disabled) return;
 
-    const touch = event.touches[0];
-    const newValue = positionToValue(touch.clientX, touch.clientY);
-    
-    setState(prev => ({ ...prev, isDragging: true }));
-    updateValue(newValue);
-    onChangeStart?.(newValue);
+      const touch = event.touches[0];
+      const newValue = positionToValue(touch.clientX, touch.clientY);
 
-    const handleTouchMove = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      const value = positionToValue(touch.clientX, touch.clientY);
-      updateValue(value);
-    };
+      setState(prev => ({ ...prev, isDragging: true }));
+      updateValue(newValue);
+      onChangeStart?.(newValue);
 
-    const handleTouchEnd = () => {
-      setState(prev => ({ ...prev, isDragging: false }));
-      onChangeEnd?.(state.currentValue);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
+      const handleTouchMove = (e: TouchEvent) => {
+        const touch = e.touches[0];
+        const value = positionToValue(touch.clientX, touch.clientY);
+        updateValue(value);
+      };
 
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
-  }, [disabled, positionToValue, updateValue, onChangeStart, onChangeEnd, state.currentValue]);
+      const handleTouchEnd = () => {
+        setState(prev => ({ ...prev, isDragging: false }));
+        onChangeEnd?.(state.currentValue);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+    },
+    [disabled, positionToValue, updateValue, onChangeStart, onChangeEnd, state.currentValue]
+  );
 
   // Handle keyboard events
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (disabled) return;
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (disabled) return;
 
-    let newValue = state.currentValue;
-    const largeStep = step * 10;
+      let newValue = state.currentValue;
+      const largeStep = step * 10;
 
-    switch (event.key) {
-      case 'ArrowLeft':
-      case 'ArrowDown':
-        event.preventDefault();
-        newValue = state.currentValue - step;
-        break;
-      case 'ArrowRight':
-      case 'ArrowUp':
-        event.preventDefault();
-        newValue = state.currentValue + step;
-        break;
-      case 'PageDown':
-        event.preventDefault();
-        newValue = state.currentValue - largeStep;
-        break;
-      case 'PageUp':
-        event.preventDefault();
-        newValue = state.currentValue + largeStep;
-        break;
-      case 'Home':
-        event.preventDefault();
-        newValue = min;
-        break;
-      case 'End':
-        event.preventDefault();
-        newValue = max;
-        break;
-      default:
-        return;
-    }
+      switch (event.key) {
+        case 'ArrowLeft':
+        case 'ArrowDown':
+          event.preventDefault();
+          newValue = state.currentValue - step;
+          break;
+        case 'ArrowRight':
+        case 'ArrowUp':
+          event.preventDefault();
+          newValue = state.currentValue + step;
+          break;
+        case 'PageDown':
+          event.preventDefault();
+          newValue = state.currentValue - largeStep;
+          break;
+        case 'PageUp':
+          event.preventDefault();
+          newValue = state.currentValue + largeStep;
+          break;
+        case 'Home':
+          event.preventDefault();
+          newValue = min;
+          break;
+        case 'End':
+          event.preventDefault();
+          newValue = max;
+          break;
+        default:
+          return;
+      }
 
-    updateValue(newValue);
-  }, [disabled, state.currentValue, step, min, max, updateValue]);
+      updateValue(newValue);
+    },
+    [disabled, state.currentValue, step, min, max, updateValue]
+  );
 
   const handleFocus = useCallback(() => {
     setState(prev => ({ ...prev, isFocused: true }));
@@ -239,18 +257,18 @@ const Slider: React.FC<SliderProps> = ({
       sm: {
         track: orientation === 'horizontal' ? 'h-1' : 'w-1',
         thumb: 'w-4 h-4',
-        container: orientation === 'horizontal' ? 'h-6' : 'w-6'
+        container: orientation === 'horizontal' ? 'h-6' : 'w-6',
       },
       md: {
         track: orientation === 'horizontal' ? 'h-2' : 'w-2',
         thumb: 'w-5 h-5',
-        container: orientation === 'horizontal' ? 'h-8' : 'w-8'
+        container: orientation === 'horizontal' ? 'h-8' : 'w-8',
       },
       lg: {
         track: orientation === 'horizontal' ? 'h-3' : 'w-3',
         thumb: 'w-6 h-6',
-        container: orientation === 'horizontal' ? 'h-10' : 'w-10'
-      }
+        container: orientation === 'horizontal' ? 'h-10' : 'w-10',
+      },
     };
     return configs[size];
   };
@@ -262,32 +280,32 @@ const Slider: React.FC<SliderProps> = ({
         track: 'bg-gray-200',
         fill: 'bg-gray-600',
         thumb: 'bg-white border-gray-600',
-        focus: 'focus:ring-gray-500'
+        focus: 'focus:ring-gray-500',
       },
       primary: {
         track: 'bg-gray-200',
         fill: 'bg-blue-600',
         thumb: 'bg-white border-blue-600',
-        focus: 'focus:ring-blue-500'
+        focus: 'focus:ring-blue-500',
       },
       success: {
         track: 'bg-gray-200',
         fill: 'bg-green-600',
         thumb: 'bg-white border-green-600',
-        focus: 'focus:ring-green-500'
+        focus: 'focus:ring-green-500',
       },
       warning: {
         track: 'bg-gray-200',
         fill: 'bg-yellow-500',
         thumb: 'bg-white border-yellow-500',
-        focus: 'focus:ring-yellow-500'
+        focus: 'focus:ring-yellow-500',
       },
       danger: {
         track: 'bg-gray-200',
         fill: 'bg-red-600',
         thumb: 'bg-white border-red-600',
-        focus: 'focus:ring-red-500'
-      }
+        focus: 'focus:ring-red-500',
+      },
     };
     return configs[variant];
   };
@@ -300,26 +318,26 @@ const Slider: React.FC<SliderProps> = ({
   // Generate tick marks
   const generateTicks = () => {
     if (!showTicks && marks.length === 0) return [];
-    
+
     const ticks = [];
-    
+
     if (showTicks) {
       const tickCount = Math.min(21, (max - min) / step + 1); // Limit ticks
       const tickStep = (max - min) / (tickCount - 1);
-      
+
       for (let i = 0; i < tickCount; i++) {
         const value = min + i * tickStep;
         ticks.push({ value: clampValue(value), label: '' });
       }
     }
-    
+
     // Add custom marks
     marks.forEach(mark => {
       if (mark.value >= min && mark.value <= max) {
         ticks.push(mark);
       }
     });
-    
+
     return ticks.sort((a, b) => a.value - b.value);
   };
 
@@ -343,9 +361,10 @@ const Slider: React.FC<SliderProps> = ({
 
   const fillClasses = `
     absolute rounded-full pointer-events-none
-    ${orientation === 'horizontal' 
-      ? `h-full ${sizeConfig.track}` 
-      : `w-full ${sizeConfig.track} bottom-0`
+    ${
+      orientation === 'horizontal'
+        ? `h-full ${sizeConfig.track}`
+        : `w-full ${sizeConfig.track} bottom-0`
     }
     ${variantConfig.fill}
     ${disabled ? 'opacity-50' : ''}
@@ -369,17 +388,13 @@ const Slider: React.FC<SliderProps> = ({
         <div className="flex items-center justify-between">
           <label
             htmlFor={sliderId}
-            className={`block text-sm font-medium ${
-              disabled ? 'text-gray-400' : 'text-gray-700'
-            }`}
+            className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-gray-700'}`}
           >
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
           {showValue && (
-            <span className={`text-sm font-medium ${
-              disabled ? 'text-gray-400' : 'text-gray-900'
-            }`}>
+            <span className={`text-sm font-medium ${disabled ? 'text-gray-400' : 'text-gray-900'}`}>
               {formatValue(state.currentValue)}
             </span>
           )}
@@ -388,9 +403,7 @@ const Slider: React.FC<SliderProps> = ({
 
       {/* Description */}
       {description && (
-        <p className={`text-sm ${disabled ? 'text-gray-400' : 'text-gray-600'}`}>
-          {description}
-        </p>
+        <p className={`text-sm ${disabled ? 'text-gray-400' : 'text-gray-600'}`}>{description}</p>
       )}
 
       {/* Min/Max Labels */}
@@ -431,7 +444,7 @@ const Slider: React.FC<SliderProps> = ({
           <div
             className={fillClasses}
             style={{
-              [orientation === 'horizontal' ? 'width' : 'height']: `${percentage}%`
+              [orientation === 'horizontal' ? 'width' : 'height']: `${percentage}%`,
             }}
           />
 
@@ -445,7 +458,7 @@ const Slider: React.FC<SliderProps> = ({
                   orientation === 'horizontal' ? 'top-1/2' : 'left-1/2'
                 }`}
                 style={{
-                  [orientation === 'horizontal' ? 'left' : 'bottom']: `${tickPercentage}%`
+                  [orientation === 'horizontal' ? 'left' : 'bottom']: `${tickPercentage}%`,
                 }}
               />
             );
@@ -457,7 +470,7 @@ const Slider: React.FC<SliderProps> = ({
             className={thumbClasses}
             style={{
               [orientation === 'horizontal' ? 'left' : 'bottom']: `${percentage}%`,
-              [orientation === 'horizontal' ? 'top' : 'left']: '50%'
+              [orientation === 'horizontal' ? 'top' : 'left']: '50%',
             }}
             tabIndex={disabled ? -1 : 0}
             onKeyDown={handleKeyDown}
@@ -473,7 +486,9 @@ const Slider: React.FC<SliderProps> = ({
 
         {/* Mark Labels */}
         {marks.length > 0 && (
-          <div className={`absolute ${orientation === 'horizontal' ? 'top-full mt-2 w-full' : 'left-full ml-2 h-full'}`}>
+          <div
+            className={`absolute ${orientation === 'horizontal' ? 'top-full mt-2 w-full' : 'left-full ml-2 h-full'}`}
+          >
             {marks.map((mark, index) => {
               if (!mark.label) return null;
               const markPercentage = ((mark.value - min) / (max - min)) * 100;
@@ -481,12 +496,12 @@ const Slider: React.FC<SliderProps> = ({
                 <div
                   key={index}
                   className={`absolute text-xs text-gray-500 ${
-                    orientation === 'horizontal' 
-                      ? 'transform -translate-x-1/2' 
+                    orientation === 'horizontal'
+                      ? 'transform -translate-x-1/2'
                       : 'transform -translate-y-1/2'
                   }`}
                   style={{
-                    [orientation === 'horizontal' ? 'left' : 'bottom']: `${markPercentage}%`
+                    [orientation === 'horizontal' ? 'left' : 'bottom']: `${markPercentage}%`,
                   }}
                 >
                   {mark.label}
@@ -524,29 +539,29 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
     }
   }, [controlledValue, isControlled]);
 
-  const handleLowChange = useCallback((value: number) => {
-    const newRange: [number, number] = [
-      Math.min(value, range[1] - minDistance),
-      range[1]
-    ];
-    
-    if (!isControlled) {
-      setRange(newRange);
-    }
-    onChange?.(newRange);
-  }, [range, minDistance, isControlled, onChange]);
+  const handleLowChange = useCallback(
+    (value: number) => {
+      const newRange: [number, number] = [Math.min(value, range[1] - minDistance), range[1]];
 
-  const handleHighChange = useCallback((value: number) => {
-    const newRange: [number, number] = [
-      range[0],
-      Math.max(value, range[0] + minDistance)
-    ];
-    
-    if (!isControlled) {
-      setRange(newRange);
-    }
-    onChange?.(newRange);
-  }, [range, minDistance, isControlled, onChange]);
+      if (!isControlled) {
+        setRange(newRange);
+      }
+      onChange?.(newRange);
+    },
+    [range, minDistance, isControlled, onChange]
+  );
+
+  const handleHighChange = useCallback(
+    (value: number) => {
+      const newRange: [number, number] = [range[0], Math.max(value, range[0] + minDistance)];
+
+      if (!isControlled) {
+        setRange(newRange);
+      }
+      onChange?.(newRange);
+    },
+    [range, minDistance, isControlled, onChange]
+  );
 
   return (
     <div className="space-y-4">
@@ -590,7 +605,7 @@ export const ExampleSliders: React.FC = () => {
   const [settings, setSettings] = useState({
     quality: 80,
     speed: 2,
-    opacity: 0.8
+    opacity: 0.8,
   });
 
   const temperatureMarks = [
@@ -598,14 +613,14 @@ export const ExampleSliders: React.FC = () => {
     { value: 25, label: 'Room' },
     { value: 50, label: 'Warm' },
     { value: 75, label: 'Hot' },
-    { value: 100, label: 'Very Hot' }
+    { value: 100, label: 'Very Hot' },
   ];
 
   return (
     <div className="space-y-8 max-w-2xl mx-auto p-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Slider Examples</h3>
-        
+
         <div className="space-y-8">
           {/* Basic Sliders */}
           <div>
@@ -632,7 +647,7 @@ export const ExampleSliders: React.FC = () => {
                 max={100}
                 step={5}
                 variant="success"
-                formatValue={(value) => `${value}%`}
+                formatValue={value => `${value}%`}
               />
 
               <Slider
@@ -645,7 +660,7 @@ export const ExampleSliders: React.FC = () => {
                 step={1}
                 variant="warning"
                 marks={temperatureMarks}
-                formatValue={(value) => `${value}°C`}
+                formatValue={value => `${value}°C`}
               />
             </div>
           </div>
@@ -654,26 +669,11 @@ export const ExampleSliders: React.FC = () => {
           <div>
             <h4 className="font-medium mb-4">Size Variants</h4>
             <div className="space-y-6">
-              <Slider
-                label="Small Slider"
-                defaultValue={30}
-                size="sm"
-                variant="primary"
-              />
-              
-              <Slider
-                label="Medium Slider"
-                defaultValue={60}
-                size="md"
-                variant="primary"
-              />
-              
-              <Slider
-                label="Large Slider"
-                defaultValue={90}
-                size="lg"
-                variant="primary"
-              />
+              <Slider label="Small Slider" defaultValue={30} size="sm" variant="primary" />
+
+              <Slider label="Medium Slider" defaultValue={60} size="md" variant="primary" />
+
+              <Slider label="Large Slider" defaultValue={90} size="lg" variant="primary" />
             </div>
           </div>
 
@@ -699,7 +699,7 @@ export const ExampleSliders: React.FC = () => {
               max={100}
               minDistance={10}
               variant="primary"
-              formatValue={(value) => `$${value}`}
+              formatValue={value => `$${value}`}
             />
           </div>
 
@@ -710,12 +710,12 @@ export const ExampleSliders: React.FC = () => {
               <Slider
                 label="Vertical Control"
                 value={settings.opacity * 100}
-                onChange={(value) => setSettings(prev => ({ ...prev, opacity: value / 100 }))}
+                onChange={value => setSettings(prev => ({ ...prev, opacity: value / 100 }))}
                 min={0}
                 max={100}
                 orientation="vertical"
                 variant="primary"
-                formatValue={(value) => `${value}%`}
+                formatValue={value => `${value}%`}
               />
             </div>
           </div>
@@ -726,25 +726,20 @@ export const ExampleSliders: React.FC = () => {
             <Slider
               label="Quality Setting"
               value={settings.quality}
-              onChange={(value) => setSettings(prev => ({ ...prev, quality: value }))}
+              onChange={value => setSettings(prev => ({ ...prev, quality: value }))}
               min={0}
               max={100}
               step={10}
               showTicks
               variant="success"
-              formatValue={(value) => `${value}%`}
+              formatValue={value => `${value}%`}
             />
           </div>
 
           {/* Disabled State */}
           <div>
             <h4 className="font-medium mb-4">Disabled State</h4>
-            <Slider
-              label="Disabled Slider"
-              defaultValue={75}
-              disabled
-              variant="primary"
-            />
+            <Slider label="Disabled Slider" defaultValue={75} disabled variant="primary" />
           </div>
         </div>
 
@@ -753,13 +748,23 @@ export const ExampleSliders: React.FC = () => {
           <h4 className="font-medium mb-2">Current Values</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <p><strong>Volume:</strong> {volume}</p>
-              <p><strong>Brightness:</strong> {brightness}%</p>
-              <p><strong>Temperature:</strong> {temperature}°C</p>
-              <p><strong>Price Range:</strong> ${priceRange[0]} - ${priceRange[1]}</p>
+              <p>
+                <strong>Volume:</strong> {volume}
+              </p>
+              <p>
+                <strong>Brightness:</strong> {brightness}%
+              </p>
+              <p>
+                <strong>Temperature:</strong> {temperature}°C
+              </p>
+              <p>
+                <strong>Price Range:</strong> ${priceRange[0]} - ${priceRange[1]}
+              </p>
             </div>
             <div>
-              <p><strong>Settings:</strong></p>
+              <p>
+                <strong>Settings:</strong>
+              </p>
               <pre className="text-xs bg-white p-2 rounded border mt-1">
                 {JSON.stringify(settings, null, 2)}
               </pre>

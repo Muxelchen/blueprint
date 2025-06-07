@@ -7,7 +7,7 @@ export { TemplateShowcase } from './TemplateShowcase';
 export * from './common';
 
 // Forms Components
-export { 
+export {
   default as Form,
   FormField,
   FormActions,
@@ -15,7 +15,7 @@ export {
   useFormContext,
   useFormValidation,
   useFormState,
-  useFormActions
+  useFormActions,
 } from './forms/Form';
 
 // Navigation Components (nav-components, routing)

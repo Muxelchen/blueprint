@@ -1,16 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Polyline, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import {
-  MapPin,
-  Navigation,
-  Timer,
-  Car,
-  Truck,
-  Bike,
-  MapIcon,
-  RefreshCw
-} from 'lucide-react';
+import { MapPin, Navigation, Timer, Car, Truck, Bike, MapIcon, RefreshCw } from 'lucide-react';
 
 export interface RoutePoint {
   lat: number;
@@ -55,31 +46,31 @@ const generateMockRoutes = (): RouteData[] => {
   const sfToLaPoints: RoutePoint[] = [];
   const sfToLaWaypoints = [
     { lat: 37.7749, lng: -122.4194, name: 'San Francisco' },
-    { lat: 37.4419, lng: -122.1430, name: 'Palo Alto' },
+    { lat: 37.4419, lng: -122.143, name: 'Palo Alto' },
     { lat: 36.7783, lng: -119.4179, name: 'Fresno' },
     { lat: 35.3733, lng: -119.0187, name: 'Bakersfield' },
-    { lat: 34.0522, lng: -118.2437, name: 'Los Angeles' }
+    { lat: 34.0522, lng: -118.2437, name: 'Los Angeles' },
   ];
 
   for (let i = 0; i < sfToLaWaypoints.length - 1; i++) {
     const start = sfToLaWaypoints[i];
     const end = sfToLaWaypoints[i + 1];
     const segments = 20;
-    
+
     for (let j = 0; j <= segments; j++) {
       const ratio = j / segments;
       const lat = start.lat + (end.lat - start.lat) * ratio;
       const lng = start.lng + (end.lng - start.lng) * ratio;
       const timestamp = new Date();
-      timestamp.setMinutes(timestamp.getMinutes() + (i * 60) + (j * 3));
-      
+      timestamp.setMinutes(timestamp.getMinutes() + i * 60 + j * 3);
+
       sfToLaPoints.push({
         lat,
         lng,
         timestamp,
         speed: 65 + Math.random() * 15,
         elevation: Math.random() * 1000,
-        heading: Math.random() * 360
+        heading: Math.random() * 360,
       });
     }
   }
@@ -100,41 +91,41 @@ const generateMockRoutes = (): RouteData[] => {
       driver: 'John Doe',
       vehicle: 'Truck-001',
       cargo: 'Electronics',
-      fuelUsed: 45.2
+      fuelUsed: 45.2,
     },
-    visible: true
+    visible: true,
   });
 
   // Route 2: New York City Delivery Routes
   const nycDeliveryPoints: RoutePoint[] = [];
   const nycStops = [
-    { lat: 40.7128, lng: -74.0060, name: 'Manhattan Depot' },
+    { lat: 40.7128, lng: -74.006, name: 'Manhattan Depot' },
     { lat: 40.7589, lng: -73.9851, name: 'Times Square' },
     { lat: 40.7831, lng: -73.9712, name: 'Central Park' },
-    { lat: 40.7505, lng: -73.9934, name: 'Hell\'s Kitchen' },
+    { lat: 40.7505, lng: -73.9934, name: "Hell's Kitchen" },
     { lat: 40.7282, lng: -74.0776, name: 'Jersey City' },
-    { lat: 40.7128, lng: -74.0060, name: 'Return to Depot' }
+    { lat: 40.7128, lng: -74.006, name: 'Return to Depot' },
   ];
 
   for (let i = 0; i < nycStops.length - 1; i++) {
     const start = nycStops[i];
     const end = nycStops[i + 1];
     const segments = 15;
-    
+
     for (let j = 0; j <= segments; j++) {
       const ratio = j / segments;
       const lat = start.lat + (end.lat - start.lat) * ratio + (Math.random() - 0.5) * 0.001;
       const lng = start.lng + (end.lng - start.lng) * ratio + (Math.random() - 0.5) * 0.001;
       const timestamp = new Date();
-      timestamp.setMinutes(timestamp.getMinutes() + (i * 30) + (j * 2));
-      
+      timestamp.setMinutes(timestamp.getMinutes() + i * 30 + j * 2);
+
       nycDeliveryPoints.push({
         lat,
         lng,
         timestamp,
         speed: 25 + Math.random() * 20,
         elevation: Math.random() * 50,
-        heading: Math.random() * 360
+        heading: Math.random() * 360,
       });
     }
   }
@@ -154,41 +145,41 @@ const generateMockRoutes = (): RouteData[] => {
       driver: 'Maria Garcia',
       vehicle: 'Van-007',
       deliveries: 12,
-      packages: 87
+      packages: 87,
     },
-    visible: true
+    visible: true,
   });
 
   // Route 3: Chicago to Milwaukee
   const chiToMilPoints: RoutePoint[] = [];
   const chiToMilWaypoints = [
     { lat: 41.8781, lng: -87.6298, name: 'Chicago' },
-    { lat: 42.0308, lng: -87.6890, name: 'Evanston' },
+    { lat: 42.0308, lng: -87.689, name: 'Evanston' },
     { lat: 42.3314, lng: -87.8458, name: 'Waukegan' },
     { lat: 42.5584, lng: -87.8212, name: 'Kenosha' },
-    { lat: 43.0389, lng: -87.9065, name: 'Milwaukee' }
+    { lat: 43.0389, lng: -87.9065, name: 'Milwaukee' },
   ];
 
   for (let i = 0; i < chiToMilWaypoints.length - 1; i++) {
     const start = chiToMilWaypoints[i];
     const end = chiToMilWaypoints[i + 1];
     const segments = 12;
-    
+
     for (let j = 0; j <= segments; j++) {
       const ratio = j / segments;
       const lat = start.lat + (end.lat - start.lat) * ratio;
       const lng = start.lng + (end.lng - start.lng) * ratio;
       const timestamp = new Date();
       timestamp.setHours(timestamp.getHours() + 2);
-      timestamp.setMinutes(timestamp.getMinutes() + (i * 20) + (j * 2));
-      
+      timestamp.setMinutes(timestamp.getMinutes() + i * 20 + j * 2);
+
       chiToMilPoints.push({
         lat,
         lng,
         timestamp,
         speed: 55 + Math.random() * 10,
         elevation: Math.random() * 200,
-        heading: Math.random() * 360
+        heading: Math.random() * 360,
       });
     }
   }
@@ -208,9 +199,9 @@ const generateMockRoutes = (): RouteData[] => {
       driver: 'Robert Johnson',
       vehicle: 'Bus-203',
       passengers: 28,
-      route: 'Express-92'
+      route: 'Express-92',
     },
-    visible: true
+    visible: true,
   });
 
   // Route 4: Seattle Bike Tour
@@ -218,32 +209,32 @@ const generateMockRoutes = (): RouteData[] => {
   const bikeStops = [
     { lat: 47.6062, lng: -122.3321, name: 'Pike Place Market' },
     { lat: 47.6205, lng: -122.3493, name: 'Seattle Center' },
-    { lat: 47.6278, lng: -122.3540, name: 'Queen Anne Hill' },
+    { lat: 47.6278, lng: -122.354, name: 'Queen Anne Hill' },
     { lat: 47.6587, lng: -122.3248, name: 'Fremont' },
     { lat: 47.6815, lng: -122.3414, name: 'Ballard' },
     { lat: 47.6734, lng: -122.3853, name: 'Discovery Park' },
-    { lat: 47.6062, lng: -122.3321, name: 'Return to Start' }
+    { lat: 47.6062, lng: -122.3321, name: 'Return to Start' },
   ];
 
   for (let i = 0; i < bikeStops.length - 1; i++) {
     const start = bikeStops[i];
     const end = bikeStops[i + 1];
     const segments = 10;
-    
+
     for (let j = 0; j <= segments; j++) {
       const ratio = j / segments;
       const lat = start.lat + (end.lat - start.lat) * ratio + (Math.random() - 0.5) * 0.002;
       const lng = start.lng + (end.lng - start.lng) * ratio + (Math.random() - 0.5) * 0.002;
       const timestamp = new Date();
-      timestamp.setMinutes(timestamp.getMinutes() - 60 + (i * 15) + (j * 1.5));
-      
+      timestamp.setMinutes(timestamp.getMinutes() - 60 + i * 15 + j * 1.5);
+
       seattleBikePoints.push({
         lat,
         lng,
         timestamp,
         speed: 12 + Math.random() * 8,
         elevation: Math.random() * 150,
-        heading: Math.random() * 360
+        heading: Math.random() * 360,
       });
     }
   }
@@ -264,9 +255,9 @@ const generateMockRoutes = (): RouteData[] => {
       cyclist: 'Emily Chen',
       bike: 'Mountain-Bike-12',
       calories: 680,
-      avgSpeed: 16.7
+      avgSpeed: 16.7,
     },
-    visible: true
+    visible: true,
   });
 
   return routes;
@@ -278,7 +269,7 @@ const routeTypeConfig = {
   walking: { icon: Navigation, color: '#10B981', strokeWidth: 3 },
   cycling: { icon: Bike, color: '#8B5CF6', strokeWidth: 3 },
   transit: { icon: Truck, color: '#F59E0B', strokeWidth: 5 },
-  delivery: { icon: Truck, color: '#EF4444', strokeWidth: 4 }
+  delivery: { icon: Truck, color: '#EF4444', strokeWidth: 4 },
 };
 
 // Route controls component
@@ -303,7 +294,7 @@ const RouteControls: React.FC<{
   onToggleWaypoints,
   onRouteToggle,
   onReset,
-  onExport
+  onExport,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -329,27 +320,27 @@ const RouteControls: React.FC<{
           <button
             onClick={onToggleAnimation}
             className={`flex items-center space-x-1 px-2 py-1 rounded text-xs transition-colors ${
-              isAnimating 
-                ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+              isAnimating
+                ? 'bg-red-100 text-red-700 hover:bg-red-200'
                 : 'bg-green-100 text-green-700 hover:bg-green-200'
             }`}
           >
             {isAnimating ? <Timer className="w-3 h-3" /> : <Timer className="w-3 h-3" />}
             <span>{isAnimating ? 'Pause' : 'Play'}</span>
           </button>
-          
+
           <button
             onClick={onToggleWaypoints}
             className={`flex items-center space-x-1 px-2 py-1 rounded text-xs transition-colors ${
-              showWaypoints 
-                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
+              showWaypoints
+                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             <MapPin className="w-3 h-3" />
             <span>Waypoints</span>
           </button>
-          
+
           <button
             onClick={onReset}
             className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
@@ -357,7 +348,7 @@ const RouteControls: React.FC<{
           >
             <RefreshCw className="w-3 h-3" />
           </button>
-          
+
           <button
             onClick={onExport}
             className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
@@ -369,38 +360,42 @@ const RouteControls: React.FC<{
 
         {/* Route List */}
         <div className="space-y-1">
-          {routes.map((route) => {
+          {routes.map(route => {
             const config = routeTypeConfig[route.type];
             const Icon = config.icon;
-            
+
             return (
               <button
                 key={route.id}
                 onClick={() => onRouteToggle(route.id)}
                 className={`w-full flex items-center justify-between p-2 rounded text-left transition-all ${
-                  route.visible 
-                    ? 'bg-gray-50 hover:bg-gray-100' 
+                  route.visible
+                    ? 'bg-gray-50 hover:bg-gray-100'
                     : 'bg-gray-100 opacity-50 hover:opacity-75'
                 }`}
               >
                 <div className="flex items-center space-x-2">
-                  <div
-                    className="w-3 h-3 rounded"
-                    style={{ backgroundColor: route.color }}
-                  />
+                  <div className="w-3 h-3 rounded" style={{ backgroundColor: route.color }} />
                   <Icon className="w-3 h-3" />
                   <div>
                     <div className="text-xs font-medium">{route.name}</div>
-                    <div className="text-xs text-gray-500">{route.distance}mi • {route.duration}min</div>
+                    <div className="text-xs text-gray-500">
+                      {route.distance}mi • {route.duration}min
+                    </div>
                   </div>
                 </div>
-                
-                <div className={`text-xs px-1 rounded ${
-                  route.status === 'active' ? 'bg-green-100 text-green-700' :
-                  route.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                  route.status === 'planned' ? 'bg-yellow-100 text-yellow-700' :
-                  'bg-red-100 text-red-700'
-                }`}>
+
+                <div
+                  className={`text-xs px-1 rounded ${
+                    route.status === 'active'
+                      ? 'bg-green-100 text-green-700'
+                      : route.status === 'completed'
+                        ? 'bg-blue-100 text-blue-700'
+                        : route.status === 'planned'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-red-100 text-red-700'
+                  }`}
+                >
                   {route.status}
                 </div>
               </button>
@@ -423,7 +418,7 @@ const RouteControls: React.FC<{
               max="2000"
               step="100"
               value={animationSpeed}
-              onChange={(e) => onSpeedChange(Number(e.target.value))}
+              onChange={e => onSpeedChange(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
             />
           </div>
@@ -438,11 +433,15 @@ const RouteControls: React.FC<{
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Active:</span>
-                <span className="font-medium">{routes.filter(r => r.status === 'active').length}</span>
+                <span className="font-medium">
+                  {routes.filter(r => r.status === 'active').length}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Total Distance:</span>
-                <span className="font-medium">{routes.reduce((sum, r) => sum + (r.distance || 0), 0).toFixed(1)}mi</span>
+                <span className="font-medium">
+                  {routes.reduce((sum, r) => sum + (r.distance || 0), 0).toFixed(1)}mi
+                </span>
               </div>
             </div>
           </div>
@@ -460,7 +459,7 @@ const AnimatedMarker: React.FC<{
 }> = ({ route, animationProgress, showWaypoints }) => {
   const currentPointIndex = Math.floor(animationProgress * (route.points.length - 1));
   const currentPoint = route.points[currentPointIndex];
-  
+
   if (!currentPoint) return null;
 
   const config = routeTypeConfig[route.type];
@@ -499,24 +498,21 @@ const AnimatedMarker: React.FC<{
       className: 'animated-marker',
       iconSize: [24, 24],
       iconAnchor: [12, 12],
-      popupAnchor: [0, -12]
+      popupAnchor: [0, -12],
     });
   };
 
   return (
     <>
       {/* Moving marker */}
-      <Marker
-        position={[currentPoint.lat, currentPoint.lng]}
-        icon={createMovingIcon()}
-      >
+      <Marker position={[currentPoint.lat, currentPoint.lng]} icon={createMovingIcon()}>
         <Popup>
           <div className="p-2">
             <div className="flex items-center space-x-2 mb-2">
               <Icon className="w-4 h-4" style={{ color: route.color }} />
               <h4 className="font-semibold">{route.name}</h4>
             </div>
-            
+
             <div className="space-y-1 text-xs">
               <div className="flex justify-between">
                 <span className="text-gray-500">Progress:</span>
@@ -544,19 +540,24 @@ const AnimatedMarker: React.FC<{
       </Marker>
 
       {/* Waypoints */}
-      {showWaypoints && route.points.filter((_, index) => index % 10 === 0).map((point, index) => (
-        <Marker
-          key={`waypoint_${route.id}_${index}`}
-          position={[point.lat, point.lng]}
-          icon={L.circleMarker([point.lat, point.lng], {
-            radius: 3,
-            fillColor: route.color,
-            color: 'white',
-            weight: 2,
-            fillOpacity: 0.8
-          }) as any}
-        />
-      ))}
+      {showWaypoints &&
+        route.points
+          .filter((_, index) => index % 10 === 0)
+          .map((point, index) => (
+            <Marker
+              key={`waypoint_${route.id}_${index}`}
+              position={[point.lat, point.lng]}
+              icon={
+                L.circleMarker([point.lat, point.lng], {
+                  radius: 3,
+                  fillColor: route.color,
+                  color: 'white',
+                  weight: 2,
+                  fillOpacity: 0.8,
+                }) as any
+              }
+            />
+          ))}
     </>
   );
 };
@@ -568,7 +569,7 @@ const RouteMapping: React.FC<RouteMapProps> = ({
   animationSpeed = 500,
   showWaypoints = false,
   onRouteClick,
-  className = ''
+  className = '',
 }) => {
   const [localRoutes, setLocalRoutes] = useState<RouteData[]>(routes);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -602,9 +603,7 @@ const RouteMapping: React.FC<RouteMapProps> = ({
 
   const handleRouteToggle = (routeId: string) => {
     setLocalRoutes(prev =>
-      prev.map(route =>
-        route.id === routeId ? { ...route, visible: !route.visible } : route
-      )
+      prev.map(route => (route.id === routeId ? { ...route, visible: !route.visible } : route))
     );
   };
 
@@ -621,8 +620,8 @@ const RouteMapping: React.FC<RouteMapProps> = ({
       settings: {
         animationSpeed: currentSpeed,
         showWaypoints: currentWaypoints,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -642,10 +641,10 @@ const RouteMapping: React.FC<RouteMapProps> = ({
   return (
     <div className={className}>
       {/* Route polylines */}
-      {visibleRoutes.map((route) => {
+      {visibleRoutes.map(route => {
         const config = routeTypeConfig[route.type];
         const positions = route.points.map(point => [point.lat, point.lng] as [number, number]);
-        
+
         return (
           <Polyline
             key={route.id}
@@ -654,26 +653,27 @@ const RouteMapping: React.FC<RouteMapProps> = ({
             weight={config.strokeWidth}
             opacity={0.8}
             eventHandlers={{
-              click: () => onRouteClick?.(route)
+              click: () => onRouteClick?.(route),
             }}
           />
         );
       })}
 
       {/* Animated markers */}
-      {isAnimating && visibleRoutes.map((route) => (
-        <AnimatedMarker
-          key={`animated_${route.id}`}
-          route={route}
-          animationProgress={animationProgress}
-          showWaypoints={currentWaypoints}
-        />
-      ))}
+      {isAnimating &&
+        visibleRoutes.map(route => (
+          <AnimatedMarker
+            key={`animated_${route.id}`}
+            route={route}
+            animationProgress={animationProgress}
+            showWaypoints={currentWaypoints}
+          />
+        ))}
 
       {/* Start/End markers */}
-      {visibleRoutes.map((route) => {
+      {visibleRoutes.map(route => {
         if (route.points.length === 0) return null;
-        
+
         const startPoint = route.points[0];
         const endPoint = route.points[route.points.length - 1];
 
@@ -695,7 +695,7 @@ const RouteMapping: React.FC<RouteMapProps> = ({
                 `,
                 className: 'start-marker',
                 iconSize: [16, 16],
-                iconAnchor: [8, 8]
+                iconAnchor: [8, 8],
               })}
             >
               <Popup>
@@ -725,7 +725,7 @@ const RouteMapping: React.FC<RouteMapProps> = ({
                   `,
                   className: 'end-marker',
                   iconSize: [16, 16],
-                  iconAnchor: [8, 8]
+                  iconAnchor: [8, 8],
                 })}
               >
                 <Popup>

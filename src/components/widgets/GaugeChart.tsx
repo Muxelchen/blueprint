@@ -17,8 +17,8 @@ interface GaugeChartProps {
   showProgressBar?: boolean;
 }
 
-const GaugeChart: React.FC<GaugeChartProps> = ({ 
-  value = 75, 
+const GaugeChart: React.FC<GaugeChartProps> = ({
+  value = 75,
   maxValue = 100,
   title = 'Performance Score',
   unit = '%',
@@ -113,8 +113,8 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
   return (
     <div className={`bg-white p-6 rounded-lg shadow-lg ${compact ? 'p-4' : ''}`}>
       <h3 className="text-lg font-semibold mb-4 text-center">{title}</h3>
-      
-      <div className="relative" style={{ height: height || (outerRadius + 40) }}>
+
+      <div className="relative" style={{ height: height || outerRadius + 40 }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -131,25 +131,25 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
               animationEasing="ease-out"
             >
               {data.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={index === 0 ? dynamicColor : entry.color}
-                />
+                <Cell key={`cell-${index}`} fill={index === 0 ? dynamicColor : entry.color} />
               ))}
             </Pie>
           </PieChart>
         </ResponsiveContainer>
-        
+
         {/* Center value display */}
         <div className="absolute inset-0 flex items-center justify-center" style={{ top: '20%' }}>
           <div className="text-center">
-            <div className={`transition-all duration-1000 ${
-              animate ? 'scale-110' : ''
-            }`} style={{ color: dynamicColor, fontSize: labelFontSize }}>
-              {Math.round(animatedValue)}{unit}
+            <div
+              className={`transition-all duration-1000 ${animate ? 'scale-110' : ''}`}
+              style={{ color: dynamicColor, fontSize: labelFontSize }}
+            >
+              {Math.round(animatedValue)}
+              {unit}
             </div>
             <div className="text-sm text-gray-500 mt-1">
-              of {maxValue}{unit}
+              of {maxValue}
+              {unit}
             </div>
           </div>
         </div>
@@ -157,19 +157,19 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
         {/* Gauge markers - Fixed positioning with correct angle calculation */}
         {showMarkers && (
           <div className="absolute inset-0">
-            {[0, 25, 50, 75, 100].map((mark) => {
+            {[0, 25, 50, 75, 100].map(mark => {
               // Correct angle calculation for semicircle gauge (180° to 0°)
               // For a semicircle: 0% = 180°, 25% = 135°, 50% = 90°, 75% = 45°, 100% = 0°
               const angle = 180 - (mark / 100) * 180;
-              
+
               // Position markers outside the gauge arc with proper radius
-              const containerHeight = height || (outerRadius + 40);
+              const containerHeight = height || outerRadius + 40;
               const markerDistance = outerRadius + 25; // Fixed distance outside the arc
               const markerRadiusPercent = (markerDistance / containerHeight) * 100;
-              
+
               const x = 50 + markerRadiusPercent * Math.cos(angle * RADIAN);
               const y = 90 + markerRadiusPercent * Math.sin(angle * RADIAN);
-              
+
               return (
                 <div
                   key={mark}
@@ -177,7 +177,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
                   style={{
                     left: `${x}%`,
                     top: `${y}%`,
-                    transform: 'translate(-50%, -50%)'
+                    transform: 'translate(-50%, -50%)',
                   }}
                 >
                   {mark}
@@ -191,19 +191,27 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
       {/* Status indicators */}
       {showStatusIndicators && (
         <div className="mt-6 grid grid-cols-4 gap-2 text-center">
-          <div className={`p-2 rounded ${percentage >= 80 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}>
+          <div
+            className={`p-2 rounded ${percentage >= 80 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}
+          >
             <div className="w-3 h-3 bg-green-500 rounded-full mx-auto mb-1"></div>
             Great
           </div>
-          <div className={`p-2 rounded ${percentage >= 60 && percentage < 80 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-500'}`}>
+          <div
+            className={`p-2 rounded ${percentage >= 60 && percentage < 80 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-500'}`}
+          >
             <div className="w-3 h-3 bg-yellow-500 rounded-full mx-auto mb-1"></div>
             Good
           </div>
-          <div className={`p-2 rounded ${percentage >= 40 && percentage < 60 ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-500'}`}>
+          <div
+            className={`p-2 rounded ${percentage >= 40 && percentage < 60 ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-500'}`}
+          >
             <div className="w-3 h-3 bg-orange-500 rounded-full mx-auto mb-1"></div>
             Fair
           </div>
-          <div className={`p-2 rounded ${percentage < 40 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-500'}`}>
+          <div
+            className={`p-2 rounded ${percentage < 40 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-500'}`}
+          >
             <div className="w-3 h-3 bg-red-500 rounded-full mx-auto mb-1"></div>
             Poor
           </div>
@@ -215,21 +223,20 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
         <div className="mt-4 p-4 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="font-bold" style={{ color: dynamicColor, fontSize: statisticsFontSize }}>
+              <p
+                className="font-bold"
+                style={{ color: dynamicColor, fontSize: statisticsFontSize }}
+              >
                 {Math.round(animatedValue)}
               </p>
               <p className="text-gray-600">Current</p>
             </div>
             <div>
-              <p className="font-bold text-gray-800">
-                {maxValue}
-              </p>
+              <p className="font-bold text-gray-800">{maxValue}</p>
               <p className="text-gray-600">Maximum</p>
             </div>
             <div>
-              <p className="font-bold text-gray-800">
-                {Math.round(percentage)}%
-              </p>
+              <p className="font-bold text-gray-800">{Math.round(percentage)}%</p>
               <p className="text-gray-600">Progress</p>
             </div>
           </div>
@@ -244,11 +251,11 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
             <span>{Math.round(percentage)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full" style={{ height: progressBarHeight }}>
-            <div 
+            <div
               className="rounded-full transition-all duration-1500 ease-out"
-              style={{ 
+              style={{
                 width: `${percentage}%`,
-                backgroundColor: dynamicColor
+                backgroundColor: dynamicColor,
               }}
             ></div>
           </div>

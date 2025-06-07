@@ -1,0 +1,63 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2020": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:react/jsx-runtime"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "react-refresh",
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "react-refresh/only-export-components": [
+      "warn",
+      { "allowConstantExport": true }
+    ],
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-unused-vars": "off",
+    "no-console": "warn",
+    "react/prop-types": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "globals": {
+    "process": "readonly",
+    "global": "readonly",
+    "NodeJS": "readonly",
+    "RequestInit": "readonly",
+    "NotificationPermission": "readonly",
+    "GeolocationPositionError": "readonly",
+    "BinaryType": "readonly",
+    "EventListener": "readonly",
+    "EventListenerObject": "readonly",
+    "EventListenerOrEventListenerObject": "readonly",
+    "AddEventListenerOptions": "readonly",
+    "EventListenerOptions": "readonly",
+    "WebSocketEventMap": "readonly"
+  },
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "*.config.js",
+    "*.config.ts"
+  ]
+}

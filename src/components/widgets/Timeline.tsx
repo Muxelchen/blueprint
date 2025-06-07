@@ -15,9 +15,7 @@ interface TimelineProps {
   title?: string;
 }
 
-const Timeline: React.FC<TimelineProps> = ({
-  title = 'Project Timeline'
-}) => {
+const Timeline: React.FC<TimelineProps> = ({ title = 'Project Timeline' }) => {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
@@ -30,7 +28,7 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 4, 1), // May 1, 2025
       type: 'milestone',
       status: 'completed',
-      assignee: 'John Doe'
+      assignee: 'John Doe',
     },
     {
       id: '2',
@@ -39,7 +37,7 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 4, 15),
       type: 'task',
       status: 'completed',
-      assignee: 'Jane Smith'
+      assignee: 'Jane Smith',
     },
     {
       id: '3',
@@ -48,7 +46,7 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 5, 3),
       type: 'meeting',
       status: 'completed',
-      assignee: 'Team Lead'
+      assignee: 'Team Lead',
     },
     {
       id: '4',
@@ -57,7 +55,7 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 5, 10),
       type: 'task',
       status: 'in-progress',
-      assignee: 'Mike Johnson'
+      assignee: 'Mike Johnson',
     },
     {
       id: '5',
@@ -66,7 +64,7 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 5, 12),
       type: 'bug',
       status: 'completed',
-      assignee: 'Sarah Wilson'
+      assignee: 'Sarah Wilson',
     },
     {
       id: '6',
@@ -75,7 +73,7 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 5, 18),
       type: 'feature',
       status: 'in-progress',
-      assignee: 'Alex Chen'
+      assignee: 'Alex Chen',
     },
     {
       id: '7',
@@ -84,7 +82,7 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 5, 25),
       type: 'release',
       status: 'pending',
-      assignee: 'DevOps Team'
+      assignee: 'DevOps Team',
     },
     {
       id: '8',
@@ -93,7 +91,7 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 6, 1),
       type: 'milestone',
       status: 'pending',
-      assignee: 'QA Team'
+      assignee: 'QA Team',
     },
     {
       id: '9',
@@ -102,7 +100,7 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 6, 10),
       type: 'task',
       status: 'pending',
-      assignee: 'Performance Team'
+      assignee: 'Performance Team',
     },
     {
       id: '10',
@@ -111,65 +109,87 @@ const Timeline: React.FC<TimelineProps> = ({
       date: new Date(2025, 6, 20),
       type: 'release',
       status: 'pending',
-      assignee: 'Release Manager'
-    }
+      assignee: 'Release Manager',
+    },
   ];
 
   const [events] = useState<TimelineEvent[]>(mockEvents);
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'milestone': return 'bg-purple-500';
-      case 'task': return 'bg-blue-500';
-      case 'meeting': return 'bg-green-500';
-      case 'release': return 'bg-red-500';
-      case 'bug': return 'bg-orange-500';
-      case 'feature': return 'bg-indigo-500';
-      default: return 'bg-gray-500';
+      case 'milestone':
+        return 'bg-purple-500';
+      case 'task':
+        return 'bg-blue-500';
+      case 'meeting':
+        return 'bg-green-500';
+      case 'release':
+        return 'bg-red-500';
+      case 'bug':
+        return 'bg-orange-500';
+      case 'feature':
+        return 'bg-indigo-500';
+      default:
+        return 'bg-gray-500';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'text-green-600 bg-green-100';
-      case 'in-progress': return 'text-blue-600 bg-blue-100';
-      case 'pending': return 'text-yellow-600 bg-yellow-100';
-      case 'cancelled': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'completed':
+        return 'text-green-600 bg-green-100';
+      case 'in-progress':
+        return 'text-blue-600 bg-blue-100';
+      case 'pending':
+        return 'text-yellow-600 bg-yellow-100';
+      case 'cancelled':
+        return 'text-red-600 bg-red-100';
+      default:
+        return 'text-gray-600 bg-gray-100';
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'milestone': return '🎯';
-      case 'task': return '📝';
-      case 'meeting': return '👥';
-      case 'release': return '🚀';
-      case 'bug': return '🐛';
-      case 'feature': return '✨';
-      default: return '📌';
+      case 'milestone':
+        return '🎯';
+      case 'task':
+        return '📝';
+      case 'meeting':
+        return '👥';
+      case 'release':
+        return '🚀';
+      case 'bug':
+        return '🐛';
+      case 'feature':
+        return '✨';
+      default:
+        return '📌';
     }
   };
 
   const filteredEvents = events
     .filter(event => selectedFilter === 'all' || event.type === selectedFilter)
     .sort((a, b) => {
-      return sortOrder === 'desc' 
+      return sortOrder === 'desc'
         ? b.date.getTime() - a.date.getTime()
         : a.date.getTime() - b.date.getTime();
     });
 
   const eventTypes = ['all', ...Array.from(new Set(events.map(e => e.type)))];
-  const statusCounts = events.reduce((acc, event) => {
-    acc[event.status] = (acc[event.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const statusCounts = events.reduce(
+    (acc, event) => {
+      acc[event.status] = (acc[event.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
   };
 
@@ -202,8 +222,8 @@ const Timeline: React.FC<TimelineProps> = ({
             key={type}
             onClick={() => setSelectedFilter(type)}
             className={`px-3 py-1 text-sm rounded-lg capitalize transition-colors ${
-              selectedFilter === type 
-                ? 'bg-blue-500 text-white' 
+              selectedFilter === type
+                ? 'bg-blue-500 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
@@ -236,48 +256,50 @@ const Timeline: React.FC<TimelineProps> = ({
       <div className="relative">
         {/* Timeline line */}
         <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-        
+
         <div className="space-y-6">
-          {filteredEvents.map((event) => (
+          {filteredEvents.map(event => (
             <div key={event.id} className="relative flex items-start space-x-4">
               {/* Timeline dot */}
-              <div className={`relative z-10 flex-shrink-0 w-6 h-6 rounded-full ${getTypeColor(event.type)} flex items-center justify-center`}>
-                <span className="text-xs text-white">
-                  {getTypeIcon(event.type)}
-                </span>
+              <div
+                className={`relative z-10 flex-shrink-0 w-6 h-6 rounded-full ${getTypeColor(event.type)} flex items-center justify-center`}
+              >
+                <span className="text-xs text-white">{getTypeIcon(event.type)}</span>
               </div>
-              
+
               {/* Event content */}
-              <div className={`flex-1 bg-white border rounded-lg p-4 shadow-sm ${
-                isOverdue(event) ? 'border-red-300 bg-red-50' : 
-                isUpcoming(event.date) ? 'border-blue-300 bg-blue-50' : 
-                'border-gray-200'
-              }`}>
+              <div
+                className={`flex-1 bg-white border rounded-lg p-4 shadow-sm ${
+                  isOverdue(event)
+                    ? 'border-red-300 bg-red-50'
+                    : isUpcoming(event.date)
+                      ? 'border-blue-300 bg-blue-50'
+                      : 'border-gray-200'
+                }`}
+              >
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900 mb-1">{event.title}</h4>
                     <p className="text-sm text-gray-600 mb-2">{event.description}</p>
                   </div>
-                  <span className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(event.status)}`}>
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(event.status)}`}
+                  >
                     {event.status.replace('-', ' ')}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center space-x-4">
-                    <span className={`px-2 py-1 rounded text-xs font-medium text-white ${getTypeColor(event.type)}`}>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium text-white ${getTypeColor(event.type)}`}
+                    >
                       {event.type}
                     </span>
-                    <span className="text-gray-500">
-                      📅 {formatDate(event.date)}
-                    </span>
-                    {event.assignee && (
-                      <span className="text-gray-500">
-                        👤 {event.assignee}
-                      </span>
-                    )}
+                    <span className="text-gray-500">📅 {formatDate(event.date)}</span>
+                    {event.assignee && <span className="text-gray-500">👤 {event.assignee}</span>}
                   </div>
-                  
+
                   {isOverdue(event) && (
                     <span className="text-red-600 text-xs font-medium">Overdue</span>
                   )}
@@ -298,12 +320,12 @@ const Timeline: React.FC<TimelineProps> = ({
           <div className="flex-1">
             <div className="flex justify-between text-sm mb-1">
               <span>Overall Progress</span>
-              <span>{Math.round((statusCounts.completed || 0) / events.length * 100)}%</span>
+              <span>{Math.round(((statusCounts.completed || 0) / events.length) * 100)}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-green-500 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${(statusCounts.completed || 0) / events.length * 100}%` }}
+                style={{ width: `${((statusCounts.completed || 0) / events.length) * 100}%` }}
               ></div>
             </div>
           </div>
@@ -324,7 +346,10 @@ const Timeline: React.FC<TimelineProps> = ({
             .sort((a, b) => a.date.getTime() - b.date.getTime())
             .slice(0, 3)
             .map(event => (
-              <div key={event.id} className="flex items-center justify-between p-2 bg-yellow-50 rounded border border-yellow-200">
+              <div
+                key={event.id}
+                className="flex items-center justify-between p-2 bg-yellow-50 rounded border border-yellow-200"
+              >
                 <div className="flex items-center space-x-2">
                   <span>{getTypeIcon(event.type)}</span>
                   <span className="text-sm font-medium">{event.title}</span>

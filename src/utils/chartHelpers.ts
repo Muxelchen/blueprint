@@ -1,17 +1,13 @@
 import { ChartData, ChartOptions } from '../types/charts';
 
 // Chart data formatting utilities
-export const formatChartData = (
-  data: any[],
-  labelKey: string,
-  valueKeys: string[]
-): ChartData => {
+export const formatChartData = (data: any[], labelKey: string, valueKeys: string[]): ChartData => {
   const labels = data.map(item => item[labelKey]);
   const datasets = valueKeys.map((key, index) => ({
     label: key,
     data: data.map(item => item[key]),
     backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
-    borderColor: `hsl(${index * 60}, 70%, 40%)`
+    borderColor: `hsl(${index * 60}, 70%, 40%)`,
   }));
 
   return { labels, datasets };
@@ -35,14 +31,14 @@ export const getDefaultChartOptions = (type: string): Partial<ChartOptions> => {
     plugins: {
       legend: {
         display: true,
-        position: 'top'
+        position: 'top',
       },
       tooltip: {
         enabled: true,
         mode: 'index',
-        intersect: false
-      }
-    }
+        intersect: false,
+      },
+    },
   };
 
   switch (type) {
@@ -51,16 +47,16 @@ export const getDefaultChartOptions = (type: string): Partial<ChartOptions> => {
         ...baseOptions,
         scales: {
           x: { display: true },
-          y: { display: true, beginAtZero: true }
-        }
+          y: { display: true, beginAtZero: true },
+        },
       };
     case 'bar':
       return {
         ...baseOptions,
         scales: {
           x: { display: true },
-          y: { display: true, beginAtZero: true }
-        }
+          y: { display: true, beginAtZero: true },
+        },
       };
     case 'pie':
     case 'doughnut':
@@ -70,9 +66,9 @@ export const getDefaultChartOptions = (type: string): Partial<ChartOptions> => {
           ...baseOptions.plugins,
           legend: {
             display: true,
-            position: 'right'
-          }
-        }
+            position: 'right',
+          },
+        },
       };
     default:
       return baseOptions;

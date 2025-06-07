@@ -1,5 +1,13 @@
 // Complete data formatting utilities for frontend
-export type FormatType = 'currency' | 'percentage' | 'number' | 'date' | 'time' | 'datetime' | 'fileSize' | 'duration';
+export type FormatType =
+  | 'currency'
+  | 'percentage'
+  | 'number'
+  | 'date'
+  | 'time'
+  | 'datetime'
+  | 'fileSize'
+  | 'duration';
 
 export interface FormatOptions {
   locale?: string;
@@ -14,109 +22,73 @@ export interface FormatOptions {
 }
 
 // Number formatting
-export const formatNumber = (
-  value: number | string, 
-  options: FormatOptions = {}
-): string => {
+export const formatNumber = (value: number | string, options: FormatOptions = {}): string => {
   const num = typeof value === 'string' ? parseFloat(value) : value;
   if (isNaN(num)) return '0';
 
-  const {
-    locale = 'en-US',
-    decimals = 2,
-    useGrouping = true,
-    prefix = '',
-    suffix = ''
-  } = options;
+  const { locale = 'en-US', decimals = 2, useGrouping = true, prefix = '', suffix = '' } = options;
 
   const formatted = new Intl.NumberFormat(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-    useGrouping
+    useGrouping,
   }).format(num);
 
   return `${prefix}${formatted}${suffix}`;
 };
 
 // Currency formatting
-export const formatCurrency = (
-  value: number | string, 
-  options: FormatOptions = {}
-): string => {
+export const formatCurrency = (value: number | string, options: FormatOptions = {}): string => {
   const num = typeof value === 'string' ? parseFloat(value) : value;
   if (isNaN(num)) return '$0.00';
 
-  const {
-    locale = 'en-US',
-    currency = 'USD',
-    decimals = 2
-  } = options;
+  const { locale = 'en-US', currency = 'USD', decimals = 2 } = options;
 
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+    maximumFractionDigits: decimals,
   }).format(num);
 };
 
 // Percentage formatting
-export const formatPercentage = (
-  value: number | string, 
-  options: FormatOptions = {}
-): string => {
+export const formatPercentage = (value: number | string, options: FormatOptions = {}): string => {
   const num = typeof value === 'string' ? parseFloat(value) : value;
   if (isNaN(num)) return '0%';
 
-  const {
-    locale = 'en-US',
-    decimals = 1
-  } = options;
+  const { locale = 'en-US', decimals = 1 } = options;
 
   return new Intl.NumberFormat(locale, {
     style: 'percent',
     minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+    maximumFractionDigits: decimals,
   }).format(num / 100);
 };
 
 // Date formatting
-export const formatDate = (
-  value: Date | string | number,
-  options: FormatOptions = {}
-): string => {
+export const formatDate = (value: Date | string | number, options: FormatOptions = {}): string => {
   const date = new Date(value);
   if (isNaN(date.getTime())) return 'Invalid Date';
 
-  const {
-    locale = 'en-US',
-    dateStyle = 'medium',
-    timezone
-  } = options;
+  const { locale = 'en-US', dateStyle = 'medium', timezone } = options;
 
   return new Intl.DateTimeFormat(locale, {
     dateStyle,
-    timeZone: timezone
+    timeZone: timezone,
   }).format(date);
 };
 
 // Time formatting
-export const formatTime = (
-  value: Date | string | number,
-  options: FormatOptions = {}
-): string => {
+export const formatTime = (value: Date | string | number, options: FormatOptions = {}): string => {
   const date = new Date(value);
   if (isNaN(date.getTime())) return 'Invalid Time';
 
-  const {
-    locale = 'en-US',
-    timeStyle = 'medium',
-    timezone
-  } = options;
+  const { locale = 'en-US', timeStyle = 'medium', timezone } = options;
 
   return new Intl.DateTimeFormat(locale, {
     timeStyle,
-    timeZone: timezone
+    timeZone: timezone,
   }).format(date);
 };
 
@@ -128,17 +100,12 @@ export const formatDateTime = (
   const date = new Date(value);
   if (isNaN(date.getTime())) return 'Invalid DateTime';
 
-  const {
-    locale = 'en-US',
-    dateStyle = 'medium',
-    timeStyle = 'short',
-    timezone
-  } = options;
+  const { locale = 'en-US', dateStyle = 'medium', timeStyle = 'short', timezone } = options;
 
   return new Intl.DateTimeFormat(locale, {
     dateStyle,
     timeStyle,
-    timeZone: timezone
+    timeZone: timezone,
   }).format(date);
 };
 
@@ -171,7 +138,7 @@ export const formatDuration = (
     if (hours % 24 > 0) parts.push(`${hours % 24} hour${hours % 24 !== 1 ? 's' : ''}`);
     if (minutes % 60 > 0) parts.push(`${minutes % 60} minute${minutes % 60 !== 1 ? 's' : ''}`);
     if (seconds % 60 > 0) parts.push(`${seconds % 60} second${seconds % 60 !== 1 ? 's' : ''}`);
-    
+
     return parts.length > 0 ? parts.join(', ') : '0 seconds';
   }
 
@@ -183,10 +150,7 @@ export const formatDuration = (
 };
 
 // Relative time formatting
-export const formatRelativeTime = (
-  date: Date | string | number,
-  locale = 'en-US'
-): string => {
+export const formatRelativeTime = (date: Date | string | number, locale = 'en-US'): string => {
   const targetDate = new Date(date);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - targetDate.getTime()) / 1000);
@@ -224,7 +188,7 @@ export const formatRelativeTime = (
 // Phone number formatting
 export const formatPhoneNumber = (phoneNumber: string, format = 'US'): string => {
   const cleaned = phoneNumber.replace(/\D/g, '');
-  
+
   if (format === 'US') {
     if (cleaned.length === 10) {
       return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
@@ -233,7 +197,7 @@ export const formatPhoneNumber = (phoneNumber: string, format = 'US'): string =>
       return `+1 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
     }
   }
-  
+
   return phoneNumber; // Return original if can't format
 };
 
@@ -254,11 +218,7 @@ export const formatSSN = (ssn: string): string => {
 };
 
 // Generic formatter function
-export const formatValue = (
-  value: any,
-  type: FormatType,
-  options: FormatOptions = {}
-): string => {
+export const formatValue = (value: any, type: FormatType, options: FormatOptions = {}): string => {
   try {
     switch (type) {
       case 'currency':
@@ -296,9 +256,7 @@ export const titleCase = (str: string): string => {
 };
 
 export const camelCase = (str: string): string => {
-  return str
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9]+(.)/g, (_, char) => char.toUpperCase());
+  return str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, char) => char.toUpperCase());
 };
 
 export const kebabCase = (str: string): string => {
@@ -322,16 +280,13 @@ export const truncate = (str: string, length: number, suffix = '...'): string =>
 };
 
 // Format list with proper conjunction
-export const formatList = (
-  items: string[],
-  conjunction = 'and'
-): string => {
+export const formatList = (items: string[], conjunction = 'and'): string => {
   if (items.length === 0) return '';
   if (items.length === 1) return items[0];
   if (items.length === 2) return `${items[0]} ${conjunction} ${items[1]}`;
 
   const lastItem = items[items.length - 1];
   const otherItems = items.slice(0, -1);
-  
+
   return `${otherItems.join(', ')}, ${conjunction} ${lastItem}`;
 };

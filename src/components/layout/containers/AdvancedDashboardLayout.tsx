@@ -38,7 +38,7 @@ class WidgetVirtualizationManager {
 
   private setupIntersectionObserver() {
     this.intersectionObserver = new IntersectionObserver(
-      (entries) => {
+      entries => {
         entries.forEach(entry => {
           const widgetId = entry.target.getAttribute('data-widget-id');
           if (widgetId) {
@@ -51,16 +51,16 @@ class WidgetVirtualizationManager {
           }
         });
       },
-      { 
+      {
         rootMargin: '100px',
-        threshold: [0, 0.1, 0.5, 1]
+        threshold: [0, 0.1, 0.5, 1],
       }
     );
   }
 
   private startPerformanceMonitoring() {
     if ('performance' in window && 'PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         list.getEntries().forEach(entry => {
           if (entry.entryType === 'measure' && entry.name.startsWith('widget-render-')) {
             const widgetId = entry.name.replace('widget-render-', '');
@@ -68,7 +68,7 @@ class WidgetVirtualizationManager {
               renderTime: entry.duration,
               frameDrops: 0,
               memoryUsage: (performance as any).memory?.usedJSHeapSize || 0,
-              lastRender: Date.now()
+              lastRender: Date.now(),
             });
           }
         });
@@ -91,9 +91,12 @@ class WidgetVirtualizationManager {
         // Prioritäts-basierte Einreihung
         const insertIndex = this.renderQueue.findIndex(id => {
           const queuedWidget = this.widgets.get(id);
-          return queuedWidget && this.getPriorityValue(queuedWidget.priority) < this.getPriorityValue(widget.priority);
+          return (
+            queuedWidget &&
+            this.getPriorityValue(queuedWidget.priority) < this.getPriorityValue(widget.priority)
+          );
         });
-        
+
         if (insertIndex === -1) {
           this.renderQueue.push(widgetId);
         } else {
@@ -164,7 +167,7 @@ const VirtualizedWidgetComponent = memo<{
   const handleRender = useCallback(() => {
     if ('performance' in window) {
       performance.mark(`widget-render-${widget.id}-start`);
-      
+
       requestAnimationFrame(() => {
         performance.mark(`widget-render-${widget.id}-end`);
         performance.measure(
@@ -182,7 +185,7 @@ const VirtualizedWidgetComponent = memo<{
 
   if (!isLoaded) {
     return (
-      <div 
+      <div
         ref={ref}
         style={{ ...style, height: widget.height }}
         className="flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg"
@@ -228,21 +231,21 @@ export const AdvancedDashboardLayout: React.FC<AdvancedLayoutProps> = ({
   enableVirtualization = true,
   enableAdvancedDragDrop = true,
   performanceMode = 'balanced',
-  maxVisibleWidgets = 50
+  maxVisibleWidgets = 50,
 }) => {
   const [dragDropState, setDragDropState] = useState<DragDropState>({
     isDragging: false,
     draggedItem: null,
     dropZones: [],
-    ghostPosition: null
+    ghostPosition: null,
   });
 
   const managerRef = useRef<WidgetVirtualizationManager>();
-  
+
   useEffect(() => {
     if (enableVirtualization) {
       managerRef.current = new WidgetVirtualizationManager();
-      
+
       // Register all widgets
       widgets.forEach(widget => {
         managerRef.current?.registerWidget(widget);
@@ -261,104 +264,132 @@ export const AdvancedDashboardLayout: React.FC<AdvancedLayoutProps> = ({
       return Object.fromEntries(
         Object.entries(layouts).map(([breakpoint, layout]) => [
           breakpoint,
-          layout.slice(0, Math.min(layout.length, maxVisibleWidgets / 2))
+          layout.slice(0, Math.min(layout.length, maxVisibleWidgets / 2)),
         ])
       );
     }
-    
+
     if (performanceMode === 'high') {
       return layouts;
     }
-    
+
     // Balanced mode - limit visible widgets
     return Object.fromEntries(
       Object.entries(layouts).map(([breakpoint, layout]) => [
         breakpoint,
-        layout.slice(0, maxVisibleWidgets)
+        layout.slice(0, maxVisibleWidgets),
       ])
     );
   }, [layouts, performanceMode, maxVisibleWidgets]);
 
   // Advanced drag handlers with visual feedback
-  const handleDragStart = useCallback((layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent, element: HTMLElement) => {
-    if (!enableAdvancedDragDrop) return;
+  const handleDragStart = useCallback(
+    (
+      layout: Layout[],
+      oldItem: Layout,
+      newItem: Layout,
+      placeholder: Layout,
+      e: MouseEvent,
+      element: HTMLElement
+    ) => {
+      if (!enableAdvancedDragDrop) return;
 
-    setDragDropState(prev => ({
-      ...prev,
-      isDragging: true,
-      draggedItem: newItem,
-      ghostPosition: { x: e.clientX, y: e.clientY }
-    }));
+      setDragDropState(prev => ({
+        ...prev,
+        isDragging: true,
+        draggedItem: newItem,
+        ghostPosition: { x: e.clientX, y: e.clientY },
+      }));
 
-    // Add visual feedback
-    element.style.opacity = '0.7';
-    element.style.transform = 'rotate(2deg)';
-    
-    // Calculate drop zones
-    const gridElements = document.querySelectorAll('.react-grid-item');
-    const dropZones = Array.from(gridElements).map(el => el.getBoundingClientRect());
-    
-    setDragDropState(prev => ({ ...prev, dropZones }));
-  }, [enableAdvancedDragDrop]);
+      // Add visual feedback
+      element.style.opacity = '0.7';
+      element.style.transform = 'rotate(2deg)';
 
-  const handleDrag = useCallback((layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent) => {
-    if (!enableAdvancedDragDrop) return;
+      // Calculate drop zones
+      const gridElements = document.querySelectorAll('.react-grid-item');
+      const dropZones = Array.from(gridElements).map(el => el.getBoundingClientRect());
 
-    setDragDropState(prev => ({
-      ...prev,
-      ghostPosition: { x: e.clientX, y: e.clientY }
-    }));
-  }, [enableAdvancedDragDrop]);
+      setDragDropState(prev => ({ ...prev, dropZones }));
+    },
+    [enableAdvancedDragDrop]
+  );
 
-  const handleDragStop = useCallback((layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent, element: HTMLElement) => {
-    if (!enableAdvancedDragDrop) return;
+  const handleDrag = useCallback(
+    (layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, e: MouseEvent) => {
+      if (!enableAdvancedDragDrop) return;
 
-    // Reset visual feedback
-    element.style.opacity = '';
-    element.style.transform = '';
+      setDragDropState(prev => ({
+        ...prev,
+        ghostPosition: { x: e.clientX, y: e.clientY },
+      }));
+    },
+    [enableAdvancedDragDrop]
+  );
 
-    setDragDropState({
-      isDragging: false,
-      draggedItem: null,
-      dropZones: [],
-      ghostPosition: null
-    });
+  const handleDragStop = useCallback(
+    (
+      layout: Layout[],
+      oldItem: Layout,
+      newItem: Layout,
+      placeholder: Layout,
+      e: MouseEvent,
+      element: HTMLElement
+    ) => {
+      if (!enableAdvancedDragDrop) return;
 
-    onLayoutChange?.(layout, { ...optimizedLayouts, [getCurrentBreakpoint()]: layout });
-  }, [enableAdvancedDragDrop, optimizedLayouts, onLayoutChange]);
+      // Reset visual feedback
+      element.style.opacity = '';
+      element.style.transform = '';
+
+      setDragDropState({
+        isDragging: false,
+        draggedItem: null,
+        dropZones: [],
+        ghostPosition: null,
+      });
+
+      onLayoutChange?.(layout, { ...optimizedLayouts, [getCurrentBreakpoint()]: layout });
+    },
+    [enableAdvancedDragDrop, optimizedLayouts, onLayoutChange]
+  );
 
   const getCurrentBreakpoint = useCallback(() => {
     const width = window.innerWidth;
-    for (const [breakpoint, minWidth] of Object.entries(breakpoints).sort(([,a], [,b]) => b - a)) {
+    for (const [breakpoint, minWidth] of Object.entries(breakpoints).sort(
+      ([, a], [, b]) => b - a
+    )) {
       if (width >= minWidth) return breakpoint;
     }
     return 'xxs';
   }, [breakpoints]);
 
   // Render widgets with virtualization
-  const renderWidget = useCallback((widgetId: string) => {
-    const widget = widgets.find(w => w.id === widgetId);
-    if (!widget) return null;
+  const renderWidget = useCallback(
+    (widgetId: string) => {
+      const widget = widgets.find(w => w.id === widgetId);
+      if (!widget) return null;
 
-    if (enableVirtualization && managerRef.current) {
-      return (
-        <VirtualizedWidgetComponent
-          key={widget.id}
-          widget={widget}
-          manager={managerRef.current}
-        />
-      );
-    }
+      if (enableVirtualization && managerRef.current) {
+        return (
+          <VirtualizedWidgetComponent
+            key={widget.id}
+            widget={widget}
+            manager={managerRef.current}
+          />
+        );
+      }
 
-    const Component = widget.component;
-    return <Component key={widget.id} {...widget.props} />;
-  }, [widgets, enableVirtualization]);
+      const Component = widget.component;
+      return <Component key={widget.id} {...widget.props} />;
+    },
+    [widgets, enableVirtualization]
+  );
 
   // Generate layout items
   const layoutItems = useMemo(() => {
     const currentBreakpoint = getCurrentBreakpoint();
     const currentLayout = optimizedLayouts[currentBreakpoint] || [];
-    
+
     return currentLayout.map(item => (
       <div key={item.i} data-grid={item}>
         {renderWidget(item.i)}
@@ -378,7 +409,7 @@ export const AdvancedDashboardLayout: React.FC<AdvancedLayoutProps> = ({
               .flat()
               .map(item => item.i)
           );
-          
+
           // Remove widgets that are no longer in any layout
           widgets.forEach(widget => {
             if (!visibleWidgetIds.has(widget.id)) {
@@ -404,7 +435,7 @@ export const AdvancedDashboardLayout: React.FC<AdvancedLayoutProps> = ({
             width: 100,
             height: 50,
             transform: 'rotate(5deg)',
-            transition: 'all 0.1s ease-out'
+            transition: 'all 0.1s ease-out',
           }}
         />
       )}
@@ -420,7 +451,7 @@ export const AdvancedDashboardLayout: React.FC<AdvancedLayoutProps> = ({
                 left: zone.left,
                 top: zone.top,
                 width: zone.width,
-                height: zone.height
+                height: zone.height,
               }}
             />
           ))}
@@ -456,7 +487,9 @@ export const AdvancedDashboardLayout: React.FC<AdvancedLayoutProps> = ({
       {process.env.NODE_ENV === 'development' && (
         <div className="fixed bottom-4 right-4 bg-black bg-opacity-80 text-white p-2 rounded text-xs">
           <div>Performance Mode: {performanceMode}</div>
-          <div>Widgets: {widgets.length}/{maxVisibleWidgets}</div>
+          <div>
+            Widgets: {widgets.length}/{maxVisibleWidgets}
+          </div>
           <div>Virtualization: {enableVirtualization ? 'ON' : 'OFF'}</div>
         </div>
       )}
@@ -481,24 +514,27 @@ export const useAdvancedLayout = (
   const [history, setHistory] = useState<{ [key: string]: Layout[] }[]>([initialLayouts]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
-  const updateLayouts = useCallback((newLayouts: { [key: string]: Layout[] }) => {
-    setLayouts(newLayouts);
-    
-    // Save to localStorage
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(newLayouts));
-    } catch (error) {
-      console.warn('Failed to save layouts to localStorage:', error);
-    }
+  const updateLayouts = useCallback(
+    (newLayouts: { [key: string]: Layout[] }) => {
+      setLayouts(newLayouts);
 
-    // Update history for undo/redo
-    setHistory(prev => {
-      const newHistory = prev.slice(0, historyIndex + 1);
-      newHistory.push(newLayouts);
-      return newHistory.slice(-50); // Keep last 50 states
-    });
-    setHistoryIndex(prev => Math.min(prev + 1, 49));
-  }, [storageKey, historyIndex]);
+      // Save to localStorage
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(newLayouts));
+      } catch (error) {
+        console.warn('Failed to save layouts to localStorage:', error);
+      }
+
+      // Update history for undo/redo
+      setHistory(prev => {
+        const newHistory = prev.slice(0, historyIndex + 1);
+        newHistory.push(newLayouts);
+        return newHistory.slice(-50); // Keep last 50 states
+      });
+      setHistoryIndex(prev => Math.min(prev + 1, 49));
+    },
+    [storageKey, historyIndex]
+  );
 
   const undo = useCallback(() => {
     if (historyIndex > 0) {
@@ -530,7 +566,7 @@ export const useAdvancedLayout = (
     redo,
     resetLayouts,
     canUndo: historyIndex > 0,
-    canRedo: historyIndex < history.length - 1
+    canRedo: historyIndex < history.length - 1,
   };
 };
 

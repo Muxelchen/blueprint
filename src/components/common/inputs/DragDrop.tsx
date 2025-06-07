@@ -30,7 +30,7 @@ const DragDrop: React.FC<DragDropProps> = ({
   onFileRemoved,
   className = '',
   disabled = false,
-  children
+  children,
 }) => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [files, setFiles] = useState<DragDropFile[]>([]);
@@ -42,18 +42,16 @@ const DragDrop: React.FC<DragDropProps> = ({
     const fileObj: DragDropFile = {
       id: `${file.name}-${Date.now()}-${Math.random()}`,
       file,
-      status: 'pending'
+      status: 'pending',
     };
 
     // Create preview for images
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setFiles(prev => prev.map(f => 
-          f.id === fileObj.id 
-            ? { ...f, preview: e.target?.result as string }
-            : f
-        ));
+      reader.onload = e => {
+        setFiles(prev =>
+          prev.map(f => (f.id === fileObj.id ? { ...f, preview: e.target?.result as string } : f))
+        );
       };
       reader.readAsDataURL(file);
     }
@@ -87,33 +85,38 @@ const DragDrop: React.FC<DragDropProps> = ({
     return null;
   };
 
-  const processFiles = useCallback((fileList: FileList) => {
-    setError(null);
-    const newFiles: DragDropFile[] = [];
-    const errors: string[] = [];
+  const processFiles = useCallback(
+    (fileList: FileList) => {
+      setError(null);
+      const newFiles: DragDropFile[] = [];
+      const errors: string[] = [];
 
-    if (files.length + fileList.length > maxFiles) {
-      setError(`Maximum ${maxFiles} files allowed. Current: ${files.length}, Adding: ${fileList.length}`);
-      return;
-    }
-
-    Array.from(fileList).forEach(file => {
-      const validationError = validateFile(file);
-      if (validationError) {
-        errors.push(validationError);
-      } else {
-        newFiles.push(createFileObject(file));
+      if (files.length + fileList.length > maxFiles) {
+        setError(
+          `Maximum ${maxFiles} files allowed. Current: ${files.length}, Adding: ${fileList.length}`
+        );
+        return;
       }
-    });
 
-    if (errors.length > 0) {
-      setError(errors.join(' '));
-      return;
-    }
+      Array.from(fileList).forEach(file => {
+        const validationError = validateFile(file);
+        if (validationError) {
+          errors.push(validationError);
+        } else {
+          newFiles.push(createFileObject(file));
+        }
+      });
 
-    setFiles(prev => [...prev, ...newFiles]);
-    onFilesAdded?.(newFiles);
-  }, [files.length, maxFiles, maxSize, accept, onFilesAdded]);
+      if (errors.length > 0) {
+        setError(errors.join(' '));
+        return;
+      }
+
+      setFiles(prev => [...prev, ...newFiles]);
+      onFilesAdded?.(newFiles);
+    },
+    [files.length, maxFiles, maxSize, accept, onFilesAdded]
+  );
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -138,28 +141,34 @@ const DragDrop: React.FC<DragDropProps> = ({
     e.stopPropagation();
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragActive(false);
-    dragCounter.current = 0;
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragActive(false);
+      dragCounter.current = 0;
 
-    if (disabled) return;
+      if (disabled) return;
 
-    const { files: droppedFiles } = e.dataTransfer;
-    if (droppedFiles && droppedFiles.length > 0) {
-      processFiles(droppedFiles);
-    }
-  }, [disabled, processFiles]);
+      const { files: droppedFiles } = e.dataTransfer;
+      if (droppedFiles && droppedFiles.length > 0) {
+        processFiles(droppedFiles);
+      }
+    },
+    [disabled, processFiles]
+  );
 
-  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { files: selectedFiles } = e.target;
-    if (selectedFiles && selectedFiles.length > 0) {
-      processFiles(selectedFiles);
-    }
-    // Reset input value to allow selecting the same file again
-    e.target.value = '';
-  }, [processFiles]);
+  const handleFileInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { files: selectedFiles } = e.target;
+      if (selectedFiles && selectedFiles.length > 0) {
+        processFiles(selectedFiles);
+      }
+      // Reset input value to allow selecting the same file again
+      e.target.value = '';
+    },
+    [processFiles]
+  );
 
   const removeFile = (fileId: string) => {
     setFiles(prev => prev.filter(f => f.id !== fileId));
@@ -183,7 +192,8 @@ const DragDrop: React.FC<DragDropProps> = ({
 
   const getFileIcon = (file: File) => {
     if (file.type.startsWith('image/')) return <Image className="w-5 h-5" />;
-    if (file.type.includes('text/') || file.type.includes('document')) return <FileText className="w-5 h-5" />;
+    if (file.type.includes('text/') || file.type.includes('document'))
+      return <FileText className="w-5 h-5" />;
     return <File className="w-5 h-5" />;
   };
 
@@ -192,9 +202,9 @@ const DragDrop: React.FC<DragDropProps> = ({
       {/* Drop Zone */}
       <div
         className={`relative border-2 border-dashed rounded-lg p-6 transition-all duration-200 cursor-pointer ${
-          isDragActive 
-            ? 'border-blue-500 bg-blue-50' 
-            : disabled 
+          isDragActive
+            ? 'border-blue-500 bg-blue-50'
+            : disabled
               ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
               : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
         }`}
@@ -216,12 +226,16 @@ const DragDrop: React.FC<DragDropProps> = ({
 
         {children || (
           <div className="text-center">
-            <Upload className={`w-12 h-12 mx-auto mb-4 ${
-              isDragActive ? 'text-blue-500' : 'text-gray-400'
-            }`} />
-            <p className={`text-lg font-medium mb-2 ${
-              isDragActive ? 'text-blue-600' : 'text-gray-600'
-            }`}>
+            <Upload
+              className={`w-12 h-12 mx-auto mb-4 ${
+                isDragActive ? 'text-blue-500' : 'text-gray-400'
+              }`}
+            />
+            <p
+              className={`text-lg font-medium mb-2 ${
+                isDragActive ? 'text-blue-600' : 'text-gray-600'
+              }`}
+            >
               {isDragActive ? 'Drop files here' : 'Drop files here or click to browse'}
             </p>
             <p className="text-sm text-gray-500">
@@ -254,7 +268,7 @@ const DragDrop: React.FC<DragDropProps> = ({
             Files ({files.length}/{maxFiles})
           </h4>
           <div className="space-y-2">
-            {files.map((fileObj) => (
+            {files.map(fileObj => (
               <div
                 key={fileObj.id}
                 className="flex items-center p-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
@@ -276,27 +290,28 @@ const DragDrop: React.FC<DragDropProps> = ({
 
                 {/* File info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {fileObj.file.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {formatFileSize(fileObj.file.size)}
-                  </p>
+                  <p className="text-sm font-medium text-gray-900 truncate">{fileObj.file.name}</p>
+                  <p className="text-xs text-gray-500">{formatFileSize(fileObj.file.size)}</p>
                 </div>
 
                 {/* Status indicator */}
                 <div className="flex-shrink-0 ml-3">
-                  <div className={`w-2 h-2 rounded-full ${
-                    fileObj.status === 'success' ? 'bg-green-500' :
-                    fileObj.status === 'error' ? 'bg-red-500' :
-                    fileObj.status === 'uploading' ? 'bg-blue-500 animate-pulse' :
-                    'bg-gray-300'
-                  }`} />
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      fileObj.status === 'success'
+                        ? 'bg-green-500'
+                        : fileObj.status === 'error'
+                          ? 'bg-red-500'
+                          : fileObj.status === 'uploading'
+                            ? 'bg-blue-500 animate-pulse'
+                            : 'bg-gray-300'
+                    }`}
+                  />
                 </div>
 
                 {/* Remove button */}
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     removeFile(fileObj.id);
                   }}

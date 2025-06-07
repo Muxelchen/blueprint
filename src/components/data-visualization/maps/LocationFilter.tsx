@@ -1,14 +1,14 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { 
-  Filter, 
-  Search, 
-  MapPin, 
-  X, 
-  ChevronDown, 
-  Star, 
-  Clock, 
+import {
+  Filter,
+  Search,
+  MapPin,
+  X,
+  ChevronDown,
+  Star,
+  Clock,
   DollarSign,
   Users,
   Car,
@@ -26,7 +26,7 @@ import {
   CheckCircle,
   Settings,
   Download,
-  RotateCcw
+  RotateCcw,
 } from 'lucide-react';
 
 export interface Location {
@@ -59,15 +59,15 @@ export interface Location {
   metadata?: Record<string, any>;
 }
 
-export type LocationCategory = 
-  | 'restaurant' 
-  | 'hotel' 
-  | 'shopping' 
-  | 'entertainment' 
-  | 'transport' 
-  | 'business' 
-  | 'healthcare' 
-  | 'education' 
+export type LocationCategory =
+  | 'restaurant'
+  | 'hotel'
+  | 'shopping'
+  | 'entertainment'
+  | 'transport'
+  | 'business'
+  | 'healthcare'
+  | 'education'
   | 'service'
   | 'attraction'
   | 'park'
@@ -130,11 +130,11 @@ const generateMockLocations = (): Location[] => {
       tags: ['luxury', 'historic', 'central park', 'iconic'],
       verified: true,
       images: ['plaza1.jpg', 'plaza2.jpg'],
-      metadata: { rooms: 282, floors: 20, built: 1907 }
+      metadata: { rooms: 282, floors: 20, built: 1907 },
     },
     {
       id: 'nyc_2',
-      name: 'Katz\'s Delicatessen',
+      name: "Katz's Delicatessen",
       description: 'Famous Jewish deli since 1888',
       category: 'restaurant' as LocationCategory,
       subcategory: 'Deli',
@@ -156,7 +156,7 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Historic Location', 'Famous Pastrami'],
       tags: ['historic', 'pastrami', 'nyc-institution', 'cash-only'],
       verified: true,
-      metadata: { established: 1888, famous_for: 'pastrami sandwich' }
+      metadata: { established: 1888, famous_for: 'pastrami sandwich' },
     },
     {
       id: 'nyc_3',
@@ -179,7 +179,7 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Playgrounds', 'Lake', 'Walking Paths', 'Wildlife'],
       tags: ['nature', 'recreation', 'family-friendly', 'free'],
       verified: true,
-      metadata: { area: '843 acres', opened: 1857 }
+      metadata: { area: '843 acres', opened: 1857 },
     },
     {
       id: 'nyc_4',
@@ -205,8 +205,8 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Genius Bar', 'Today at Apple', 'Personal Setup'],
       tags: ['technology', 'flagship', '24-7', 'iconic'],
       verified: true,
-      metadata: { floors: 3, underground: true, glass_cube: true }
-    }
+      metadata: { floors: 3, underground: true, glass_cube: true },
+    },
   ];
 
   // San Francisco locations
@@ -232,17 +232,17 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Walking Path', 'Bike Path', 'Visitor Center'],
       tags: ['iconic', 'photography', 'free', 'must-see'],
       verified: true,
-      metadata: { opened: 1937, length: '8980 feet', height: '746 feet' }
+      metadata: { opened: 1937, length: '8980 feet', height: '746 feet' },
     },
     {
       id: 'sf_2',
-      name: 'Fisherman\'s Wharf',
+      name: "Fisherman's Wharf",
       description: 'Popular waterfront area with shops and restaurants',
       category: 'entertainment' as LocationCategory,
       subcategory: 'Waterfront',
-      lat: 37.8080,
+      lat: 37.808,
       lng: -122.4177,
-      address: 'Fisherman\'s Wharf',
+      address: "Fisherman's Wharf",
       city: 'San Francisco',
       state: 'CA',
       country: 'USA',
@@ -255,7 +255,7 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Restaurants', 'Shops', 'Street Performers', 'Boat Tours'],
       tags: ['tourist', 'seafood', 'family-friendly', 'sea-lions'],
       verified: true,
-      metadata: { attractions: ['Pier 39', 'Aquarium of the Bay', 'Sea Lions'] }
+      metadata: { attractions: ['Pier 39', 'Aquarium of the Bay', 'Sea Lions'] },
     },
     {
       id: 'sf_3',
@@ -281,8 +281,8 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Artisanal Coffee', 'Pastries', 'WiFi'],
       tags: ['coffee', 'artisanal', 'local', 'wifi'],
       verified: true,
-      metadata: { founded: 2002, roasting: 'single-origin' }
-    }
+      metadata: { founded: 2002, roasting: 'single-origin' },
+    },
   ];
 
   // Los Angeles locations
@@ -308,7 +308,7 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Celebrity Stars', 'Street Performers', 'Souvenir Shops'],
       tags: ['celebrity', 'hollywood', 'free', 'tourist'],
       verified: true,
-      metadata: { stars: 2700, established: 1958 }
+      metadata: { stars: 2700, established: 1958 },
     },
     {
       id: 'la_2',
@@ -333,8 +333,8 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Ferris Wheel', 'Roller Coaster', 'Arcade', 'Restaurants'],
       tags: ['beach', 'family-friendly', 'amusement', 'iconic'],
       verified: true,
-      metadata: { opened: 1909, ferris_wheel_height: '85 feet' }
-    }
+      metadata: { opened: 1909, ferris_wheel_height: '85 feet' },
+    },
   ];
 
   // Chicago locations
@@ -361,7 +361,7 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Cloud Gate', 'Crown Fountain', 'Concerts', 'Art Installations'],
       tags: ['art', 'free', 'iconic', 'photography'],
       verified: true,
-      metadata: { opened: 2004, area: '24.5 acres' }
+      metadata: { opened: 2004, area: '24.5 acres' },
     },
     {
       id: 'chi_2',
@@ -384,8 +384,8 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Deep Dish Pizza', 'Local Beer', 'Family Friendly'],
       tags: ['chicago-style', 'pizza', 'local', 'family'],
       verified: true,
-      metadata: { specialty: 'deep dish', established: 1985 }
-    }
+      metadata: { specialty: 'deep dish', established: 1985 },
+    },
   ];
 
   // Gas stations
@@ -395,7 +395,7 @@ const generateMockLocations = (): Location[] => {
       name: 'Shell Station',
       description: 'Gas station with convenience store',
       category: 'gas' as LocationCategory,
-      lat: 40.7580,
+      lat: 40.758,
       lng: -73.9855,
       address: '1234 Broadway',
       city: 'New York',
@@ -410,14 +410,20 @@ const generateMockLocations = (): Location[] => {
       amenities: ['Premium Gas', 'Car Wash', 'Convenience Store'],
       tags: ['24-7', 'gas', 'convenience'],
       verified: true,
-      metadata: { fuel_types: ['Regular', 'Premium', 'Diesel'] }
-    }
+      metadata: { fuel_types: ['Regular', 'Premium', 'Diesel'] },
+    },
   ];
 
   // Add calculated distances (mock)
-  const allLocations = [...nycLocations, ...sfLocations, ...laLocations, ...chicagoLocations, ...gasStations];
-  
-  allLocations.forEach((location) => {
+  const allLocations = [
+    ...nycLocations,
+    ...sfLocations,
+    ...laLocations,
+    ...chicagoLocations,
+    ...gasStations,
+  ];
+
+  allLocations.forEach(location => {
     // Add missing properties to satisfy TypeScript
     (location as any).distance = Math.random() * 50; // Random distance up to 50 miles
     (location as any).lastUpdated = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000); // Random date within last 30 days
@@ -440,7 +446,7 @@ const categoryConfig = {
   attraction: { icon: Star, color: '#F59E0B', label: 'Attractions' },
   park: { icon: MapPin, color: '#10B981', label: 'Parks' },
   gas: { icon: Zap, color: '#F97316', label: 'Gas Stations' },
-  parking: { icon: ParkingCircle, color: '#6B7280', label: 'Parking' }
+  parking: { icon: ParkingCircle, color: '#6B7280', label: 'Parking' },
 };
 
 // Feature configurations
@@ -453,7 +459,7 @@ const featureConfig = {
   'outdoor-seating': { icon: MapPin, label: 'Outdoor Seating' },
   'pet-friendly': { icon: Heart, label: 'Pet Friendly' },
   accessibility: { icon: Users, label: 'Accessible' },
-  '24-7': { icon: Clock, label: '24/7' }
+  '24-7': { icon: Clock, label: '24/7' },
 };
 
 const LocationFilter: React.FC<LocationFilterProps> = ({
@@ -469,10 +475,10 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   onFilterChange,
   className = '',
   markerSize = 'md',
-  maxResults = 100
+  maxResults = 100,
 }) => {
   const locations = useMemo(() => generateMockLocations(), []);
-  
+
   const [filters, setFilters] = useState<FilterOptions>({
     categories: [],
     rating: 0,
@@ -482,7 +488,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
     features: [],
     searchQuery: '',
     verified: null,
-    ...defaultFilters
+    ...defaultFilters,
   });
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -494,68 +500,60 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
     // Search query
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase();
-      filtered = filtered.filter(location =>
-        location.name.toLowerCase().includes(query) ||
-        location.description?.toLowerCase().includes(query) ||
-        location.category.toLowerCase().includes(query) ||
-        location.city?.toLowerCase().includes(query) ||
-        location.address?.toLowerCase().includes(query) ||
-        location.tags?.some(tag => tag.toLowerCase().includes(query))
+      filtered = filtered.filter(
+        location =>
+          location.name.toLowerCase().includes(query) ||
+          location.description?.toLowerCase().includes(query) ||
+          location.category.toLowerCase().includes(query) ||
+          location.city?.toLowerCase().includes(query) ||
+          location.address?.toLowerCase().includes(query) ||
+          location.tags?.some(tag => tag.toLowerCase().includes(query))
       );
     }
 
     // Categories
     if (filters.categories.length > 0) {
-      filtered = filtered.filter(location => 
-        filters.categories.includes(location.category)
-      );
+      filtered = filtered.filter(location => filters.categories.includes(location.category));
     }
 
     // Rating
     if (filters.rating > 0) {
-      filtered = filtered.filter(location => 
-        (location.rating || 0) >= filters.rating
-      );
+      filtered = filtered.filter(location => (location.rating || 0) >= filters.rating);
     }
 
     // Price level
     if (filters.priceLevel.length > 0 && filters.priceLevel.length < 4) {
-      filtered = filtered.filter(location => 
+      filtered = filtered.filter(location =>
         location.priceLevel ? filters.priceLevel.includes(location.priceLevel) : true
       );
     }
 
     // Distance
     if (filters.distance < 50) {
-      filtered = filtered.filter(location => 
-        (location.distance || 0) <= filters.distance
-      );
+      filtered = filtered.filter(location => (location.distance || 0) <= filters.distance);
     }
 
     // Open status
     if (filters.isOpen !== null) {
-      filtered = filtered.filter(location => 
-        location.isOpen === filters.isOpen
-      );
+      filtered = filtered.filter(location => location.isOpen === filters.isOpen);
     }
 
     // Features
     if (filters.features.length > 0) {
       filtered = filtered.filter(location =>
-        filters.features.every(feature => 
-          location.features?.includes(feature) || 
-          location.amenities?.some(amenity => 
-            amenity.toLowerCase().includes(feature.replace('-', ' '))
-          )
+        filters.features.every(
+          feature =>
+            location.features?.includes(feature) ||
+            location.amenities?.some(amenity =>
+              amenity.toLowerCase().includes(feature.replace('-', ' '))
+            )
         )
       );
     }
 
     // Verified
     if (filters.verified !== null) {
-      filtered = filtered.filter(location => 
-        location.verified === filters.verified
-      );
+      filtered = filtered.filter(location => location.verified === filters.verified);
     }
 
     // Limit results
@@ -563,11 +561,14 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   }, [locations, filters, maxResults]);
 
   // Update filters
-  const updateFilters = useCallback((newFilters: Partial<FilterOptions>) => {
-    const updatedFilters = { ...filters, ...newFilters };
-    setFilters(updatedFilters);
-    onFilterChange?.(filteredLocations, updatedFilters);
-  }, [filters, filteredLocations, onFilterChange]);
+  const updateFilters = useCallback(
+    (newFilters: Partial<FilterOptions>) => {
+      const updatedFilters = { ...filters, ...newFilters };
+      setFilters(updatedFilters);
+      onFilterChange?.(filteredLocations, updatedFilters);
+    },
+    [filters, filteredLocations, onFilterChange]
+  );
 
   // Reset filters
   const resetFilters = () => {
@@ -579,7 +580,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
       isOpen: null,
       features: [],
       searchQuery: '',
-      verified: null
+      verified: null,
     };
     setFilters(defaultState);
   };
@@ -590,7 +591,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
       filters,
       locations: filteredLocations,
       timestamp: new Date().toISOString(),
-      totalResults: filteredLocations.length
+      totalResults: filteredLocations.length,
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -609,7 +610,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
     const sizes = {
       sm: { size: 20, iconSize: 12 },
       md: { size: 24, iconSize: 16 },
-      lg: { size: 32, iconSize: 20 }
+      lg: { size: 32, iconSize: 20 },
     };
     return sizes[markerSize];
   };
@@ -619,7 +620,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   // Create custom marker icon
   const createMarkerIcon = (location: Location) => {
     const config = categoryConfig[location.category];
-    
+
     const iconHtml = `
       <div style="
         background-color: ${config.color};
@@ -636,16 +637,25 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
         position: relative;
       ">
         <svg width="${markerConfig.iconSize}" height="${markerConfig.iconSize}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          ${config.icon === Utensils ? '<path d="m3 2 1.578 6.131a.926.926 0 0 0 1.814.445L9 2m-6 0h2m4 0h2m4 0h2l2.5 7M2 17h20l-2 5H4z"/>' :
-            config.icon === Building ? '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>' :
-            config.icon === ShoppingBag ? '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>' :
-            config.icon === Star ? '<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>' :
-            config.icon === MapPin ? '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>' :
-            config.icon === Zap ? '<polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>' :
-            '<circle cx="12" cy="12" r="10"/>'
+          ${
+            config.icon === Utensils
+              ? '<path d="m3 2 1.578 6.131a.926.926 0 0 0 1.814.445L9 2m-6 0h2m4 0h2m4 0h2l2.5 7M2 17h20l-2 5H4z"/>'
+              : config.icon === Building
+                ? '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>'
+                : config.icon === ShoppingBag
+                  ? '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>'
+                  : config.icon === Star
+                    ? '<polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>'
+                    : config.icon === MapPin
+                      ? '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'
+                      : config.icon === Zap
+                        ? '<polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>'
+                        : '<circle cx="12" cy="12" r="10"/>'
           }
         </svg>
-        ${location.verified ? `
+        ${
+          location.verified
+            ? `
           <div style="
             position: absolute;
             bottom: -2px;
@@ -656,7 +666,9 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
             border-radius: 50%;
             border: 1px solid white;
           "></div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
     `;
 
@@ -665,22 +677,20 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
       className: 'location-marker',
       iconSize: [markerConfig.size, markerConfig.size],
       iconAnchor: [markerConfig.size / 2, markerConfig.size / 2],
-      popupAnchor: [0, -markerConfig.size / 2]
+      popupAnchor: [0, -markerConfig.size / 2],
     });
   };
 
   // Render price level indicator
   const renderPriceLevel = (priceLevel?: number) => {
     if (!priceLevel) return null;
-    
+
     return (
       <div className="flex items-center">
         {Array.from({ length: 4 }, (_, i) => (
           <DollarSign
             key={i}
-            className={`w-3 h-3 ${
-              i < priceLevel ? 'text-green-500' : 'text-gray-300'
-            }`}
+            className={`w-3 h-3 ${i < priceLevel ? 'text-green-500' : 'text-gray-300'}`}
           />
         ))}
       </div>
@@ -690,7 +700,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   // Render rating stars
   const renderRating = (rating?: number, reviewCount?: number) => {
     if (!rating) return null;
-    
+
     return (
       <div className="flex items-center space-x-1">
         <div className="flex">
@@ -698,9 +708,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
             <Star
               key={i}
               className={`w-3 h-3 ${
-                i < Math.floor(rating) 
-                  ? 'text-yellow-400 fill-current' 
-                  : 'text-gray-300'
+                i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
               }`}
             />
           ))}
@@ -715,7 +723,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   return (
     <div className={className}>
       {/* Location markers */}
-      {filteredLocations.map((location) => (
+      {filteredLocations.map(location => (
         <Marker
           key={location.id}
           position={[location.lat, location.lng]}
@@ -723,7 +731,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
           eventHandlers={{
             click: () => {
               onLocationClick?.(location);
-            }
+            },
           }}
         >
           <Popup className="location-popup">
@@ -733,18 +741,14 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
                 <div className="flex-1">
                   <h4 className="font-semibold text-sm flex items-center">
                     {location.name}
-                    {location.verified && (
-                      <CheckCircle className="w-3 h-3 text-green-500 ml-1" />
-                    )}
+                    {location.verified && <CheckCircle className="w-3 h-3 text-green-500 ml-1" />}
                   </h4>
                   <p className="text-xs text-gray-600 mb-1">{location.description}</p>
                   <div className="flex items-center space-x-2 text-xs text-gray-500">
                     <span className="px-1 py-0.5 bg-gray-100 rounded">
                       {categoryConfig[location.category].label}
                     </span>
-                    {location.subcategory && (
-                      <span>{location.subcategory}</span>
-                    )}
+                    {location.subcategory && <span>{location.subcategory}</span>}
                   </div>
                 </div>
               </div>
@@ -759,19 +763,25 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
               {location.address && (
                 <div className="flex items-center space-x-1 text-xs text-gray-600 mb-2">
                   <MapPin className="w-3 h-3" />
-                  <span>{location.address}, {location.city}, {location.state}</span>
+                  <span>
+                    {location.address}, {location.city}, {location.state}
+                  </span>
                 </div>
               )}
 
               {/* Status and Hours */}
               <div className="flex items-center justify-between mb-2">
                 {location.isOpen !== undefined && (
-                  <div className={`flex items-center space-x-1 text-xs ${
-                    location.isOpen ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    <div className={`w-2 h-2 rounded-full ${
-                      location.isOpen ? 'bg-green-500' : 'bg-red-500'
-                    }`} />
+                  <div
+                    className={`flex items-center space-x-1 text-xs ${
+                      location.isOpen ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        location.isOpen ? 'bg-green-500' : 'bg-red-500'
+                      }`}
+                    />
                     <span>{location.isOpen ? 'Open' : 'Closed'}</span>
                   </div>
                 )}
@@ -786,7 +796,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
               {location.features && location.features.length > 0 && (
                 <div className="mb-2">
                   <div className="flex flex-wrap gap-1">
-                    {location.features.slice(0, 4).map((feature) => {
+                    {location.features.slice(0, 4).map(feature => {
                       const featureIcon = featureConfig[feature as keyof typeof featureConfig];
                       return featureIcon ? (
                         <div
@@ -844,9 +854,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
             <div className="flex items-center space-x-2">
               <Filter className="w-4 h-4 text-blue-500" />
               <span className="font-medium text-sm">Filters</span>
-              <span className="text-xs text-gray-500">
-                ({filteredLocations.length} results)
-              </span>
+              <span className="text-xs text-gray-500">({filteredLocations.length} results)</span>
             </div>
             <div className="flex items-center space-x-1">
               <button
@@ -866,10 +874,14 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
                 className={`p-1 transition-colors ${
-                  isFilterOpen ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                  isFilterOpen
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                 } rounded`}
               >
-                <ChevronDown className={`w-3 h-3 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-3 h-3 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`}
+                />
               </button>
             </div>
           </div>
@@ -883,7 +895,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
                   type="text"
                   placeholder="Search locations..."
                   value={filters.searchQuery}
-                  onChange={(e) => updateFilters({ searchQuery: e.target.value })}
+                  onChange={e => updateFilters({ searchQuery: e.target.value })}
                   className="w-full pl-7 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {filters.searchQuery && (
@@ -904,14 +916,12 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
               {/* Categories */}
               {showCategoryFilter && (
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
-                    Categories
-                  </label>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Categories</label>
                   <div className="grid grid-cols-2 gap-1">
                     {Object.entries(categoryConfig).map(([key, config]) => {
                       const isSelected = filters.categories.includes(key as LocationCategory);
                       const Icon = config.icon;
-                      
+
                       return (
                         <button
                           key={key}
@@ -948,7 +958,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
                     max="5"
                     step="0.5"
                     value={filters.rating}
-                    onChange={(e) => updateFilters({ rating: Number(e.target.value) })}
+                    onChange={e => updateFilters({ rating: Number(e.target.value) })}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -996,7 +1006,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
                     min="1"
                     max="50"
                     value={filters.distance}
-                    onChange={(e) => updateFilters({ distance: Number(e.target.value) })}
+                    onChange={e => updateFilters({ distance: Number(e.target.value) })}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1005,14 +1015,12 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
               {/* Features Filter */}
               {showFeatureFilter && (
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
-                    Features
-                  </label>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Features</label>
                   <div className="grid grid-cols-2 gap-1">
                     {Object.entries(featureConfig).map(([key, config]) => {
                       const isSelected = filters.features.includes(key);
                       const Icon = config.icon;
-                      
+
                       return (
                         <button
                           key={key}
@@ -1044,24 +1052,28 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
                     type="checkbox"
                     id="open-only"
                     checked={filters.isOpen === true}
-                    onChange={(e) => updateFilters({ 
-                      isOpen: e.target.checked ? true : null 
-                    })}
+                    onChange={e =>
+                      updateFilters({
+                        isOpen: e.target.checked ? true : null,
+                      })
+                    }
                     className="rounded"
                   />
                   <label htmlFor="open-only" className="text-xs text-gray-700">
                     Open now only
                   </label>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     id="verified-only"
                     checked={filters.verified === true}
-                    onChange={(e) => updateFilters({ 
-                      verified: e.target.checked ? true : null 
-                    })}
+                    onChange={e =>
+                      updateFilters({
+                        verified: e.target.checked ? true : null,
+                      })
+                    }
                     className="rounded"
                   />
                   <label htmlFor="verified-only" className="text-xs text-gray-700">

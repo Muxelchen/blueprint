@@ -25,7 +25,7 @@ const Accordion: React.FC<AccordionProps> = ({
   variant = 'default',
   size = 'md',
   className = '',
-  onItemToggle
+  onItemToggle,
 }) => {
   const [openItems, setOpenItems] = useState<Set<string>>(
     new Set(items.filter(item => item.defaultOpen).map(item => item.id))
@@ -61,7 +61,7 @@ const Accordion: React.FC<AccordionProps> = ({
       default: 'space-y-2',
       bordered: 'border border-gray-200 rounded-lg overflow-hidden',
       filled: 'bg-gray-50 rounded-lg overflow-hidden',
-      minimal: 'space-y-1'
+      minimal: 'space-y-1',
     };
 
     return `${baseClasses} ${variantClasses[variant]} ${className}`;
@@ -73,7 +73,7 @@ const Accordion: React.FC<AccordionProps> = ({
       default: 'border border-gray-200 rounded-lg',
       bordered: 'border-b border-gray-200 last:border-b-0',
       filled: 'border-b border-gray-200 last:border-b-0',
-      minimal: ''
+      minimal: '',
     };
 
     const stateClasses = isOpen ? 'accordion-item-open' : '';
@@ -86,7 +86,7 @@ const Accordion: React.FC<AccordionProps> = ({
     const sizeClasses = {
       sm: 'px-3 py-2 text-sm',
       md: 'px-4 py-3 text-base',
-      lg: 'px-6 py-4 text-lg'
+      lg: 'px-6 py-4 text-lg',
     };
 
     const baseClasses = `
@@ -99,7 +99,7 @@ const Accordion: React.FC<AccordionProps> = ({
       default: `bg-white hover:bg-gray-50 ${variant === 'default' ? 'rounded-t-lg' : ''}`,
       bordered: 'bg-white hover:bg-gray-50',
       filled: 'bg-gray-50 hover:bg-gray-100',
-      minimal: 'bg-transparent hover:bg-gray-50 rounded-md'
+      minimal: 'bg-transparent hover:bg-gray-50 rounded-md',
     };
 
     const stateClasses = isOpen && variant !== 'minimal' ? 'bg-gray-50' : '';
@@ -112,14 +112,14 @@ const Accordion: React.FC<AccordionProps> = ({
     const sizeClasses = {
       sm: 'px-3 py-2',
       md: 'px-4 py-3',
-      lg: 'px-6 py-4'
+      lg: 'px-6 py-4',
     };
 
     const variantClasses = {
       default: 'bg-white border-t border-gray-200',
       bordered: 'bg-white border-t border-gray-200',
       filled: 'bg-white border-t border-gray-200',
-      minimal: 'bg-transparent'
+      minimal: 'bg-transparent',
     };
 
     return `accordion-content ${sizeClasses[size]} ${variantClasses[variant]}`;
@@ -127,9 +127,9 @@ const Accordion: React.FC<AccordionProps> = ({
 
   return (
     <div className={getAccordionClasses()}>
-      {items.map((item) => {
+      {items.map(item => {
         const isOpen = openItems.has(item.id);
-        
+
         return (
           <div key={item.id} className={getItemClasses(item, isOpen)}>
             <button
@@ -140,12 +140,10 @@ const Accordion: React.FC<AccordionProps> = ({
               aria-controls={`accordion-content-${item.id}`}
             >
               <div className="flex items-center gap-3">
-                {item.icon && (
-                  <span className="w-5 h-5 text-gray-500">{item.icon}</span>
-                )}
+                {item.icon && <span className="w-5 h-5 text-gray-500">{item.icon}</span>}
                 <span className="font-medium text-gray-900">{item.title}</span>
               </div>
-              
+
               <ChevronDown
                 className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
                   isOpen ? 'rotate-180' : ''
@@ -158,9 +156,7 @@ const Accordion: React.FC<AccordionProps> = ({
                 id={`accordion-content-${item.id}`}
                 className={`${getContentClasses()} animate-accordion-down`}
               >
-                <div className="text-gray-700">
-                  {item.content}
-                </div>
+                <div className="text-gray-700">{item.content}</div>
               </div>
             )}
           </div>
@@ -188,10 +184,12 @@ export const ExampleAccordion: React.FC = () => {
             <li>Start exploring the features</li>
           </ol>
           <div className="mt-4 p-3 bg-blue-50 rounded-md">
-            <p className="text-blue-800 text-sm">💡 Tip: Check out our video tutorials for a quick overview!</p>
+            <p className="text-blue-800 text-sm">
+              💡 Tip: Check out our video tutorials for a quick overview!
+            </p>
           </div>
         </div>
-      )
+      ),
     },
     {
       id: 'account-settings',
@@ -213,7 +211,7 @@ export const ExampleAccordion: React.FC = () => {
             </button>
           </div>
         </div>
-      )
+      ),
     },
     {
       id: 'file-management',
@@ -241,7 +239,7 @@ export const ExampleAccordion: React.FC = () => {
             </div>
           </div>
         </div>
-      )
+      ),
     },
     {
       id: 'team-collaboration',
@@ -275,12 +273,14 @@ export const ExampleAccordion: React.FC = () => {
               </div>
               <div>
                 <h4 className="font-semibold">Real-time Collaboration</h4>
-                <p className="text-sm text-gray-600">Work together in real-time with live updates</p>
+                <p className="text-sm text-gray-600">
+                  Work together in real-time with live updates
+                </p>
               </div>
             </div>
           </div>
         </div>
-      )
+      ),
     },
     {
       id: 'security',
@@ -291,8 +291,8 @@ export const ExampleAccordion: React.FC = () => {
         <div>
           <p>This section is currently being updated with the latest security information.</p>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const settingsItems: AccordionItem[] = [
@@ -318,7 +318,7 @@ export const ExampleAccordion: React.FC = () => {
             </select>
           </div>
         </div>
-      )
+      ),
     },
     {
       id: 'notifications',
@@ -338,8 +338,8 @@ export const ExampleAccordion: React.FC = () => {
             <input type="checkbox" className="rounded" />
           </div>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -349,28 +349,20 @@ export const ExampleAccordion: React.FC = () => {
         <Accordion
           items={faqItems}
           allowMultiple={true}
-          onItemToggle={(itemId, isOpen) => console.log(`FAQ ${itemId} ${isOpen ? 'opened' : 'closed'}`)}
+          onItemToggle={(itemId, isOpen) =>
+            console.log(`FAQ ${itemId} ${isOpen ? 'opened' : 'closed'}`)
+          }
         />
       </div>
 
       <div>
         <h3 className="text-lg font-semibold mb-4">Settings (Bordered Style)</h3>
-        <Accordion
-          items={settingsItems}
-          variant="bordered"
-          size="lg"
-          allowMultiple={false}
-        />
+        <Accordion items={settingsItems} variant="bordered" size="lg" allowMultiple={false} />
       </div>
 
       <div>
         <h3 className="text-lg font-semibold mb-4">Minimal Style</h3>
-        <Accordion
-          items={faqItems.slice(0, 3)}
-          variant="minimal"
-          size="sm"
-          allowMultiple={true}
-        />
+        <Accordion items={faqItems.slice(0, 3)} variant="minimal" size="sm" allowMultiple={true} />
       </div>
     </div>
   );

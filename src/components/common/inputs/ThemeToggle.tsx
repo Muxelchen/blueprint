@@ -11,7 +11,7 @@ export interface ThemeToggleProps {
 const ThemeToggle: React.FC<ThemeToggleProps> = ({
   className = '',
   size = 'md',
-  onThemeChange
+  onThemeChange,
 }) => {
   const [isDark, setIsDark] = useState<boolean>(() => {
     // Initialize from localStorage or system preference
@@ -36,10 +36,10 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
       document.body.style.backgroundColor = '#f9fafb';
       document.body.style.color = '#111827';
     }
-    
+
     // Save to localStorage
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    
+
     // Trigger callback
     onThemeChange?.(isDark);
   }, [isDark, onThemeChange]);

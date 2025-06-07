@@ -9,10 +9,38 @@ export const MapDashboardTemplate: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<number | null>(null);
 
   const locations = [
-    { id: 1, name: 'Downtown Office', lat: 37.7749, lng: -122.4194, type: 'office', status: 'active' },
-    { id: 2, name: 'Warehouse North', lat: 37.8044, lng: -122.2712, type: 'warehouse', status: 'active' },
-    { id: 3, name: 'Store Location A', lat: 37.7849, lng: -122.4094, type: 'store', status: 'maintenance' },
-    { id: 4, name: 'Distribution Center', lat: 37.7649, lng: -122.4294, type: 'distribution', status: 'active' },
+    {
+      id: 1,
+      name: 'Downtown Office',
+      lat: 37.7749,
+      lng: -122.4194,
+      type: 'office',
+      status: 'active',
+    },
+    {
+      id: 2,
+      name: 'Warehouse North',
+      lat: 37.8044,
+      lng: -122.2712,
+      type: 'warehouse',
+      status: 'active',
+    },
+    {
+      id: 3,
+      name: 'Store Location A',
+      lat: 37.7849,
+      lng: -122.4094,
+      type: 'store',
+      status: 'maintenance',
+    },
+    {
+      id: 4,
+      name: 'Distribution Center',
+      lat: 37.7649,
+      lng: -122.4294,
+      type: 'distribution',
+      status: 'active',
+    },
   ];
 
   const mapStats = [
@@ -32,12 +60,20 @@ export const MapDashboardTemplate: React.FC = () => {
               <Map className="w-6 h-6 mr-2" />
               Location Dashboard
             </h1>
-            <p className="text-sm text-gray-600">Real-time location tracking and geospatial analytics</p>
+            <p className="text-sm text-gray-600">
+              Real-time location tracking and geospatial analytics
+            </p>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" leftIcon={<Filter />}>Filter</Button>
-            <Button variant="outline" size="sm" leftIcon={<Download />}>Export Data</Button>
-            <Button variant="outline" size="sm" leftIcon={<Settings />}>Map Settings</Button>
+            <Button variant="outline" size="sm" leftIcon={<Filter />}>
+              Filter
+            </Button>
+            <Button variant="outline" size="sm" leftIcon={<Download />}>
+              Export Data
+            </Button>
+            <Button variant="outline" size="sm" leftIcon={<Settings />}>
+              Map Settings
+            </Button>
           </div>
         </div>
       </div>
@@ -60,7 +96,7 @@ export const MapDashboardTemplate: React.FC = () => {
             <div className="mb-6">
               <h3 className="text-sm font-medium text-gray-900 mb-3">Map View</h3>
               <div className="grid grid-cols-2 gap-2">
-                {['satellite', 'street', 'terrain', 'traffic'].map((view) => (
+                {['satellite', 'street', 'terrain', 'traffic'].map(view => (
                   <button
                     key={view}
                     onClick={() => setActiveView(view)}
@@ -78,9 +114,11 @@ export const MapDashboardTemplate: React.FC = () => {
 
             {/* Location List */}
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Locations ({locations.length})</h3>
+              <h3 className="text-sm font-medium text-gray-900 mb-3">
+                Locations ({locations.length})
+              </h3>
               <div className="space-y-2">
-                {locations.map((location) => (
+                {locations.map(location => (
                   <LocationCard
                     key={location.id}
                     location={location}
@@ -115,8 +153,9 @@ export const MapDashboardTemplate: React.FC = () => {
                 <Map className="w-24 h-24 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">Interactive Map</h3>
                 <p className="text-gray-500 max-w-md">
-                  Your interactive map component (Leaflet, Google Maps, or Mapbox) would render here.
-                  This template provides the perfect layout and controls for any mapping solution.
+                  Your interactive map component (Leaflet, Google Maps, or Mapbox) would render
+                  here. This template provides the perfect layout and controls for any mapping
+                  solution.
                 </p>
               </div>
 
@@ -167,7 +206,7 @@ export const MapDashboardTemplate: React.FC = () => {
             ) : (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Analytics Overview</h3>
-                
+
                 {/* Heat Map */}
                 <div className="mb-6">
                   <h4 className="text-sm font-medium text-gray-900 mb-2">Activity Heat Map</h4>
@@ -190,9 +229,21 @@ export const MapDashboardTemplate: React.FC = () => {
                 <div>
                   <h4 className="text-sm font-medium text-gray-900 mb-2">Recent Activity</h4>
                   <div className="space-y-3">
-                    <ActivityItem activity="New delivery completed" location="Store Location A" time="2 min ago" />
-                    <ActivityItem activity="Route optimized" location="Warehouse North" time="15 min ago" />
-                    <ActivityItem activity="Maintenance scheduled" location="Distribution Center" time="1 hour ago" />
+                    <ActivityItem
+                      activity="New delivery completed"
+                      location="Store Location A"
+                      time="2 min ago"
+                    />
+                    <ActivityItem
+                      activity="Route optimized"
+                      location="Warehouse North"
+                      time="15 min ago"
+                    />
+                    <ActivityItem
+                      activity="Maintenance scheduled"
+                      location="Distribution Center"
+                      time="1 hour ago"
+                    />
                   </div>
                 </div>
               </div>
@@ -214,9 +265,7 @@ const LocationCard: React.FC<{
     animate={{ opacity: 1, x: 0 }}
     onClick={onClick}
     className={`p-3 rounded-lg border cursor-pointer transition-all ${
-      isSelected
-        ? 'bg-blue-50 border-blue-300'
-        : 'bg-white border-gray-200 hover:border-gray-300'
+      isSelected ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200 hover:border-gray-300'
     }`}
   >
     <div className="flex items-center justify-between">
@@ -224,9 +273,13 @@ const LocationCard: React.FC<{
         <MapPin className="w-4 h-4 text-gray-500" />
         <span className="text-sm font-medium text-gray-900">{location.name}</span>
       </div>
-      <span className={`px-2 py-1 text-xs rounded-full ${
-        location.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-      }`}>
+      <span
+        className={`px-2 py-1 text-xs rounded-full ${
+          location.status === 'active'
+            ? 'bg-green-100 text-green-800'
+            : 'bg-yellow-100 text-yellow-800'
+        }`}
+      >
         {location.status}
       </span>
     </div>
@@ -239,11 +292,13 @@ const MapMarker: React.FC<{ type: string }> = ({ type }) => {
     office: 'bg-blue-500',
     warehouse: 'bg-green-500',
     store: 'bg-purple-500',
-    distribution: 'bg-orange-500'
+    distribution: 'bg-orange-500',
   };
 
   return (
-    <div className={`w-6 h-6 ${colors[type] || 'bg-gray-500'} rounded-full shadow-lg border-2 border-white animate-pulse`}>
+    <div
+      className={`w-6 h-6 ${colors[type] || 'bg-gray-500'} rounded-full shadow-lg border-2 border-white animate-pulse`}
+    >
       <div className="w-full h-full rounded-full bg-white opacity-30"></div>
     </div>
   );
@@ -256,9 +311,12 @@ const LegendItem: React.FC<{ color: string; label: string }> = ({ color, label }
   </div>
 );
 
-const LocationDetails: React.FC<{ locationId: any; locations: any[] }> = ({ locationId, locations }) => {
+const LocationDetails: React.FC<{ locationId: any; locations: any[] }> = ({
+  locationId,
+  locations,
+}) => {
   const location = locations.find(l => l.id === locationId);
-  
+
   return (
     <div>
       <h3 className="text-lg font-semibold text-gray-900 mb-4">{location?.name}</h3>
@@ -273,15 +331,22 @@ const LocationDetails: React.FC<{ locationId: any; locations: any[] }> = ({ loca
         </div>
         <div>
           <label className="text-sm font-medium text-gray-600">Coordinates</label>
-          <p className="text-sm text-gray-900">{location?.lat}, {location?.lng}</p>
+          <p className="text-sm text-gray-900">
+            {location?.lat}, {location?.lng}
+          </p>
         </div>
-        <Button size="sm" className="w-full">View Details</Button>
+        <Button size="sm" className="w-full">
+          View Details
+        </Button>
       </div>
     </div>
   );
 };
 
-const RouteEfficiency: React.FC<{ route: string; efficiency: number }> = ({ route, efficiency }) => (
+const RouteEfficiency: React.FC<{ route: string; efficiency: number }> = ({
+  route,
+  efficiency,
+}) => (
   <div>
     <div className="flex justify-between text-sm mb-1">
       <span className="text-gray-600">{route}</span>
@@ -296,10 +361,16 @@ const RouteEfficiency: React.FC<{ route: string; efficiency: number }> = ({ rout
   </div>
 );
 
-const ActivityItem: React.FC<{ activity: string; location: string; time: string }> = ({ activity, location, time }) => (
+const ActivityItem: React.FC<{ activity: string; location: string; time: string }> = ({
+  activity,
+  location,
+  time,
+}) => (
   <div className="border-l-2 border-blue-500 pl-3">
     <p className="text-sm font-medium text-gray-900">{activity}</p>
-    <p className="text-xs text-gray-500">{location} • {time}</p>
+    <p className="text-xs text-gray-500">
+      {location} • {time}
+    </p>
   </div>
 );
 

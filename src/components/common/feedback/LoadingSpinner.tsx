@@ -5,10 +5,7 @@ export interface LoadingSpinnerProps {
   className?: string;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
-  children, 
-  className = '' 
-}) => {
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ children, className = '' }) => {
   return (
     <div className={`loadingspinner-component ${className}`}>
       <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">

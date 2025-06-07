@@ -12,7 +12,7 @@ export const required = (value: any): ValidationResult => {
   const isValid = value !== null && value !== undefined && value !== '';
   return {
     isValid,
-    errors: isValid ? [] : ['This field is required']
+    errors: isValid ? [] : ['This field is required'],
   };
 };
 
@@ -21,7 +21,7 @@ export const minLength = (value: string, min: number): ValidationResult => {
   const isValid = length >= min;
   return {
     isValid,
-    errors: isValid ? [] : [`Minimum length is ${min} characters`]
+    errors: isValid ? [] : [`Minimum length is ${min} characters`],
   };
 };
 
@@ -30,7 +30,7 @@ export const maxLength = (value: string, max: number): ValidationResult => {
   const isValid = length <= max;
   return {
     isValid,
-    errors: isValid ? [] : [`Maximum length is ${max} characters`]
+    errors: isValid ? [] : [`Maximum length is ${max} characters`],
   };
 };
 
@@ -38,7 +38,7 @@ export const minValue = (value: number, min: number): ValidationResult => {
   const isValid = value >= min;
   return {
     isValid,
-    errors: isValid ? [] : [`Minimum value is ${min}`]
+    errors: isValid ? [] : [`Minimum value is ${min}`],
   };
 };
 
@@ -46,7 +46,7 @@ export const maxValue = (value: number, max: number): ValidationResult => {
   const isValid = value <= max;
   return {
     isValid,
-    errors: isValid ? [] : [`Maximum value is ${max}`]
+    errors: isValid ? [] : [`Maximum value is ${max}`],
   };
 };
 
@@ -54,7 +54,7 @@ export const pattern = (value: string, regex: RegExp, message?: string): Validat
   const isValid = regex.test(value);
   return {
     isValid,
-    errors: isValid ? [] : [message || 'Invalid format']
+    errors: isValid ? [] : [message || 'Invalid format'],
   };
 };
 
@@ -67,20 +67,20 @@ export const email = (value: string): ValidationResult => {
 // Phone validation
 export const phone = (value: string, format: 'US' | 'international' = 'US'): ValidationResult => {
   const cleaned = value.replace(/\D/g, '');
-  
+
   if (format === 'US') {
     const isValid = cleaned.length === 10 || (cleaned.length === 11 && cleaned[0] === '1');
     return {
       isValid,
-      errors: isValid ? [] : ['Please enter a valid US phone number']
+      errors: isValid ? [] : ['Please enter a valid US phone number'],
     };
   }
-  
+
   // International format - basic validation
   const isValid = cleaned.length >= 7 && cleaned.length <= 15;
   return {
     isValid,
-    errors: isValid ? [] : ['Please enter a valid phone number']
+    errors: isValid ? [] : ['Please enter a valid phone number'],
   };
 };
 
@@ -95,19 +95,22 @@ export const url = (value: string): ValidationResult => {
 };
 
 // Password validation
-export const password = (value: string, options: {
-  minLength?: number;
-  requireUppercase?: boolean;
-  requireLowercase?: boolean;
-  requireNumbers?: boolean;
-  requireSpecialChars?: boolean;
-} = {}): ValidationResult => {
+export const password = (
+  value: string,
+  options: {
+    minLength?: number;
+    requireUppercase?: boolean;
+    requireLowercase?: boolean;
+    requireNumbers?: boolean;
+    requireSpecialChars?: boolean;
+  } = {}
+): ValidationResult => {
   const {
     minLength = 8,
     requireUppercase = true,
     requireLowercase = true,
     requireNumbers = true,
-    requireSpecialChars = true
+    requireSpecialChars = true,
   } = options;
 
   const errors: string[] = [];
@@ -134,38 +137,38 @@ export const password = (value: string, options: {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
 // Credit card validation
 export const creditCard = (value: string): ValidationResult => {
   const cleaned = value.replace(/\D/g, '');
-  
+
   // Luhn algorithm - start with isEven = false since we process right to left
   // and we want to double every second digit starting from the second-to-last
   let sum = 0;
   let isEven = false;
-  
+
   for (let i = cleaned.length - 1; i >= 0; i--) {
     let digit = parseInt(cleaned[i]);
-    
+
     if (isEven) {
       digit *= 2;
       if (digit > 9) {
         digit -= 9;
       }
     }
-    
+
     sum += digit;
     isEven = !isEven;
   }
-  
+
   const isValid = sum % 10 === 0 && cleaned.length >= 13 && cleaned.length <= 19;
-  
+
   return {
     isValid,
-    errors: isValid ? [] : ['Please enter a valid credit card number']
+    errors: isValid ? [] : ['Please enter a valid credit card number'],
   };
 };
 
@@ -198,24 +201,28 @@ export const dateRange = (
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
 // Age validation
-export const age = (birthDate: Date | string, minAge: number, maxAge?: number): ValidationResult => {
+export const age = (
+  birthDate: Date | string,
+  minAge: number,
+  maxAge?: number
+): ValidationResult => {
   const birth = new Date(birthDate);
   const today = new Date();
-  
+
   // More accurate age calculation that considers month and day
   const yearDiff = today.getFullYear() - birth.getFullYear();
   // Adjust age if birthday hasn't occurred yet this year
-  const hasBirthdayOccurredThisYear = 
-    today.getMonth() > birth.getMonth() || 
+  const hasBirthdayOccurredThisYear =
+    today.getMonth() > birth.getMonth() ||
     (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
-  
+
   const age = hasBirthdayOccurredThisYear ? yearDiff : yearDiff - 1;
-  
+
   const errors: string[] = [];
 
   if (age < minAge) {
@@ -228,7 +235,7 @@ export const age = (birthDate: Date | string, minAge: number, maxAge?: number): 
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
@@ -255,7 +262,7 @@ export const file = (
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
@@ -280,16 +287,13 @@ export const compose = (...validators: ValidatorFunction[]) => {
     return {
       isValid,
       errors: allErrors,
-      warnings: allWarnings.length > 0 ? allWarnings : undefined
+      warnings: allWarnings.length > 0 ? allWarnings : undefined,
     };
   };
 };
 
 // Conditional validation
-export const when = (
-  condition: (value: any) => boolean,
-  validator: ValidatorFunction
-) => {
+export const when = (condition: (value: any) => boolean, validator: ValidatorFunction) => {
   return (value: any, options?: any): ValidationResult => {
     if (!condition(value)) {
       return { isValid: true, errors: [] };
@@ -318,12 +322,9 @@ export const validateForm = (
 };
 
 // Real-time validation with debounce
-export const createDebouncedValidator = (
-  validator: ValidatorFunction,
-  delay = 300
-) => {
+export const createDebouncedValidator = (validator: ValidatorFunction, delay = 300) => {
   let timeoutId: number;
-  
+
   return (value: any, callback: (result: ValidationResult) => void) => {
     clearTimeout(timeoutId);
     timeoutId = window.setTimeout(() => {
@@ -343,7 +344,7 @@ export const asyncValidation = async (
   } catch (error) {
     return {
       isValid: false,
-      errors: ['Validation error occurred']
+      errors: ['Validation error occurred'],
     };
   }
 };
@@ -365,7 +366,7 @@ export const ValidationRules = {
   age,
   file,
   compose,
-  when
+  when,
 };
 
 export default ValidationRules;

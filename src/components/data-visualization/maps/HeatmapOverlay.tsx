@@ -1,16 +1,16 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { 
-  Thermometer, 
-  TrendingUp, 
-  Activity, 
+import {
+  Thermometer,
+  TrendingUp,
+  Activity,
   Settings,
   Play,
   Pause,
   RotateCcw,
   Download,
-  Palette
+  Palette,
 } from 'lucide-react';
 
 // Extend Leaflet types for heat layer
@@ -19,7 +19,7 @@ declare module 'leaflet' {
     setLatLngs(latlngs: number[][]): this;
     addLatLng(latlng: number[]): this;
   }
-  
+
   function heatLayer(latlngs: number[][], options?: any): HeatLayer;
 }
 
@@ -56,13 +56,13 @@ const generateMockHeatmapData = (): HeatmapPoint[] => {
   const categories = ['traffic', 'sales', 'population', 'temperature', 'wifi'];
   const baseLocations = [
     { lat: 37.7749, lng: -122.4194, city: 'San Francisco' },
-    { lat: 40.7128, lng: -74.0060, city: 'New York' },
+    { lat: 40.7128, lng: -74.006, city: 'New York' },
     { lat: 34.0522, lng: -118.2437, city: 'Los Angeles' },
     { lat: 41.8781, lng: -87.6298, city: 'Chicago' },
     { lat: 25.7617, lng: -80.1918, city: 'Miami' },
     { lat: 47.6062, lng: -122.3321, city: 'Seattle' },
     { lat: 39.7392, lng: -104.9903, city: 'Denver' },
-    { lat: 30.2672, lng: -97.7431, city: 'Austin' }
+    { lat: 30.2672, lng: -97.7431, city: 'Austin' },
   ];
 
   let pointId = 1;
@@ -78,7 +78,7 @@ const generateMockHeatmapData = (): HeatmapPoint[] => {
 
       const category = categories[Math.floor(Math.random() * categories.length)];
       const baseIntensity = Math.random();
-      
+
       // Add some clustering effects
       const clusterFactor = Math.exp(-Math.pow(distance * 20, 2));
       const intensity = Math.min(1, baseIntensity + clusterFactor * 0.5);
@@ -100,8 +100,8 @@ const generateMockHeatmapData = (): HeatmapPoint[] => {
           city: location.city,
           cluster: Math.floor(i / 10),
           source: `sensor_${locationIndex}_${i}`,
-          confidence: 0.7 + Math.random() * 0.3
-        }
+          confidence: 0.7 + Math.random() * 0.3,
+        },
       });
     }
   });
@@ -117,7 +117,7 @@ const gradients = {
     0.4: '#009ffd',
     0.6: '#00d2ff',
     0.8: '#ffffff',
-    1.0: '#ffffff'
+    1.0: '#ffffff',
   },
   heat: {
     0.0: '#0000ff',
@@ -125,7 +125,7 @@ const gradients = {
     0.4: '#ffff00',
     0.6: '#ff8000',
     0.8: '#ff0000',
-    1.0: '#ffffff'
+    1.0: '#ffffff',
   },
   viridis: {
     0.0: '#440154',
@@ -133,7 +133,7 @@ const gradients = {
     0.4: '#35b779',
     0.6: '#8fd744',
     0.8: '#fde725',
-    1.0: '#ffffff'
+    1.0: '#ffffff',
   },
   plasma: {
     0.0: '#0d0887',
@@ -141,7 +141,7 @@ const gradients = {
     0.4: '#cc4778',
     0.6: '#f89441',
     0.8: '#feca57',
-    1.0: '#f0f921'
+    1.0: '#f0f921',
   },
   cool: {
     0.0: '#00ffff',
@@ -149,8 +149,8 @@ const gradients = {
     0.4: '#8000ff',
     0.6: '#ff00ff',
     0.8: '#ff0080',
-    1.0: '#ff0000'
-  }
+    1.0: '#ff0000',
+  },
 };
 
 // Heatmap controls component
@@ -183,7 +183,7 @@ const HeatmapControls: React.FC<{
   onToggleAnimation,
   onSpeedChange,
   onReset,
-  onExport
+  onExport,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -209,15 +209,15 @@ const HeatmapControls: React.FC<{
           <button
             onClick={onToggleAnimation}
             className={`flex items-center space-x-1 px-2 py-1 rounded text-xs transition-colors ${
-              isAnimating 
-                ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+              isAnimating
+                ? 'bg-red-100 text-red-700 hover:bg-red-200'
                 : 'bg-green-100 text-green-700 hover:bg-green-200'
             }`}
           >
             {isAnimating ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
             <span>{isAnimating ? 'Pause' : 'Play'}</span>
           </button>
-          
+
           <button
             onClick={onReset}
             className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
@@ -225,7 +225,7 @@ const HeatmapControls: React.FC<{
           >
             <RotateCcw className="w-3 h-3" />
           </button>
-          
+
           <button
             onClick={onExport}
             className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
@@ -240,7 +240,7 @@ const HeatmapControls: React.FC<{
           <Activity className="w-3 h-3 text-blue-500" />
           <span className="text-gray-600">Intensity:</span>
           <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-gradient-to-r from-blue-500 to-red-500 transition-all duration-300"
               style={{ width: `${opacity * 100}%` }}
             />
@@ -262,22 +262,20 @@ const HeatmapControls: React.FC<{
               min="5"
               max="50"
               value={radius}
-              onChange={(e) => onRadiusChange(Number(e.target.value))}
+              onChange={e => onRadiusChange(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
           {/* Blur Control */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Blur: {blur}px
-            </label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Blur: {blur}px</label>
             <input
               type="range"
               min="5"
               max="30"
               value={blur}
-              onChange={(e) => onBlurChange(Number(e.target.value))}
+              onChange={e => onBlurChange(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
             />
           </div>
@@ -293,7 +291,7 @@ const HeatmapControls: React.FC<{
               max="1"
               step="0.1"
               value={opacity}
-              onChange={(e) => onOpacityChange(Number(e.target.value))}
+              onChange={e => onOpacityChange(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
             />
           </div>
@@ -309,28 +307,26 @@ const HeatmapControls: React.FC<{
               max="2000"
               step="100"
               value={animationSpeed}
-              onChange={(e) => onSpeedChange(Number(e.target.value))}
+              onChange={e => onSpeedChange(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
           {/* Gradient Selection */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-2">
-              Color Scheme
-            </label>
+            <label className="block text-xs font-medium text-gray-700 mb-2">Color Scheme</label>
             <div className="grid grid-cols-2 gap-2">
-              {Object.keys(gradients).map((gradientName) => (
+              {Object.keys(gradients).map(gradientName => (
                 <button
                   key={gradientName}
                   onClick={() => onGradientChange(gradientName)}
                   className={`relative h-8 rounded border-2 transition-all ${
-                    gradient === gradientName 
-                      ? 'border-blue-500 ring-2 ring-blue-200' 
+                    gradient === gradientName
+                      ? 'border-blue-500 ring-2 ring-blue-200'
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
                   style={{
-                    background: `linear-gradient(to right, ${Object.values(gradients[gradientName as keyof typeof gradients]).join(', ')})`
+                    background: `linear-gradient(to right, ${Object.values(gradients[gradientName as keyof typeof gradients]).join(', ')})`,
                   }}
                   title={gradientName}
                 >
@@ -365,27 +361,27 @@ const HeatmapLegend: React.FC<{
         <Palette className="w-4 h-4 mr-2" />
         Intensity Scale
       </h4>
-      
+
       <div className="flex items-center space-x-3">
         <span className="text-xs text-gray-500 font-medium">
-          {minValue}{unit}
+          {minValue}
+          {unit}
         </span>
-        
-        <div 
+
+        <div
           className="w-32 h-4 rounded border border-gray-300"
           style={{
-            background: `linear-gradient(to right, ${gradientStops})`
+            background: `linear-gradient(to right, ${gradientStops})`,
           }}
         />
-        
+
         <span className="text-xs text-gray-500 font-medium">
-          {maxValue}{unit}
+          {maxValue}
+          {unit}
         </span>
       </div>
-      
-      <div className="mt-2 text-xs text-gray-400 text-center">
-        Low ← Intensity → High
-      </div>
+
+      <div className="mt-2 text-xs text-gray-400 text-center">Low ← Intensity → High</div>
     </div>
   );
 };
@@ -398,14 +394,14 @@ const HeatmapStats: React.FC<{
   const stats = useMemo(() => {
     const intensities = points.map(p => p.intensity);
     const values = points.map(p => p.value || 0);
-    
+
     return {
       totalPoints: points.length,
       avgIntensity: intensities.reduce((sum, i) => sum + i, 0) / intensities.length,
       maxIntensity: Math.max(...intensities),
       minIntensity: Math.min(...intensities),
       totalValue: values.reduce((sum, v) => sum + v, 0),
-      hotspots: points.filter(p => p.intensity > 0.7).length
+      hotspots: points.filter(p => p.intensity > 0.7).length,
     };
   }, [points]);
 
@@ -415,25 +411,29 @@ const HeatmapStats: React.FC<{
         <TrendingUp className="w-4 h-4 mr-2" />
         Heatmap Statistics
       </h4>
-      
+
       <div className="grid grid-cols-2 gap-3 text-xs">
         <div className="text-center">
           <div className="text-lg font-bold text-blue-600">{stats.totalPoints}</div>
           <div className="text-gray-500">Data Points</div>
         </div>
-        
+
         <div className="text-center">
           <div className="text-lg font-bold text-red-600">{stats.hotspots}</div>
           <div className="text-gray-500">Hotspots</div>
         </div>
-        
+
         <div className="text-center">
-          <div className="text-lg font-bold text-green-600">{Math.round(stats.avgIntensity * 100)}%</div>
+          <div className="text-lg font-bold text-green-600">
+            {Math.round(stats.avgIntensity * 100)}%
+          </div>
           <div className="text-gray-500">Avg Intensity</div>
         </div>
-        
+
         <div className="text-center">
-          <div className="text-lg font-bold text-orange-600">{stats.totalValue.toLocaleString()}</div>
+          <div className="text-lg font-bold text-orange-600">
+            {stats.totalValue.toLocaleString()}
+          </div>
           <div className="text-gray-500">Total Value</div>
         </div>
       </div>
@@ -459,7 +459,7 @@ const HeatmapOverlay: React.FC<HeatmapOverlayProps> = ({
   showAnimation = true,
   animationSpeed = 1000,
   className = '',
-  onIntensityChange
+  onIntensityChange,
 }) => {
   const map = useMap();
   const heatLayerRef = useRef<L.HeatLayer | null>(null);
@@ -482,7 +482,7 @@ const HeatmapOverlay: React.FC<HeatmapOverlayProps> = ({
     // Animate based on timestamp
     const now = new Date();
     const timeRange = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-    const animationTime = now.getTime() - (frame * currentSpeed);
+    const animationTime = now.getTime() - frame * currentSpeed;
 
     return pointsData
       .filter(point => {
@@ -497,7 +497,7 @@ const HeatmapOverlay: React.FC<HeatmapOverlayProps> = ({
           const timeDiff = Math.abs(point.timestamp.getTime() - animationTime);
           const fadeDistance = timeRange / 20;
           if (timeDiff < fadeDistance) {
-            intensity *= 1 - (timeDiff / fadeDistance);
+            intensity *= 1 - timeDiff / fadeDistance;
           }
         }
         return [point.lat, point.lng, Math.max(0, intensity)];
@@ -515,7 +515,7 @@ const HeatmapOverlay: React.FC<HeatmapOverlayProps> = ({
 
     // Create new heatmap layer
     const heatmapData = formatPointsForHeatmap(points, showAnimation ? animationFrame : undefined);
-    
+
     // @ts-ignore - Leaflet.heat types might not be perfect
     const heatLayer = L.heatLayer(heatmapData, {
       radius: currentRadius,
@@ -523,7 +523,7 @@ const HeatmapOverlay: React.FC<HeatmapOverlayProps> = ({
       maxZoom: maxZoom,
       minOpacity: minOpacity,
       max: 1.0,
-      gradient: gradients[currentGradient as keyof typeof gradients]
+      gradient: gradients[currentGradient as keyof typeof gradients],
     });
 
     heatLayer.addTo(map);
@@ -534,14 +534,23 @@ const HeatmapOverlay: React.FC<HeatmapOverlayProps> = ({
         map.removeLayer(heatLayerRef.current);
       }
     };
-  }, [map, points, currentRadius, currentBlur, currentGradient, animationFrame, showAnimation, currentSpeed]);
+  }, [
+    map,
+    points,
+    currentRadius,
+    currentBlur,
+    currentGradient,
+    animationFrame,
+    showAnimation,
+    currentSpeed,
+  ]);
 
   // Animation loop
   useEffect(() => {
     if (isAnimating && showAnimation) {
       animationRef.current = setInterval(() => {
         setAnimationFrame(prev => prev + 1);
-        setCurrentTime(new Date(Date.now() - (animationFrame * currentSpeed)));
+        setCurrentTime(new Date(Date.now() - animationFrame * currentSpeed));
       }, currentSpeed);
     } else {
       if (animationRef.current) {
@@ -581,13 +590,13 @@ const HeatmapOverlay: React.FC<HeatmapOverlayProps> = ({
         blur: currentBlur,
         opacity: currentOpacity,
         gradient: currentGradient,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       statistics: {
         totalPoints: points.length,
         avgIntensity: points.reduce((sum, p) => sum + p.intensity, 0) / points.length,
-        hotspots: points.filter(p => p.intensity > 0.7).length
-      }
+        hotspots: points.filter(p => p.intensity > 0.7).length,
+      },
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });

@@ -30,12 +30,12 @@ const BadgeCounter: React.FC<BadgeCounterProps> = ({
   interactive = false,
   onCountChange,
   className = '',
-  label
+  label,
 }) => {
   const [state, setState] = useState<BadgeCounterState>({
     currentCount: initialCount,
     isAnimating: false,
-    history: [initialCount]
+    history: [initialCount],
   });
 
   // Load count from localStorage if available
@@ -47,7 +47,7 @@ const BadgeCounter: React.FC<BadgeCounterProps> = ({
       setState(prev => ({
         ...prev,
         currentCount: count,
-        history: [count]
+        history: [count],
       }));
     }
   }, [label]);
@@ -67,33 +67,36 @@ const BadgeCounter: React.FC<BadgeCounterProps> = ({
     }
   }, [initialCount]);
 
-  const updateCount = useCallback((newCount: number, animate = true) => {
-    const clampedCount = Math.max(0, newCount);
-    
-    setState(prev => {
-      if (animate && animated) {
+  const updateCount = useCallback(
+    (newCount: number, animate = true) => {
+      const clampedCount = Math.max(0, newCount);
+
+      setState(prev => {
+        if (animate && animated) {
+          return {
+            currentCount: clampedCount,
+            isAnimating: true,
+            history: [...prev.history.slice(-9), clampedCount], // Keep last 10 values
+          };
+        }
+
         return {
           currentCount: clampedCount,
-          isAnimating: true,
-          history: [...prev.history.slice(-9), clampedCount] // Keep last 10 values
+          isAnimating: false,
+          history: [...prev.history.slice(-9), clampedCount],
         };
+      });
+
+      if (animate && animated) {
+        setTimeout(() => {
+          setState(prev => ({ ...prev, isAnimating: false }));
+        }, 300);
       }
-      
-      return {
-        currentCount: clampedCount,
-        isAnimating: false,
-        history: [...prev.history.slice(-9), clampedCount]
-      };
-    });
 
-    if (animate && animated) {
-      setTimeout(() => {
-        setState(prev => ({ ...prev, isAnimating: false }));
-      }, 300);
-    }
-
-    onCountChange?.(clampedCount);
-  }, [animated, onCountChange]);
+      onCountChange?.(clampedCount);
+    },
+    [animated, onCountChange]
+  );
 
   const increment = useCallback(() => {
     updateCount(state.currentCount + 1);
@@ -114,7 +117,7 @@ const BadgeCounter: React.FC<BadgeCounterProps> = ({
     const sizeClasses = {
       sm: 'px-1.5 py-0.5 text-xs min-w-[1.25rem] h-5',
       md: 'px-2 py-1 text-sm min-w-[1.5rem] h-6',
-      lg: 'px-2.5 py-1.5 text-base min-w-[2rem] h-8'
+      lg: 'px-2.5 py-1.5 text-base min-w-[2rem] h-8',
     };
 
     const variantClasses = {
@@ -124,12 +127,13 @@ const BadgeCounter: React.FC<BadgeCounterProps> = ({
       success: 'bg-green-500 text-white',
       warning: 'bg-yellow-500 text-white',
       error: 'bg-red-500 text-white',
-      info: 'bg-blue-400 text-white'
+      info: 'bg-blue-400 text-white',
     };
 
-    const animationClasses = state.isAnimating && animated
-      ? 'transform scale-110 transition-transform duration-300 ease-out'
-      : 'transition-all duration-200 ease-in-out';
+    const animationClasses =
+      state.isAnimating && animated
+        ? 'transform scale-110 transition-transform duration-300 ease-out'
+        : 'transition-all duration-200 ease-in-out';
 
     return `
       inline-flex items-center justify-center rounded-full font-semibold
@@ -139,7 +143,7 @@ const BadgeCounter: React.FC<BadgeCounterProps> = ({
 
   const getInteractiveStyles = () => {
     if (!interactive) return '';
-    
+
     return `
       cursor-pointer hover:opacity-80 active:scale-95
       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
@@ -168,12 +172,16 @@ const BadgeCounter: React.FC<BadgeCounterProps> = ({
       <span
         className={`${getBadgeStyles()} ${getInteractiveStyles()}`}
         onClick={interactive ? increment : undefined}
-        onKeyDown={interactive ? (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            increment();
-          }
-        } : undefined}
+        onKeyDown={
+          interactive
+            ? e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  increment();
+                }
+              }
+            : undefined
+        }
         tabIndex={interactive ? 0 : undefined}
         role={interactive ? 'button' : undefined}
         aria-label={`Count: ${state.currentCount}${interactive ? '. Click to increment.' : ''}`}
@@ -224,8 +232,8 @@ export const useBadgeManager = () => {
     setState(prev => ({
       badges: {
         ...prev.badges,
-        [id]: Math.max(0, count)
-      }
+        [id]: Math.max(0, count),
+      },
     }));
   }, []);
 
@@ -233,8 +241,8 @@ export const useBadgeManager = () => {
     setState(prev => ({
       badges: {
         ...prev.badges,
-        [id]: (prev.badges[id] || 0) + amount
-      }
+        [id]: (prev.badges[id] || 0) + amount,
+      },
     }));
   }, []);
 
@@ -242,8 +250,8 @@ export const useBadgeManager = () => {
     setState(prev => ({
       badges: {
         ...prev.badges,
-        [id]: Math.max(0, (prev.badges[id] || 0) - amount)
-      }
+        [id]: Math.max(0, (prev.badges[id] || 0) - amount),
+      },
     }));
   }, []);
 
@@ -251,8 +259,8 @@ export const useBadgeManager = () => {
     setState(prev => ({
       badges: {
         ...prev.badges,
-        [id]: 0
-      }
+        [id]: 0,
+      },
     }));
   }, []);
 
@@ -272,7 +280,7 @@ export const useBadgeManager = () => {
     resetBadge,
     clearAllBadges,
     getTotalCount,
-    getBadgeCount: (id: string) => state.badges[id] || 0
+    getBadgeCount: (id: string) => state.badges[id] || 0,
   };
 };
 
@@ -298,16 +306,16 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
   showZero = false,
   position = 'top-right',
   offset = { x: 0, y: 0 },
-  className = ''
+  className = '',
 }) => {
   const getPositionClasses = () => {
     const positions = {
       'top-right': 'top-0 right-0 transform translate-x-1/2 -translate-y-1/2',
       'top-left': 'top-0 left-0 transform -translate-x-1/2 -translate-y-1/2',
       'bottom-right': 'bottom-0 right-0 transform translate-x-1/2 translate-y-1/2',
-      'bottom-left': 'bottom-0 left-0 transform -translate-x-1/2 translate-y-1/2'
+      'bottom-left': 'bottom-0 left-0 transform -translate-x-1/2 translate-y-1/2',
     };
-    
+
     return positions[position];
   };
 
@@ -320,7 +328,7 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
         <div
           className={`absolute ${getPositionClasses()}`}
           style={{
-            transform: `translate(${offset.x}px, ${offset.y}px)`
+            transform: `translate(${offset.x}px, ${offset.y}px)`,
           }}
         >
           <BadgeCounter
@@ -339,24 +347,18 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
 
 // Example usage component
 export const ExampleBadges: React.FC = () => {
-  const {
-    badges,
-    incrementBadge,
-    resetBadge,
-    clearAllBadges,
-    getTotalCount
-  } = useBadgeManager();
+  const { badges, incrementBadge, resetBadge, clearAllBadges, getTotalCount } = useBadgeManager();
 
   const [localCount, setLocalCount] = useState(5);
 
   const simulateNotifications = () => {
     // Simulate incoming notifications
     incrementBadge('messages', Math.floor(Math.random() * 5) + 1);
-    
+
     setTimeout(() => {
       incrementBadge('alerts', Math.floor(Math.random() * 3) + 1);
     }, 1000);
-    
+
     setTimeout(() => {
       incrementBadge('tasks', Math.floor(Math.random() * 2) + 1);
     }, 2000);
@@ -366,7 +368,7 @@ export const ExampleBadges: React.FC = () => {
     <div className="space-y-8">
       <div>
         <h3 className="text-lg font-semibold mb-4">Badge Counter Examples</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Basic Badge Counters */}
           <div className="space-y-4">
@@ -398,9 +400,7 @@ export const ExampleBadges: React.FC = () => {
                 label="interactive-demo"
                 onCountChange={setLocalCount}
               />
-              <div className="text-sm text-gray-600">
-                Click the badge or use +/- buttons
-              </div>
+              <div className="text-sm text-gray-600">Click the badge or use +/- buttons</div>
               <button
                 onClick={() => setLocalCount(0)}
                 className="px-3 py-1 text-sm bg-gray-200 rounded-md hover:bg-gray-300"
@@ -417,11 +417,7 @@ export const ExampleBadges: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span>Messages:</span>
                 <div className="flex items-center gap-2">
-                  <BadgeCounter
-                    count={badges.messages || 0}
-                    variant="info"
-                    showZero
-                  />
+                  <BadgeCounter count={badges.messages || 0} variant="info" showZero />
                   <button
                     onClick={() => incrementBadge('messages')}
                     className="px-2 py-1 text-xs bg-blue-500 text-white rounded"
@@ -430,15 +426,11 @@ export const ExampleBadges: React.FC = () => {
                   </button>
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span>Alerts:</span>
                 <div className="flex items-center gap-2">
-                  <BadgeCounter
-                    count={badges.alerts || 0}
-                    variant="warning"
-                    showZero
-                  />
+                  <BadgeCounter count={badges.alerts || 0} variant="warning" showZero />
                   <button
                     onClick={() => incrementBadge('alerts')}
                     className="px-2 py-1 text-xs bg-yellow-500 text-white rounded"
@@ -447,15 +439,11 @@ export const ExampleBadges: React.FC = () => {
                   </button>
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span>Tasks:</span>
                 <div className="flex items-center gap-2">
-                  <BadgeCounter
-                    count={badges.tasks || 0}
-                    variant="success"
-                    showZero
-                  />
+                  <BadgeCounter count={badges.tasks || 0} variant="success" showZero />
                   <button
                     onClick={() => incrementBadge('tasks')}
                     className="px-2 py-1 text-xs bg-green-500 text-white rounded"
@@ -506,28 +494,28 @@ export const ExampleBadges: React.FC = () => {
           >
             Simulate Notifications
           </button>
-          
+
           <button
             onClick={() => resetBadge('messages')}
             className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
           >
             Clear Messages
           </button>
-          
+
           <button
             onClick={() => resetBadge('alerts')}
             className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
           >
             Clear Alerts
           </button>
-          
+
           <button
             onClick={() => resetBadge('tasks')}
             className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
           >
             Clear Tasks
           </button>
-          
+
           <button
             onClick={clearAllBadges}
             className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
@@ -536,9 +524,7 @@ export const ExampleBadges: React.FC = () => {
           </button>
         </div>
 
-        <div className="mt-4 text-sm text-gray-600">
-          Total notifications: {getTotalCount()}
-        </div>
+        <div className="mt-4 text-sm text-gray-600">Total notifications: {getTotalCount()}</div>
       </div>
     </div>
   );

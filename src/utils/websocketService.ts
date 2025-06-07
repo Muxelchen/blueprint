@@ -25,7 +25,7 @@ const DEFAULT_OPTIONS: WebSocketOptions = {
   reconnectInterval: 2000,
   maxReconnectAttempts: 5,
   heartbeatInterval: 30000,
-  debug: false
+  debug: false,
 };
 
 class WebSocketService {
@@ -49,14 +49,17 @@ class WebSocketService {
    * @param userId Optional user ID for authentication
    */
   public connect(userId?: string): void {
-    if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
+    if (
+      this.socket &&
+      (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)
+    ) {
       this.debugLog('WebSocket is already connected or connecting');
       return;
     }
 
     this.userId = userId;
     const connectionUrl = userId ? `${this.url}?userId=${userId}` : this.url;
-    
+
     this.debugLog(`Connecting to WebSocket: ${connectionUrl}`);
     this.socket = new WebSocket(connectionUrl);
 
@@ -73,7 +76,7 @@ class WebSocketService {
     this.debugLog('Disconnecting WebSocket');
     this.clearTimers();
     this.reconnectAttempts = 0;
-    
+
     if (this.socket) {
       this.socket.close();
       this.socket = null;
@@ -95,7 +98,7 @@ class WebSocketService {
       id: uuidv4(),
       type,
       payload,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.socket.send(JSON.stringify(message));
@@ -110,7 +113,7 @@ class WebSocketService {
     if (this.channels.has(channel)) {
       return;
     }
-    
+
     this.channels.add(channel);
     this.send('SUBSCRIBE', { channel });
     this.debugLog(`Subscribed to channel: ${channel}`);
@@ -124,7 +127,7 @@ class WebSocketService {
     if (!this.channels.has(channel)) {
       return;
     }
-    
+
     this.channels.delete(channel);
     this.send('UNSUBSCRIBE', { channel });
     this.debugLog(`Unsubscribed from channel: ${channel}`);
@@ -172,15 +175,15 @@ class WebSocketService {
   private handleOpen(event: Event): void {
     this.debugLog('WebSocket connected');
     this.reconnectAttempts = 0;
-    
+
     // Start heartbeat
     this.startHeartbeat();
-    
+
     // Resubscribe to channels if there are any
     if (this.channels.size > 0) {
       this.resubscribeToChannels();
     }
-    
+
     // Call onOpen callback if provided
     if (this.options.onOpen) {
       this.options.onOpen();
@@ -194,20 +197,19 @@ class WebSocketService {
     try {
       const message = JSON.parse(event.data) as WebSocketMessage;
       this.debugLog(`Message received: ${message.type}`, message);
-      
+
       // Handle heartbeat response
       if (message.type === 'PONG') {
         return;
       }
-      
+
       // Call global message handler if provided
       if (this.options.onMessage) {
         this.options.onMessage(message);
       }
-      
+
       // Call specific message listeners
       this.messageListeners.forEach(listener => listener(message));
-      
     } catch (error) {
       this.debugLog('Error parsing message', error);
     }
@@ -219,14 +221,18 @@ class WebSocketService {
   private handleClose(event: CloseEvent): void {
     this.debugLog(`WebSocket disconnected: ${event.code} ${event.reason}`);
     this.clearTimers();
-    
+
     // Call onClose callback if provided
     if (this.options.onClose) {
       this.options.onClose();
     }
-    
+
     // Auto-reconnect if enabled
-    if (this.options.autoReconnect && (!this.options.maxReconnectAttempts || this.reconnectAttempts < this.options.maxReconnectAttempts)) {
+    if (
+      this.options.autoReconnect &&
+      (!this.options.maxReconnectAttempts ||
+        this.reconnectAttempts < this.options.maxReconnectAttempts)
+    ) {
       this.attemptReconnect();
     }
   }
@@ -236,7 +242,7 @@ class WebSocketService {
    */
   private handleError(event: Event): void {
     this.debugLog('WebSocket error', event);
-    
+
     // Call onError callback if provided
     if (this.options.onError) {
       this.options.onError(event);
@@ -248,13 +254,15 @@ class WebSocketService {
    */
   private attemptReconnect(): void {
     this.reconnectAttempts += 1;
-    
-    this.debugLog(`Attempting to reconnect (${this.reconnectAttempts}/${this.options.maxReconnectAttempts || 'unlimited'})`);
-    
+
+    this.debugLog(
+      `Attempting to reconnect (${this.reconnectAttempts}/${this.options.maxReconnectAttempts || 'unlimited'})`
+    );
+
     if (this.options.onReconnect) {
       this.options.onReconnect(this.reconnectAttempts);
     }
-    
+
     this.reconnectTimeout = window.setTimeout(() => {
       this.connect(this.userId);
     }, this.options.reconnectInterval);
@@ -265,9 +273,9 @@ class WebSocketService {
    */
   private startHeartbeat(): void {
     if (!this.options.heartbeatInterval) return;
-    
+
     this.clearTimers();
-    
+
     this.heartbeatInterval = window.setInterval(() => {
       this.send('PING', { timestamp: Date.now() });
     }, this.options.heartbeatInterval);
@@ -281,7 +289,7 @@ class WebSocketService {
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = null;
     }
-    
+
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;

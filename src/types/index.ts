@@ -19,10 +19,10 @@ export type ComponentVariant = 'primary' | 'secondary' | 'success' | 'warning' |
 export type ComponentState = 'default' | 'hover' | 'active' | 'disabled' | 'loading';
 
 // Type modules - organized by component categories
-export * from './forms';        // Form-related types
-export * from './navigation';   // Navigation component types  
-export * from './layout';       // Layout component types
-export * from './widgets';      // Widget component types
-export * from './charts';       // Chart component types
-export * from './maps';         // Map component types
+export * from './forms'; // Form-related types
+export * from './navigation'; // Navigation component types
+export * from './layout'; // Layout component types
+export * from './widgets'; // Widget component types
+export * from './charts'; // Chart component types
+export * from './maps'; // Map component types
 export * from './notifications'; // Notification types

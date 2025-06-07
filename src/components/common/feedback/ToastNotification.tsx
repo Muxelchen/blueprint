@@ -141,7 +141,7 @@ const ToastComponent: React.FC<ToastComponentProps> = ({ toast }) => {
 
   const getStyles = () => {
     const baseStyles = 'relative overflow-hidden rounded-lg shadow-lg border p-4 backdrop-blur-sm';
-    
+
     switch (toast.type) {
       case 'success':
         return `${baseStyles} bg-green-50 border-green-200 text-green-800`;
@@ -160,12 +160,18 @@ const ToastComponent: React.FC<ToastComponentProps> = ({ toast }) => {
 
   const getProgressBarColor = () => {
     switch (toast.type) {
-      case 'success': return 'bg-green-400';
-      case 'error': return 'bg-red-400';
-      case 'warning': return 'bg-yellow-400';
-      case 'info': return 'bg-blue-400';
-      case 'notification': return 'bg-purple-400';
-      default: return 'bg-gray-400';
+      case 'success':
+        return 'bg-green-400';
+      case 'error':
+        return 'bg-red-400';
+      case 'warning':
+        return 'bg-yellow-400';
+      case 'info':
+        return 'bg-blue-400';
+      case 'notification':
+        return 'bg-purple-400';
+      default:
+        return 'bg-gray-400';
     }
   };
 
@@ -188,16 +194,12 @@ const ToastComponent: React.FC<ToastComponentProps> = ({ toast }) => {
       )}
 
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 mt-0.5">
-          {getIcon()}
-        </div>
+        <div className="flex-shrink-0 mt-0.5">{getIcon()}</div>
 
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-sm">{toast.title}</div>
-          {toast.message && (
-            <div className="text-sm opacity-90 mt-1">{toast.message}</div>
-          )}
-          
+          {toast.message && <div className="text-sm opacity-90 mt-1">{toast.message}</div>}
+
           {toast.action && (
             <button
               onClick={toast.action.onClick}
@@ -226,16 +228,16 @@ export const useToastActions = () => {
   return {
     success: (title: string, message?: string, options?: Partial<Toast>) =>
       addToast({ type: 'success', title, message, ...options }),
-    
+
     error: (title: string, message?: string, options?: Partial<Toast>) =>
       addToast({ type: 'error', title, message, ...options }),
-    
+
     warning: (title: string, message?: string, options?: Partial<Toast>) =>
       addToast({ type: 'warning', title, message, ...options }),
-    
+
     info: (title: string, message?: string, options?: Partial<Toast>) =>
       addToast({ type: 'info', title, message, ...options }),
-    
+
     notification: (title: string, message?: string, options?: Partial<Toast>) =>
       addToast({ type: 'notification', title, message, ...options }),
   };
@@ -248,24 +250,24 @@ export const ExampleToasts: React.FC = () => {
 
   const showExampleToasts = () => {
     success('Success!', 'Your operation completed successfully.');
-    
+
     setTimeout(() => {
       error('Error occurred', 'Please try again later.', { persistent: true });
     }, 1000);
-    
+
     setTimeout(() => {
       warning('Warning', 'This action cannot be undone.');
     }, 2000);
-    
+
     setTimeout(() => {
       info('Information', 'New features are available.', {
         action: {
           label: 'Learn more',
-          onClick: () => console.log('Learn more clicked')
-        }
+          onClick: () => console.log('Learn more clicked'),
+        },
       });
     }, 3000);
-    
+
     setTimeout(() => {
       notification('New message', 'You have received a new notification.');
     }, 4000);
@@ -274,7 +276,7 @@ export const ExampleToasts: React.FC = () => {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Toast Notifications</h3>
-      
+
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => success('Success!', 'Operation completed.')}
@@ -282,44 +284,48 @@ export const ExampleToasts: React.FC = () => {
         >
           Success Toast
         </button>
-        
+
         <button
           onClick={() => error('Error!', 'Something went wrong.')}
           className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
         >
           Error Toast
         </button>
-        
+
         <button
           onClick={() => warning('Warning!', 'Please be careful.')}
           className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
         >
           Warning Toast
         </button>
-        
+
         <button
-          onClick={() => info('Info', 'Here is some information.', {
-            action: { label: 'Got it', onClick: () => console.log('Acknowledged') }
-          })}
+          onClick={() =>
+            info('Info', 'Here is some information.', {
+              action: { label: 'Got it', onClick: () => console.log('Acknowledged') },
+            })
+          }
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
         >
           Info Toast with Action
         </button>
-        
+
         <button
-          onClick={() => notification('Notification', 'New update available.', { persistent: true })}
+          onClick={() =>
+            notification('Notification', 'New update available.', { persistent: true })
+          }
           className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
         >
           Persistent Toast
         </button>
-        
+
         <button
           onClick={showExampleToasts}
           className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
         >
           Show All Types
         </button>
-        
+
         <button
           onClick={clearAll}
           className="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500"

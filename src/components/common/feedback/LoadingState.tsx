@@ -34,7 +34,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   showProgress = false,
   mockDelay = 0,
   className = '',
-  children
+  children,
 }) => {
   const [internalLoading, setInternalLoading] = useState(isLoading);
   const [currentProgress, setCurrentProgress] = useState(progress);
@@ -87,7 +87,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({
       sm: 'w-4 h-4',
       md: 'w-6 h-6',
       lg: 'w-8 h-8',
-      xl: 'w-12 h-12'
+      xl: 'w-12 h-12',
     };
     return sizes[size];
   };
@@ -99,7 +99,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({
       yellow: 'text-yellow-600',
       red: 'text-red-600',
       purple: 'text-purple-600',
-      gray: 'text-gray-600'
+      gray: 'text-gray-600',
     };
     return colors[color];
   };
@@ -110,13 +110,13 @@ const LoadingState: React.FC<LoadingStateProps> = ({
 
   const renderDots = () => (
     <div className="flex space-x-1">
-      {[0, 1, 2].map((index) => (
+      {[0, 1, 2].map(index => (
         <div
           key={index}
           className={`rounded-full ${getSizeClasses()} ${getColorClasses().replace('text-', 'bg-')} animate-pulse`}
           style={{
             animationDelay: `${index * 0.2}s`,
-            animationDuration: '1s'
+            animationDuration: '1s',
           }}
         />
       ))}
@@ -124,7 +124,9 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   );
 
   const renderPulse = () => (
-    <div className={`${getSizeClasses()} ${getColorClasses().replace('text-', 'bg-')} rounded-full animate-pulse`} />
+    <div
+      className={`${getSizeClasses()} ${getColorClasses().replace('text-', 'bg-')} rounded-full animate-pulse`}
+    />
   );
 
   const renderProgressBar = () => (
@@ -167,11 +169,11 @@ const LoadingState: React.FC<LoadingStateProps> = ({
     <div className={`flex flex-col items-center justify-center space-y-4 ${className}`}>
       {variant !== 'skeleton' && renderLoadingIndicator()}
       {variant === 'skeleton' && renderSkeleton()}
-      
+
       {message && variant !== 'skeleton' && (
         <p className="text-sm text-gray-600 text-center">{message}</p>
       )}
-      
+
       {showProgress && variant !== 'bar' && variant !== 'skeleton' && (
         <div className="w-full max-w-xs">
           <div className="flex justify-between text-xs text-gray-500 mb-1">
@@ -187,9 +189,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   if (overlay) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 shadow-xl">
-          {loadingContent}
-        </div>
+        <div className="bg-white rounded-lg p-8 shadow-xl">{loadingContent}</div>
       </div>
     );
   }
@@ -214,7 +214,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({
 export const AsyncLoadingWrapper: React.FC<AsyncLoadingProps> = ({
   asyncFunction,
   loadingMessage = 'Loading...',
-  children
+  children,
 }) => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -223,7 +223,7 @@ export const AsyncLoadingWrapper: React.FC<AsyncLoadingProps> = ({
   const executeAsync = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await asyncFunction();
       setResult(data);
@@ -288,15 +288,13 @@ export const ConnectionStatus: React.FC<{
       ) : (
         <WifiOff className="w-4 h-4 text-red-600" />
       )}
-      
+
       <span className={`text-sm ${online ? 'text-green-600' : 'text-red-600'}`}>
         {online ? 'Online' : 'Offline'}
       </span>
-      
+
       {showDetails && online && connectionType !== 'unknown' && (
-        <span className="text-xs text-gray-500">
-          ({connectionType})
-        </span>
+        <span className="text-xs text-gray-500">({connectionType})</span>
       )}
     </div>
   );
@@ -320,7 +318,7 @@ export const LoadingButton: React.FC<{
   loadingText = 'Loading...',
   variant = 'primary',
   size = 'md',
-  className = ''
+  className = '',
 }) => {
   const [isLoading, setIsLoading] = useState(loading);
 
@@ -336,11 +334,12 @@ export const LoadingButton: React.FC<{
   };
 
   const getVariantClasses = () => {
-    const base = 'font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    const base =
+      'font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
     const variants = {
       primary: `${base} bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500`,
       secondary: `${base} bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500`,
-      danger: `${base} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500`
+      danger: `${base} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500`,
     };
     return variants[variant];
   };
@@ -349,7 +348,7 @@ export const LoadingButton: React.FC<{
     const sizes = {
       sm: 'px-3 py-1.5 text-sm',
       md: 'px-4 py-2 text-sm',
-      lg: 'px-6 py-3 text-base'
+      lg: 'px-6 py-3 text-base',
     };
     return sizes[size];
   };
@@ -379,26 +378,26 @@ export const StatusIndicator: React.FC<{
         icon: <Loader2 className="w-4 h-4 animate-spin" />,
         color: 'text-blue-600',
         bgColor: 'bg-blue-50',
-        borderColor: 'border-blue-200'
+        borderColor: 'border-blue-200',
       },
       success: {
         icon: <CheckCircle className="w-4 h-4" />,
         color: 'text-green-600',
         bgColor: 'bg-green-50',
-        borderColor: 'border-green-200'
+        borderColor: 'border-green-200',
       },
       error: {
         icon: <XCircle className="w-4 h-4" />,
         color: 'text-red-600',
         bgColor: 'bg-red-50',
-        borderColor: 'border-red-200'
+        borderColor: 'border-red-200',
       },
       warning: {
         icon: <AlertCircle className="w-4 h-4" />,
         color: 'text-yellow-600',
         bgColor: 'bg-yellow-50',
-        borderColor: 'border-yellow-200'
-      }
+        borderColor: 'border-yellow-200',
+      },
     };
     return configs[status];
   };
@@ -406,15 +405,11 @@ export const StatusIndicator: React.FC<{
   const config = getStatusConfig();
 
   return (
-    <div className={`flex items-center space-x-2 p-3 rounded-lg border ${config.bgColor} ${config.borderColor} ${className}`}>
-      {showIcon && (
-        <div className={config.color}>
-          {config.icon}
-        </div>
-      )}
-      {message && (
-        <span className={`text-sm ${config.color}`}>{message}</span>
-      )}
+    <div
+      className={`flex items-center space-x-2 p-3 rounded-lg border ${config.bgColor} ${config.borderColor} ${className}`}
+    >
+      {showIcon && <div className={config.color}>{config.icon}</div>}
+      {message && <span className={`text-sm ${config.color}`}>{message}</span>}
     </div>
   );
 };
@@ -455,7 +450,7 @@ export const ExampleLoadingState: React.FC = () => {
     <div className="space-y-8 p-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Loading State System</h3>
-        
+
         {/* Connection Status */}
         <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
           <h4 className="font-medium mb-3">Connection Status</h4>
@@ -505,7 +500,7 @@ export const ExampleLoadingState: React.FC = () => {
         {/* Interactive Examples */}
         <div className="space-y-6">
           <h4 className="font-medium">Interactive Loading Examples</h4>
-          
+
           {/* Basic Loading */}
           <div>
             <button
@@ -515,7 +510,7 @@ export const ExampleLoadingState: React.FC = () => {
             >
               Trigger Basic Loading
             </button>
-            
+
             <div className="border border-gray-200 rounded-lg p-6 min-h-32">
               {basicLoading ? (
                 <LoadingState
@@ -542,7 +537,7 @@ export const ExampleLoadingState: React.FC = () => {
             >
               Trigger Progress Loading
             </button>
-            
+
             <div className="border border-gray-200 rounded-lg p-6">
               <LoadingState
                 isLoading={progressLoading}
@@ -563,14 +558,10 @@ export const ExampleLoadingState: React.FC = () => {
           <div className="space-y-4">
             <h5 className="font-medium">Loading Buttons</h5>
             <div className="flex flex-wrap gap-4">
-              <LoadingButton
-                onClick={handleButtonAction}
-                variant="primary"
-                loadingText="Saving..."
-              >
+              <LoadingButton onClick={handleButtonAction} variant="primary" loadingText="Saving...">
                 Save Changes
               </LoadingButton>
-              
+
               <LoadingButton
                 onClick={handleButtonAction}
                 variant="secondary"
@@ -578,7 +569,7 @@ export const ExampleLoadingState: React.FC = () => {
               >
                 Upload File
               </LoadingButton>
-              
+
               <LoadingButton
                 onClick={handleButtonAction}
                 variant="danger"
@@ -616,7 +607,9 @@ export const ExampleLoadingState: React.FC = () => {
             <h5 className="font-medium mb-3">Async Loading Wrapper</h5>
             <div className="border border-gray-200 rounded-lg p-4">
               <AsyncLoadingWrapper
-                asyncFunction={() => mockApiCall(3000).then(() => ({ message: 'Data loaded!', timestamp: new Date() }))}
+                asyncFunction={() =>
+                  mockApiCall(3000).then(() => ({ message: 'Data loaded!', timestamp: new Date() }))
+                }
                 loadingMessage="Fetching async data..."
               >
                 {(result, error) => (
@@ -625,7 +618,9 @@ export const ExampleLoadingState: React.FC = () => {
                       <div>
                         <h6 className="font-medium">Async Result:</h6>
                         <p className="text-sm text-gray-600">{result.message}</p>
-                        <p className="text-xs text-gray-500">Loaded at: {result.timestamp?.toLocaleTimeString()}</p>
+                        <p className="text-xs text-gray-500">
+                          Loaded at: {result.timestamp?.toLocaleTimeString()}
+                        </p>
                       </div>
                     )}
                     {error && (

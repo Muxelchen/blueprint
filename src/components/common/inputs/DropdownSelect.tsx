@@ -76,7 +76,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
   dropdownClassName = '',
   optionClassName = '',
   name,
-  id
+  id,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -87,7 +87,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
     isOpen: false,
     searchTerm: '',
     highlightedIndex: -1,
-    isFocused: false
+    isFocused: false,
   });
 
   const [selectedValue, setSelectedValue] = useState<string | number | null>(
@@ -104,66 +104,77 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
   // Filter options based on search term
   const filteredOptions = options.filter(option => {
     if (!state.searchTerm) return true;
-    return option.label.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-           option.description?.toLowerCase().includes(state.searchTerm.toLowerCase());
+    return (
+      option.label.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+      option.description?.toLowerCase().includes(state.searchTerm.toLowerCase())
+    );
   });
 
   // Group options if they have groups
-  const groupedOptions = filteredOptions.reduce((groups, option) => {
-    const group = option.group || 'default';
-    if (!groups[group]) {
-      groups[group] = [];
-    }
-    groups[group].push(option);
-    return groups;
-  }, {} as Record<string, SelectOption[]>);
+  const groupedOptions = filteredOptions.reduce(
+    (groups, option) => {
+      const group = option.group || 'default';
+      if (!groups[group]) {
+        groups[group] = [];
+      }
+      groups[group].push(option);
+      return groups;
+    },
+    {} as Record<string, SelectOption[]>
+  );
 
   // Get selected option
   const selectedOption = options.find(option => option.value === selectedValue);
 
   // Handle option selection
-  const handleSelect = useCallback((option: SelectOption) => {
-    if (option.disabled) return;
+  const handleSelect = useCallback(
+    (option: SelectOption) => {
+      if (option.disabled) return;
 
-    const newValue = option.value;
-    
-    if (!isControlled) {
-      setSelectedValue(newValue);
-    }
+      const newValue = option.value;
 
-    setState(prev => ({
-      ...prev,
-      isOpen: false,
-      searchTerm: '',
-      highlightedIndex: -1
-    }));
+      if (!isControlled) {
+        setSelectedValue(newValue);
+      }
 
-    onChange?.(newValue);
-    onClose?.();
-  }, [isControlled, onChange, onClose]);
+      setState(prev => ({
+        ...prev,
+        isOpen: false,
+        searchTerm: '',
+        highlightedIndex: -1,
+      }));
+
+      onChange?.(newValue);
+      onClose?.();
+    },
+    [isControlled, onChange, onClose]
+  );
 
   // Handle clear selection
-  const handleClear = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    if (!isControlled) {
-      setSelectedValue(null);
-    }
+  const handleClear = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
 
-    onChange?.(null);
-  }, [isControlled, onChange]);
+      if (!isControlled) {
+        setSelectedValue(null);
+      }
+
+      onChange?.(null);
+    },
+    [isControlled, onChange]
+  );
 
   // Handle dropdown toggle
   const handleToggle = useCallback(() => {
     if (disabled) return;
 
     const newIsOpen = !state.isOpen;
-    
+
     setState(prev => ({
       ...prev,
       isOpen: newIsOpen,
       searchTerm: '',
-      highlightedIndex: newIsOpen ? 0 : -1
+      highlightedIndex: newIsOpen ? 0 : -1,
     }));
 
     if (newIsOpen) {
@@ -178,62 +189,68 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
   }, [disabled, state.isOpen, searchable, onOpen, onClose]);
 
   // Handle search input change
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setState(prev => ({
-      ...prev,
-      searchTerm: value,
-      highlightedIndex: 0
-    }));
-    onSearchChange?.(value);
-  }, [onSearchChange]);
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setState(prev => ({
+        ...prev,
+        searchTerm: value,
+        highlightedIndex: 0,
+      }));
+      onSearchChange?.(value);
+    },
+    [onSearchChange]
+  );
 
   // Handle keyboard navigation
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!state.isOpen) {
-      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        handleToggle();
-      }
-      return;
-    }
-
-    switch (e.key) {
-      case 'Escape':
-        e.preventDefault();
-        setState(prev => ({ ...prev, isOpen: false, searchTerm: '' }));
-        onClose?.();
-        break;
-        
-      case 'ArrowDown':
-        e.preventDefault();
-        setState(prev => ({
-          ...prev,
-          highlightedIndex: Math.min(prev.highlightedIndex + 1, filteredOptions.length - 1)
-        }));
-        break;
-        
-      case 'ArrowUp':
-        e.preventDefault();
-        setState(prev => ({
-          ...prev,
-          highlightedIndex: Math.max(prev.highlightedIndex - 1, 0)
-        }));
-        break;
-        
-      case 'Enter':
-        e.preventDefault();
-        if (state.highlightedIndex >= 0 && filteredOptions[state.highlightedIndex]) {
-          handleSelect(filteredOptions[state.highlightedIndex]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!state.isOpen) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          handleToggle();
         }
-        break;
-        
-      case 'Tab':
-        setState(prev => ({ ...prev, isOpen: false, searchTerm: '' }));
-        onClose?.();
-        break;
-    }
-  }, [state.isOpen, state.highlightedIndex, filteredOptions, handleToggle, handleSelect, onClose]);
+        return;
+      }
+
+      switch (e.key) {
+        case 'Escape':
+          e.preventDefault();
+          setState(prev => ({ ...prev, isOpen: false, searchTerm: '' }));
+          onClose?.();
+          break;
+
+        case 'ArrowDown':
+          e.preventDefault();
+          setState(prev => ({
+            ...prev,
+            highlightedIndex: Math.min(prev.highlightedIndex + 1, filteredOptions.length - 1),
+          }));
+          break;
+
+        case 'ArrowUp':
+          e.preventDefault();
+          setState(prev => ({
+            ...prev,
+            highlightedIndex: Math.max(prev.highlightedIndex - 1, 0),
+          }));
+          break;
+
+        case 'Enter':
+          e.preventDefault();
+          if (state.highlightedIndex >= 0 && filteredOptions[state.highlightedIndex]) {
+            handleSelect(filteredOptions[state.highlightedIndex]);
+          }
+          break;
+
+        case 'Tab':
+          setState(prev => ({ ...prev, isOpen: false, searchTerm: '' }));
+          onClose?.();
+          break;
+      }
+    },
+    [state.isOpen, state.highlightedIndex, filteredOptions, handleToggle, handleSelect, onClose]
+  );
 
   // Handle click outside
   useEffect(() => {
@@ -257,20 +274,20 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
         container: 'h-8 text-sm px-3',
         icon: 'w-4 h-4',
         dropdown: 'text-sm',
-        option: 'px-3 py-1.5 text-sm'
+        option: 'px-3 py-1.5 text-sm',
       },
       md: {
         container: 'h-10 text-base px-3',
         icon: 'w-5 h-5',
         dropdown: 'text-base',
-        option: 'px-3 py-2 text-base'
+        option: 'px-3 py-2 text-base',
       },
       lg: {
         container: 'h-12 text-lg px-4',
         icon: 'w-6 h-6',
         dropdown: 'text-lg',
-        option: 'px-4 py-3 text-lg'
-      }
+        option: 'px-4 py-3 text-lg',
+      },
     };
     return configs[size];
   };
@@ -280,20 +297,20 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
     const configs = {
       default: {
         container: 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
-        dropdown: 'border-gray-200'
+        dropdown: 'border-gray-200',
       },
       error: {
         container: 'border-red-300 focus:border-red-500 focus:ring-red-500',
-        dropdown: 'border-red-200'
+        dropdown: 'border-red-200',
       },
       success: {
         container: 'border-green-300 focus:border-green-500 focus:ring-green-500',
-        dropdown: 'border-green-200'
+        dropdown: 'border-green-200',
       },
       warning: {
         container: 'border-yellow-300 focus:border-yellow-500 focus:ring-yellow-500',
-        dropdown: 'border-yellow-200'
-      }
+        dropdown: 'border-yellow-200',
+      },
     };
     return configs[variant];
   };
@@ -325,9 +342,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
       {label && (
         <label
           htmlFor={selectId}
-          className={`block text-sm font-medium ${
-            disabled ? 'text-gray-400' : 'text-gray-700'
-          }`}
+          className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-gray-700'}`}
         >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -336,9 +351,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
 
       {/* Description */}
       {description && !error && (
-        <p className={`text-xs ${disabled ? 'text-gray-400' : 'text-gray-600'}`}>
-          {description}
-        </p>
+        <p className={`text-xs ${disabled ? 'text-gray-400' : 'text-gray-600'}`}>{description}</p>
       )}
 
       {/* Select Container */}
@@ -375,14 +388,10 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center flex-1 min-w-0">
               {selectedOption?.icon && (
-                <div className="mr-2 flex-shrink-0">
-                  {selectedOption.icon}
-                </div>
+                <div className="mr-2 flex-shrink-0">{selectedOption.icon}</div>
               )}
               <span
-                className={`block truncate ${
-                  selectedOption ? 'text-gray-900' : 'text-gray-500'
-                }`}
+                className={`block truncate ${selectedOption ? 'text-gray-900' : 'text-gray-500'}`}
               >
                 {selectedOption ? selectedOption.label : placeholder}
               </span>
@@ -441,11 +450,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
             )}
 
             {/* Options */}
-            <div
-              className="overflow-auto"
-              style={{ maxHeight: `${maxHeight}px` }}
-              role="listbox"
-            >
+            <div className="overflow-auto" style={{ maxHeight: `${maxHeight}px` }} role="listbox">
               {filteredOptions.length === 0 ? (
                 <div className={`${sizeConfig.option} text-gray-500 text-center`}>
                   {noOptionsText}
@@ -461,7 +466,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
                     )}
 
                     {/* Group Options */}
-                    {groupOptions.map((option) => {
+                    {groupOptions.map(option => {
                       const globalIndex = filteredOptions.indexOf(option);
                       const isHighlighted = globalIndex === state.highlightedIndex;
                       const isSelected = option.value === selectedValue;
@@ -481,11 +486,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
                           aria-selected={isSelected}
                         >
                           <div className="flex items-center flex-1 min-w-0">
-                            {option.icon && (
-                              <div className="mr-2 flex-shrink-0">
-                                {option.icon}
-                              </div>
-                            )}
+                            {option.icon && <div className="mr-2 flex-shrink-0">{option.icon}</div>}
                             <div className="flex-1 min-w-0">
                               <div className="truncate">{option.label}</div>
                               {option.description && (
@@ -495,9 +496,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
                               )}
                             </div>
                           </div>
-                          {isSelected && (
-                            <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                          )}
+                          {isSelected && <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />}
                         </div>
                       );
                     })}
@@ -510,9 +509,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({
       </div>
 
       {/* Error Message */}
-      {error && (
-        <p className="text-xs text-red-600">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 };
@@ -530,7 +527,7 @@ export const ExampleDropdownSelects: React.FC = () => {
     { value: 'de', label: 'Germany', icon: '🇩🇪' },
     { value: 'fr', label: 'France', icon: '🇫🇷' },
     { value: 'jp', label: 'Japan', icon: '🇯🇵' },
-    { value: 'au', label: 'Australia', icon: '🇦🇺' }
+    { value: 'au', label: 'Australia', icon: '🇦🇺' },
   ];
 
   const categoryOptions: SelectOption[] = [
@@ -540,7 +537,7 @@ export const ExampleDropdownSelects: React.FC = () => {
     { value: 'home', label: 'Home & Garden', group: 'Products' },
     { value: 'support', label: 'Customer Support', group: 'Services' },
     { value: 'consulting', label: 'Consulting', group: 'Services' },
-    { value: 'training', label: 'Training', group: 'Services' }
+    { value: 'training', label: 'Training', group: 'Services' },
   ];
 
   const userOptions: SelectOption[] = [
@@ -548,27 +545,43 @@ export const ExampleDropdownSelects: React.FC = () => {
       value: 1,
       label: 'John Doe',
       description: 'Software Engineer',
-      icon: <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">JD</div>
+      icon: (
+        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+          JD
+        </div>
+      ),
     },
     {
       value: 2,
       label: 'Jane Smith',
       description: 'Product Manager',
-      icon: <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">JS</div>
+      icon: (
+        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">
+          JS
+        </div>
+      ),
     },
     {
       value: 3,
       label: 'Bob Johnson',
       description: 'Designer',
-      icon: <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">BJ</div>
+      icon: (
+        <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">
+          BJ
+        </div>
+      ),
     },
     {
       value: 4,
       label: 'Alice Brown',
       description: 'Marketing Manager',
       disabled: true,
-      icon: <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs">AB</div>
-    }
+      icon: (
+        <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs">
+          AB
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -629,14 +642,14 @@ export const ExampleDropdownSelects: React.FC = () => {
                 size="sm"
                 placeholder="Small size..."
               />
-              
+
               <DropdownSelect
                 label="Medium Select"
                 options={countryOptions.slice(0, 4)}
                 size="md"
                 placeholder="Medium size..."
               />
-              
+
               <DropdownSelect
                 label="Large Select"
                 options={countryOptions.slice(0, 4)}
@@ -657,14 +670,14 @@ export const ExampleDropdownSelects: React.FC = () => {
                 error="Please select a valid option"
                 placeholder="Error state..."
               />
-              
+
               <DropdownSelect
                 label="Disabled State"
                 options={countryOptions.slice(0, 4)}
                 disabled
                 placeholder="Disabled select..."
               />
-              
+
               <DropdownSelect
                 label="Loading State"
                 options={countryOptions.slice(0, 4)}
@@ -704,9 +717,15 @@ export const ExampleDropdownSelects: React.FC = () => {
         <div className="mt-8 p-4 bg-gray-50 rounded-lg">
           <h4 className="font-medium mb-2">Current Selections</h4>
           <div className="space-y-2 text-sm">
-            <p><strong>Country:</strong> {selectedCountry || 'None'}</p>
-            <p><strong>Category:</strong> {selectedCategory || 'None'}</p>
-            <p><strong>User:</strong> {selectedUser || 'None'}</p>
+            <p>
+              <strong>Country:</strong> {selectedCountry || 'None'}
+            </p>
+            <p>
+              <strong>Category:</strong> {selectedCategory || 'None'}
+            </p>
+            <p>
+              <strong>User:</strong> {selectedUser || 'None'}
+            </p>
           </div>
         </div>
       </div>

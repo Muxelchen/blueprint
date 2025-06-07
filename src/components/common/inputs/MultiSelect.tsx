@@ -40,7 +40,19 @@ export interface MultiSelectProps {
   chipClassName?: string;
   name?: string;
   id?: string;
-  chipColor?: 'default' | 'primary' | 'success' | 'warning' | 'error' | 'blue' | 'green' | 'yellow' | 'red' | 'purple' | 'pink' | 'indigo';
+  chipColor?:
+    | 'default'
+    | 'primary'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'blue'
+    | 'green'
+    | 'yellow'
+    | 'red'
+    | 'purple'
+    | 'pink'
+    | 'indigo';
   chipVariant?: 'default' | 'solid' | 'outline';
 }
 
@@ -82,7 +94,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   name,
   id,
   chipColor = 'default',
-  chipVariant = 'default'
+  chipVariant = 'default',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -94,7 +106,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     searchTerm: '',
     highlightedIndex: -1,
     isFocused: false,
-    selectedValues: controlledValue || defaultValue
+    selectedValues: controlledValue || defaultValue,
   });
 
   // Update state when controlled value changes
@@ -105,28 +117,31 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   }, [controlledValue, isControlled]);
 
   // Filter options based on search term
-  const filteredOptions = options.filter(option => 
-    option.label.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-    (option.description && option.description.toLowerCase().includes(state.searchTerm.toLowerCase()))
+  const filteredOptions = options.filter(
+    option =>
+      option.label.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+      (option.description &&
+        option.description.toLowerCase().includes(state.searchTerm.toLowerCase()))
   );
 
   // Group options
-  const groupedOptions = filteredOptions.reduce((groups, option) => {
-    const group = option.group || 'default';
-    if (!groups[group]) groups[group] = [];
-    groups[group].push(option);
-    return groups;
-  }, {} as Record<string, MultiSelectOption[]>);
-
-  const selectedOptions = options.filter(option => 
-    state.selectedValues.includes(option.value)
+  const groupedOptions = filteredOptions.reduce(
+    (groups, option) => {
+      const group = option.group || 'default';
+      if (!groups[group]) groups[group] = [];
+      groups[group].push(option);
+      return groups;
+    },
+    {} as Record<string, MultiSelectOption[]>
   );
+
+  const selectedOptions = options.filter(option => state.selectedValues.includes(option.value));
 
   const handleToggle = useCallback(() => {
     if (disabled) return;
-    
+
     setState(prev => ({ ...prev, isOpen: !prev.isOpen, highlightedIndex: -1 }));
-    
+
     if (!state.isOpen) {
       onOpen?.();
     } else {
@@ -134,33 +149,36 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     }
   }, [disabled, state.isOpen, onOpen, onClose]);
 
-  const handleSelect = useCallback((option: MultiSelectOption) => {
-    if (option.disabled) return;
+  const handleSelect = useCallback(
+    (option: MultiSelectOption) => {
+      if (option.disabled) return;
 
-    const isSelected = state.selectedValues.includes(option.value);
-    let newValues: (string | number)[];
+      const isSelected = state.selectedValues.includes(option.value);
+      let newValues: (string | number)[];
 
-    if (isSelected) {
-      newValues = state.selectedValues.filter(v => v !== option.value);
-    } else {
-      if (maxSelected && state.selectedValues.length >= maxSelected) {
-        return; // Don't add if max selected reached
+      if (isSelected) {
+        newValues = state.selectedValues.filter(v => v !== option.value);
+      } else {
+        if (maxSelected && state.selectedValues.length >= maxSelected) {
+          return; // Don't add if max selected reached
+        }
+        newValues = [...state.selectedValues, option.value];
       }
-      newValues = [...state.selectedValues, option.value];
-    }
 
-    if (!isControlled) {
-      setState(prev => ({ ...prev, selectedValues: newValues }));
-    }
+      if (!isControlled) {
+        setState(prev => ({ ...prev, selectedValues: newValues }));
+      }
 
-    onChange?.(newValues);
-  }, [state.selectedValues, isControlled, onChange, maxSelected]);
+      onChange?.(newValues);
+    },
+    [state.selectedValues, isControlled, onChange, maxSelected]
+  );
 
   const handleSelectAll = useCallback(() => {
     const allValues = filteredOptions
       .filter(option => !option.disabled)
       .map(option => option.value);
-    
+
     const isAllSelected = allValues.every(value => state.selectedValues.includes(value));
     const newValues = isAllSelected ? [] : allValues;
 
@@ -171,76 +189,88 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     onChange?.(newValues);
   }, [filteredOptions, state.selectedValues, isControlled, onChange]);
 
-  const handleRemoveOption = useCallback((optionValue: string | number) => {
-    const newValues = state.selectedValues.filter(v => v !== optionValue);
+  const handleRemoveOption = useCallback(
+    (optionValue: string | number) => {
+      const newValues = state.selectedValues.filter(v => v !== optionValue);
 
-    if (!isControlled) {
-      setState(prev => ({ ...prev, selectedValues: newValues }));
-    }
-
-    onChange?.(newValues);
-  }, [state.selectedValues, isControlled, onChange]);
-
-  const handleClear = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    if (!isControlled) {
-      setState(prev => ({ ...prev, selectedValues: [] }));
-    }
-
-    onChange?.([]);
-  }, [isControlled, onChange]);
-
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchValue = e.target.value;
-    setState(prev => ({ 
-      ...prev, 
-      searchTerm: searchValue,
-      highlightedIndex: -1
-    }));
-    onSearchChange?.(searchValue);
-  }, [onSearchChange]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!state.isOpen) {
-      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        handleToggle();
+      if (!isControlled) {
+        setState(prev => ({ ...prev, selectedValues: newValues }));
       }
-      return;
-    }
 
-    switch (e.key) {
-      case 'Escape':
-        e.preventDefault();
-        setState(prev => ({ ...prev, isOpen: false, searchTerm: '' }));
-        onClose?.();
-        break;
-        
-      case 'ArrowDown':
-        e.preventDefault();
-        setState(prev => ({
-          ...prev,
-          highlightedIndex: Math.min(prev.highlightedIndex + 1, filteredOptions.length - 1)
-        }));
-        break;
-        
-      case 'ArrowUp':
-        e.preventDefault();
-        setState(prev => ({
-          ...prev,
-          highlightedIndex: Math.max(prev.highlightedIndex - 1, 0)
-        }));
-        break;
-        
-      case 'Enter':
-        e.preventDefault();
-        if (state.highlightedIndex >= 0 && filteredOptions[state.highlightedIndex]) {
-          handleSelect(filteredOptions[state.highlightedIndex]);
+      onChange?.(newValues);
+    },
+    [state.selectedValues, isControlled, onChange]
+  );
+
+  const handleClear = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      if (!isControlled) {
+        setState(prev => ({ ...prev, selectedValues: [] }));
+      }
+
+      onChange?.([]);
+    },
+    [isControlled, onChange]
+  );
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const searchValue = e.target.value;
+      setState(prev => ({
+        ...prev,
+        searchTerm: searchValue,
+        highlightedIndex: -1,
+      }));
+      onSearchChange?.(searchValue);
+    },
+    [onSearchChange]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!state.isOpen) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          handleToggle();
         }
-        break;
-    }
-  }, [state.isOpen, state.highlightedIndex, filteredOptions, handleToggle, handleSelect, onClose]);
+        return;
+      }
+
+      switch (e.key) {
+        case 'Escape':
+          e.preventDefault();
+          setState(prev => ({ ...prev, isOpen: false, searchTerm: '' }));
+          onClose?.();
+          break;
+
+        case 'ArrowDown':
+          e.preventDefault();
+          setState(prev => ({
+            ...prev,
+            highlightedIndex: Math.min(prev.highlightedIndex + 1, filteredOptions.length - 1),
+          }));
+          break;
+
+        case 'ArrowUp':
+          e.preventDefault();
+          setState(prev => ({
+            ...prev,
+            highlightedIndex: Math.max(prev.highlightedIndex - 1, 0),
+          }));
+          break;
+
+        case 'Enter':
+          e.preventDefault();
+          if (state.highlightedIndex >= 0 && filteredOptions[state.highlightedIndex]) {
+            handleSelect(filteredOptions[state.highlightedIndex]);
+          }
+          break;
+      }
+    },
+    [state.isOpen, state.highlightedIndex, filteredOptions, handleToggle, handleSelect, onClose]
+  );
 
   // Handle click outside
   useEffect(() => {
@@ -266,7 +296,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         icon: 'w-4 h-4',
         dropdown: 'text-sm',
         option: 'px-3 py-1.5 text-sm',
-        text: 'text-sm'
+        text: 'text-sm',
       },
       md: {
         container: 'min-h-10 text-base px-3 py-2',
@@ -274,7 +304,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         icon: 'w-5 h-5',
         dropdown: 'text-base',
         option: 'px-3 py-2 text-base',
-        text: 'text-base'
+        text: 'text-base',
       },
       lg: {
         container: 'min-h-12 text-lg px-4 py-3',
@@ -282,8 +312,8 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         icon: 'w-6 h-6',
         dropdown: 'text-lg',
         option: 'px-4 py-3 text-lg',
-        text: 'text-lg'
-      }
+        text: 'text-lg',
+      },
     };
     return configs[size];
   };
@@ -293,27 +323,28 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     const configs = {
       default: {
         container: 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
-        dropdown: 'border-gray-200'
+        dropdown: 'border-gray-200',
       },
       error: {
         container: 'border-red-300 focus:border-red-500 focus:ring-red-500',
-        dropdown: 'border-red-200'
+        dropdown: 'border-red-200',
       },
       success: {
         container: 'border-green-300 focus:border-green-500 focus:ring-green-500',
-        dropdown: 'border-green-200'
+        dropdown: 'border-green-200',
       },
       warning: {
         container: 'border-yellow-300 focus:border-yellow-500 focus:ring-yellow-500',
-        dropdown: 'border-yellow-200'
-      }
+        dropdown: 'border-yellow-200',
+      },
     };
     return configs[variant];
   };
 
   // Get chip styling configuration
   const getChipConfig = () => {
-    const baseStyles = chipVariant === 'solid' ? 'border-transparent' : 'border-current bg-transparent';
+    const baseStyles =
+      chipVariant === 'solid' ? 'border-transparent' : 'border-current bg-transparent';
     const chipConfigs = {
       default: `bg-gray-100 text-gray-800 border-gray-200 ${baseStyles}`,
       blue: `bg-blue-100 text-blue-800 border-blue-200 ${baseStyles}`,
@@ -326,9 +357,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
       primary: `bg-blue-100 text-blue-800 border-blue-200 ${baseStyles}`,
       success: `bg-green-100 text-green-800 border-green-200 ${baseStyles}`,
       warning: `bg-yellow-100 text-yellow-800 border-yellow-200 ${baseStyles}`,
-      error: `bg-red-100 text-red-800 border-red-200 ${baseStyles}`
+      error: `bg-red-100 text-red-800 border-red-200 ${baseStyles}`,
     };
-    
+
     return chipConfigs[chipColor as keyof typeof chipConfigs] || chipConfigs.default;
   };
 
@@ -340,13 +371,14 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   const containerClasses = `
     relative w-full border rounded-md transition-colors
     ${sizeConfig.container}
-    ${disabled 
-      ? 'bg-gray-50 border-gray-200 cursor-not-allowed' 
-      : error 
-        ? 'border-red-300 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500'
-        : state.isOpen || state.isFocused
-          ? 'border-blue-500 ring-1 ring-blue-500'
-          : `${variantConfig.container} hover:border-gray-400`
+    ${
+      disabled
+        ? 'bg-gray-50 border-gray-200 cursor-not-allowed'
+        : error
+          ? 'border-red-300 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500'
+          : state.isOpen || state.isFocused
+            ? 'border-blue-500 ring-1 ring-blue-500'
+            : `${variantConfig.container} hover:border-gray-400`
     }
   `;
 
@@ -364,9 +396,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
       {label && (
         <label
           htmlFor={selectId}
-          className={`block text-sm font-medium ${
-            disabled ? 'text-gray-400' : 'text-gray-700'
-          }`}
+          className={`block text-sm font-medium ${disabled ? 'text-gray-400' : 'text-gray-700'}`}
         >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -375,9 +405,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 
       {/* Description */}
       {description && !error && (
-        <p className={`text-xs ${disabled ? 'text-gray-400' : 'text-gray-600'}`}>
-          {description}
-        </p>
+        <p className={`text-xs ${disabled ? 'text-gray-400' : 'text-gray-600'}`}>{description}</p>
       )}
 
       {/* Select Container */}
@@ -415,7 +443,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             <div className="flex-1 min-w-0">
               {selectedOptions.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
-                  {selectedOptions.map((option) => (
+                  {selectedOptions.map(option => (
                     <div
                       key={option.value}
                       className={`
@@ -425,18 +453,12 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                         ${chipClassName}
                       `}
                     >
-                      {option.icon && (
-                        <div className="flex-shrink-0">
-                          {option.icon}
-                        </div>
-                      )}
-                      <span className="truncate max-w-24">
-                        {option.label}
-                      </span>
+                      {option.icon && <div className="flex-shrink-0">{option.icon}</div>}
+                      <span className="truncate max-w-24">{option.label}</span>
                       {!disabled && (
                         <button
                           type="button"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             handleRemoveOption(option.value);
                           }}
@@ -515,7 +537,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                   onClick={handleSelectAll}
                 >
                   <span className="text-sm font-medium">
-                    {selectedOptions.length === filteredOptions.length ? 'Deselect All' : 'Select All'}
+                    {selectedOptions.length === filteredOptions.length
+                      ? 'Deselect All'
+                      : 'Select All'}
                   </span>
                   {selectedOptions.length === filteredOptions.length && (
                     <Check className="w-4 h-4 text-blue-600" />
@@ -527,9 +551,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             {/* Options List */}
             <div className="py-1">
               {filteredOptions.length === 0 ? (
-                <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                  {noOptionsText}
-                </div>
+                <div className="px-3 py-2 text-sm text-gray-500 text-center">{noOptionsText}</div>
               ) : (
                 Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
                   <div key={groupName || 'ungrouped'}>
@@ -539,10 +561,13 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                       </div>
                     )}
                     <div>
-                      {groupOptions.map((option) => {
+                      {groupOptions.map(option => {
                         const isSelected = state.selectedValues.includes(option.value);
-                        const isHighlighted = filteredOptions.indexOf(option) === state.highlightedIndex;
-                        const isDisabled = option.disabled || (maxSelected && selectedOptions.length >= maxSelected && !isSelected);
+                        const isHighlighted =
+                          filteredOptions.indexOf(option) === state.highlightedIndex;
+                        const isDisabled =
+                          option.disabled ||
+                          (maxSelected && selectedOptions.length >= maxSelected && !isSelected);
 
                         return (
                           <div
@@ -558,9 +583,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                           >
                             <div className="flex items-center flex-1 min-w-0">
                               {option.icon && (
-                                <div className="mr-2 flex-shrink-0">
-                                  {option.icon}
-                                </div>
+                                <div className="mr-2 flex-shrink-0">{option.icon}</div>
                               )}
                               <div className="flex-1 min-w-0">
                                 <div className="truncate">{option.label}</div>
@@ -595,9 +618,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
       )}
 
       {/* Error Message */}
-      {error && (
-        <p className="text-xs text-red-600">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 };
@@ -607,17 +628,13 @@ export const useMultiSelect = (initialValues: (string | number)[] = []) => {
   const [selectedValues, setSelectedValues] = useState<(string | number)[]>(initialValues);
 
   const toggleValue = useCallback((value: string | number) => {
-    setSelectedValues(prev => 
-      prev.includes(value) 
-        ? prev.filter(v => v !== value)
-        : [...prev, value]
+    setSelectedValues(prev =>
+      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
     );
   }, []);
 
   const selectValue = useCallback((value: string | number) => {
-    setSelectedValues(prev => 
-      prev.includes(value) ? prev : [...prev, value]
-    );
+    setSelectedValues(prev => (prev.includes(value) ? prev : [...prev, value]));
   }, []);
 
   const deselectValue = useCallback((value: string | number) => {
@@ -632,9 +649,12 @@ export const useMultiSelect = (initialValues: (string | number)[] = []) => {
     setSelectedValues([]);
   }, []);
 
-  const isSelected = useCallback((value: string | number) => {
-    return selectedValues.includes(value);
-  }, [selectedValues]);
+  const isSelected = useCallback(
+    (value: string | number) => {
+      return selectedValues.includes(value);
+    },
+    [selectedValues]
+  );
 
   const getSelectedCount = useCallback(() => {
     return selectedValues.length;
@@ -649,14 +669,17 @@ export const useMultiSelect = (initialValues: (string | number)[] = []) => {
     selectAll,
     deselectAll,
     isSelected,
-    getSelectedCount
+    getSelectedCount,
   };
 };
 
 // Example usage component
 export const ExampleMultiSelects: React.FC = () => {
   const [selectedCountries, setSelectedCountries] = useState<(string | number)[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<(string | number)[]>(['react', 'typescript']);
+  const [selectedSkills, setSelectedSkills] = useState<(string | number)[]>([
+    'react',
+    'typescript',
+  ]);
   const [selectedUsers, setSelectedUsers] = useState<(string | number)[]>([]);
 
   const countryOptions: MultiSelectOption[] = [
@@ -666,7 +689,7 @@ export const ExampleMultiSelects: React.FC = () => {
     { value: 'de', label: 'Germany', icon: '🇩🇪', group: 'Europe' },
     { value: 'fr', label: 'France', icon: '🇫🇷', group: 'Europe' },
     { value: 'jp', label: 'Japan', icon: '🇯🇵', group: 'Asia' },
-    { value: 'au', label: 'Australia', icon: '🇦🇺', group: 'Oceania' }
+    { value: 'au', label: 'Australia', icon: '🇦🇺', group: 'Oceania' },
   ];
 
   const skillOptions: MultiSelectOption[] = [
@@ -677,7 +700,7 @@ export const ExampleMultiSelects: React.FC = () => {
     { value: 'nodejs', label: 'Node.js', color: '#339933' },
     { value: 'graphql', label: 'GraphQL', color: '#E10098' },
     { value: 'docker', label: 'Docker', color: '#2496ED' },
-    { value: 'aws', label: 'AWS', color: '#232F3E' }
+    { value: 'aws', label: 'AWS', color: '#232F3E' },
   ];
 
   const userOptions: MultiSelectOption[] = [
@@ -685,34 +708,50 @@ export const ExampleMultiSelects: React.FC = () => {
       value: 1,
       label: 'John Doe',
       description: 'Software Engineer',
-      icon: <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">JD</div>
+      icon: (
+        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+          JD
+        </div>
+      ),
     },
     {
       value: 2,
       label: 'Jane Smith',
       description: 'Product Manager',
-      icon: <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">JS</div>
+      icon: (
+        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">
+          JS
+        </div>
+      ),
     },
     {
       value: 3,
       label: 'Bob Johnson',
       description: 'Designer',
-      icon: <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">BJ</div>
+      icon: (
+        <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">
+          BJ
+        </div>
+      ),
     },
     {
       value: 4,
       label: 'Alice Brown',
       description: 'Marketing Manager',
       disabled: true,
-      icon: <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs">AB</div>
-    }
+      icon: (
+        <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs">
+          AB
+        </div>
+      ),
+    },
   ];
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto p-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Multi-Select Examples</h3>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Basic Multi-Select */}
           <div>

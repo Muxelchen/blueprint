@@ -1,5 +1,5 @@
-import '@testing-library/jest-dom'
-import { vi, beforeAll, afterAll } from 'vitest'
+import '@testing-library/jest-dom';
+import { vi, beforeAll, afterAll } from 'vitest';
 
 // Mock Web APIs that might not be available in test environment
 Object.defineProperty(window, 'matchMedia', {
@@ -14,21 +14,21 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}))
+}));
 
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}))
+}));
 
 // Mock performance API
 Object.defineProperty(window, 'performance', {
@@ -43,27 +43,26 @@ Object.defineProperty(window, 'performance', {
       jsHeapSizeLimit: 10000000,
     },
   },
-})
+});
 
 // Mock requestIdleCallback for testing environments
-global.requestIdleCallback = vi.fn((cb) => setTimeout(cb, 0) as unknown as number)
-global.cancelIdleCallback = vi.fn()
+global.requestIdleCallback = vi.fn(cb => setTimeout(cb, 0) as unknown as number);
+global.cancelIdleCallback = vi.fn();
 
 // Suppress console warnings in tests
-const originalWarn = console.warn
+const originalWarn = console.warn;
 beforeAll(() => {
   console.warn = (...args) => {
     if (
-      typeof args[0] === 'string' &&
-      args[0].includes('componentWillReceiveProps') ||
+      (typeof args[0] === 'string' && args[0].includes('componentWillReceiveProps')) ||
       args[0].includes('componentWillUpdate')
     ) {
-      return
+      return;
     }
-    originalWarn(...args)
-  }
-})
+    originalWarn(...args);
+  };
+});
 
 afterAll(() => {
-  console.warn = originalWarn
-})
+  console.warn = originalWarn;
+});

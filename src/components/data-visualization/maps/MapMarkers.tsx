@@ -1,18 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { 
-  Building, 
-  Warehouse, 
-  Palette, 
-  Users, 
+import {
+  Building,
+  Warehouse,
+  Palette,
+  Users,
   DollarSign,
   Filter,
   Eye,
   EyeOff,
   RotateCcw,
   Edit,
-  Trash2
+  Trash2,
 } from 'lucide-react';
 
 export interface MarkerData {
@@ -62,14 +62,14 @@ const mockMarkers: MarkerData[] = [
     category: 'headquarters',
     color: '#3B82F6',
     size: 'large',
-    data: { 
-      employees: 250, 
-      revenue: 5000000, 
+    data: {
+      employees: 250,
+      revenue: 5000000,
       established: '2015',
       floors: 15,
-      sqft: 50000
+      sqft: 50000,
     },
-    visible: true
+    visible: true,
   },
   {
     id: 'SF002',
@@ -80,47 +80,47 @@ const mockMarkers: MarkerData[] = [
     category: 'development',
     color: '#10B981',
     size: 'medium',
-    data: { 
-      employees: 120, 
+    data: {
+      employees: 120,
       revenue: 2500000,
       established: '2018',
-      teams: 8
+      teams: 8,
     },
-    visible: true
+    visible: true,
   },
   {
     id: 'NYC001',
     lat: 40.7128,
-    lng: -74.0060,
+    lng: -74.006,
     title: 'New York Office',
     description: 'East coast business operations',
     category: 'office',
     color: '#F59E0B',
     size: 'medium',
-    data: { 
-      employees: 180, 
+    data: {
+      employees: 180,
       revenue: 3500000,
       established: '2017',
-      floors: 8
+      floors: 8,
     },
-    visible: true
+    visible: true,
   },
   {
     id: 'NYC002',
     lat: 40.7228,
-    lng: -73.9960,
+    lng: -73.996,
     title: 'NYC Warehouse',
     description: 'Distribution and logistics center',
     category: 'warehouse',
     color: '#EF4444',
     size: 'large',
-    data: { 
-      employees: 85, 
+    data: {
+      employees: 85,
       capacity: 100000,
       established: '2019',
-      sqft: 200000
+      sqft: 200000,
     },
-    visible: true
+    visible: true,
   },
   {
     id: 'LA001',
@@ -131,13 +131,13 @@ const mockMarkers: MarkerData[] = [
     category: 'studio',
     color: '#8B5CF6',
     size: 'medium',
-    data: { 
-      employees: 95, 
+    data: {
+      employees: 95,
       revenue: 2000000,
       established: '2020',
-      studios: 5
+      studios: 5,
     },
-    visible: true
+    visible: true,
   },
   {
     id: 'CHI001',
@@ -148,12 +148,12 @@ const mockMarkers: MarkerData[] = [
     category: 'office',
     color: '#F59E0B',
     size: 'medium',
-    data: { 
-      employees: 120, 
+    data: {
+      employees: 120,
       revenue: 1800000,
-      established: '2019'
+      established: '2019',
     },
-    visible: true
+    visible: true,
   },
   {
     id: 'SEA001',
@@ -164,14 +164,14 @@ const mockMarkers: MarkerData[] = [
     category: 'research',
     color: '#06B6D4',
     size: 'large',
-    data: { 
-      employees: 300, 
+    data: {
+      employees: 300,
       revenue: 8000000,
       established: '2016',
       labs: 12,
-      patents: 45
+      patents: 45,
     },
-    visible: true
+    visible: true,
   },
   {
     id: 'MIA001',
@@ -182,13 +182,13 @@ const mockMarkers: MarkerData[] = [
     category: 'sales',
     color: '#EC4899',
     size: 'small',
-    data: { 
-      employees: 60, 
+    data: {
+      employees: 60,
       revenue: 1200000,
       established: '2021',
-      territories: 15
+      territories: 15,
     },
-    visible: true
+    visible: true,
   },
   {
     id: 'DEN001',
@@ -199,12 +199,12 @@ const mockMarkers: MarkerData[] = [
     category: 'warehouse',
     color: '#EF4444',
     size: 'medium',
-    data: { 
-      employees: 75, 
+    data: {
+      employees: 75,
       capacity: 75000,
-      established: '2022'
+      established: '2022',
     },
-    visible: true
+    visible: true,
   },
   {
     id: 'AUS001',
@@ -215,13 +215,13 @@ const mockMarkers: MarkerData[] = [
     category: 'research',
     color: '#06B6D4',
     size: 'small',
-    data: { 
-      employees: 45, 
+    data: {
+      employees: 45,
       projects: 8,
-      established: '2023'
+      established: '2023',
     },
-    visible: true
-  }
+    visible: true,
+  },
 ];
 
 // Mock categories
@@ -232,7 +232,7 @@ const mockCategories: MarkerCategory[] = [
     color: '#3B82F6',
     icon: <Building className="w-4 h-4" />,
     count: 1,
-    visible: true
+    visible: true,
   },
   {
     id: 'office',
@@ -240,7 +240,7 @@ const mockCategories: MarkerCategory[] = [
     color: '#F59E0B',
     icon: <Building className="w-4 h-4" />,
     count: 2,
-    visible: true
+    visible: true,
   },
   {
     id: 'warehouse',
@@ -248,7 +248,7 @@ const mockCategories: MarkerCategory[] = [
     color: '#EF4444',
     icon: <Warehouse className="w-4 h-4" />,
     count: 2,
-    visible: true
+    visible: true,
   },
   {
     id: 'development',
@@ -256,7 +256,7 @@ const mockCategories: MarkerCategory[] = [
     color: '#10B981',
     icon: <Users className="w-4 h-4" />,
     count: 1,
-    visible: true
+    visible: true,
   },
   {
     id: 'studio',
@@ -264,7 +264,7 @@ const mockCategories: MarkerCategory[] = [
     color: '#8B5CF6',
     icon: <Palette className="w-4 h-4" />,
     count: 1,
-    visible: true
+    visible: true,
   },
   {
     id: 'research',
@@ -272,7 +272,7 @@ const mockCategories: MarkerCategory[] = [
     color: '#06B6D4',
     icon: <Users className="w-4 h-4" />,
     count: 2,
-    visible: true
+    visible: true,
   },
   {
     id: 'sales',
@@ -280,8 +280,8 @@ const mockCategories: MarkerCategory[] = [
     color: '#EC4899',
     icon: <DollarSign className="w-4 h-4" />,
     count: 1,
-    visible: true
-  }
+    visible: true,
+  },
 ];
 
 // Custom marker icon factory
@@ -289,11 +289,11 @@ const createMarkerIcon = (marker: MarkerData) => {
   const sizeMap = {
     small: { width: 25, height: 25, fontSize: 10 },
     medium: { width: 30, height: 30, fontSize: 12 },
-    large: { width: 35, height: 35, fontSize: 14 }
+    large: { width: 35, height: 35, fontSize: 14 },
   };
 
   const size = sizeMap[marker.size || 'medium'];
-  
+
   const iconHtml = `
     <div style="
       background-color: ${marker.color};
@@ -320,7 +320,7 @@ const createMarkerIcon = (marker: MarkerData) => {
     className: 'custom-marker-icon',
     iconSize: [size.width, size.height],
     iconAnchor: [size.width / 2, size.height / 2],
-    popupAnchor: [0, -size.height / 2]
+    popupAnchor: [0, -size.height / 2],
   });
 };
 
@@ -348,13 +348,10 @@ const MarkerPopup: React.FC<{
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-2">
-          <div
-            className="w-4 h-4 rounded-full"
-            style={{ backgroundColor: marker.color }}
-          />
+          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: marker.color }} />
           <h4 className="font-semibold text-gray-900 text-sm">{marker.title}</h4>
         </div>
-        
+
         <div className="flex items-center space-x-1">
           {onEdit && (
             <button
@@ -378,9 +375,7 @@ const MarkerPopup: React.FC<{
       </div>
 
       {/* Description */}
-      {marker.description && (
-        <p className="text-sm text-gray-600 mb-3">{marker.description}</p>
-      )}
+      {marker.description && <p className="text-sm text-gray-600 mb-3">{marker.description}</p>}
 
       {/* Details */}
       <div className="space-y-2 text-xs">
@@ -413,7 +408,9 @@ const MarkerPopup: React.FC<{
             <div className="space-y-1">
               {Object.entries(marker.data).map(([key, value]) => (
                 <div key={key} className="flex justify-between">
-                  <span className="text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span>
+                  <span className="text-gray-500 capitalize">
+                    {key.replace(/([A-Z])/g, ' $1')}:
+                  </span>
                   <span className="font-medium">{formatValue(key, value)}</span>
                 </div>
               ))}
@@ -432,7 +429,7 @@ const CategoryFilter: React.FC<{
   onReset: () => void;
 }> = ({ categories, onCategoryToggle, onReset }) => {
   const visibleCount = categories.filter(c => c.visible).length;
-  
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
       <div className="flex items-center justify-between mb-3">
@@ -451,27 +448,24 @@ const CategoryFilter: React.FC<{
       </div>
 
       <div className="space-y-2">
-        {categories.map((category) => (
+        {categories.map(category => (
           <button
             key={category.id}
             onClick={() => onCategoryToggle(category.id)}
             className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${
-              category.visible 
-                ? 'bg-gray-50 hover:bg-gray-100' 
+              category.visible
+                ? 'bg-gray-50 hover:bg-gray-100'
                 : 'bg-gray-100 opacity-50 hover:opacity-75'
             }`}
           >
             <div className="flex items-center space-x-3">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: category.color }}
-              />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
               <div className="flex items-center space-x-2">
                 {category.icon}
                 <span className="text-sm font-medium">{category.name}</span>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <span className="text-xs text-gray-500">{category.count}</span>
               {category.visible ? (
@@ -498,37 +492,41 @@ const MarkerStats: React.FC<{ markers: MarkerData[] }> = ({ markers }) => {
     const totalEmployees = visibleMarkers.reduce((sum, m) => sum + (m.data?.employees || 0), 0);
     const totalRevenue = visibleMarkers.reduce((sum, m) => sum + (m.data?.revenue || 0), 0);
     const categories = [...new Set(visibleMarkers.map(m => m.category))].length;
-    
+
     return {
       total: visibleMarkers.length,
       employees: totalEmployees,
       revenue: totalRevenue,
-      categories
+      categories,
     };
   }, [markers]);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
       <h4 className="font-medium text-gray-900 mb-3">Statistics</h4>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <div className="text-center">
           <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
           <div className="text-xs text-gray-500">Total Markers</div>
         </div>
-        
+
         <div className="text-center">
           <div className="text-2xl font-bold text-green-600">{stats.categories}</div>
           <div className="text-xs text-gray-500">Categories</div>
         </div>
-        
+
         <div className="text-center">
-          <div className="text-lg font-bold text-purple-600">{stats.employees.toLocaleString()}</div>
+          <div className="text-lg font-bold text-purple-600">
+            {stats.employees.toLocaleString()}
+          </div>
           <div className="text-xs text-gray-500">Employees</div>
         </div>
-        
+
         <div className="text-center">
-          <div className="text-lg font-bold text-orange-600">${(stats.revenue / 1000000).toFixed(1)}M</div>
+          <div className="text-lg font-bold text-orange-600">
+            ${(stats.revenue / 1000000).toFixed(1)}M
+          </div>
           <div className="text-xs text-gray-500">Revenue</div>
         </div>
       </div>
@@ -544,19 +542,15 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   onMarkerClick,
   onMarkerEdit,
   onMarkerDelete,
-  className = ''
+  className = '',
 }) => {
   const [localMarkers, setLocalMarkers] = useState<MarkerData[]>(markers);
   const [localCategories, setLocalCategories] = useState<MarkerCategory[]>(categories);
 
   // Filter visible markers based on category visibility
   const visibleMarkers = useMemo(() => {
-    const visibleCategoryIds = new Set(
-      localCategories.filter(c => c.visible).map(c => c.id)
-    );
-    return localMarkers.filter(
-      marker => marker.visible && visibleCategoryIds.has(marker.category)
-    );
+    const visibleCategoryIds = new Set(localCategories.filter(c => c.visible).map(c => c.id));
+    return localMarkers.filter(marker => marker.visible && visibleCategoryIds.has(marker.category));
   }, [localMarkers, localCategories]);
 
   const handleMarkerClick = (marker: MarkerData) => {
@@ -565,16 +559,12 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
 
   const handleCategoryToggle = (categoryId: string) => {
     setLocalCategories(prev =>
-      prev.map(cat =>
-        cat.id === categoryId ? { ...cat, visible: !cat.visible } : cat
-      )
+      prev.map(cat => (cat.id === categoryId ? { ...cat, visible: !cat.visible } : cat))
     );
   };
 
   const handleCategoryReset = () => {
-    setLocalCategories(prev =>
-      prev.map(cat => ({ ...cat, visible: true }))
-    );
+    setLocalCategories(prev => prev.map(cat => ({ ...cat, visible: true })));
   };
 
   const handleMarkerEdit = (marker: MarkerData) => {
@@ -591,21 +581,17 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   return (
     <div className={className}>
       {/* Markers */}
-      {visibleMarkers.map((marker) => (
+      {visibleMarkers.map(marker => (
         <Marker
           key={marker.id}
           position={[marker.lat, marker.lng]}
           icon={createMarkerIcon(marker)}
           eventHandlers={{
-            click: () => handleMarkerClick(marker)
+            click: () => handleMarkerClick(marker),
           }}
         >
           <Popup>
-            <MarkerPopup
-              marker={marker}
-              onEdit={handleMarkerEdit}
-              onDelete={handleMarkerDelete}
-            />
+            <MarkerPopup marker={marker} onEdit={handleMarkerEdit} onDelete={handleMarkerDelete} />
           </Popup>
         </Marker>
       ))}
@@ -623,9 +609,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
           )}
 
           {/* Statistics */}
-          {showLegend && (
-            <MarkerStats markers={localMarkers} />
-          )}
+          {showLegend && <MarkerStats markers={localMarkers} />}
         </div>
       )}
     </div>
