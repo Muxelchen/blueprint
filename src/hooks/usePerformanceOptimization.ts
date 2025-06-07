@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -7,166 +7,151 @@ interface PerformanceMetrics {
   componentName: string;
 }
 
-interface UsePerformanceOptimizationReturn {
-  useVisibilityOptimization: (threshold?: number) => [React.RefObject<HTMLDivElement>, boolean];
-  useRenderOptimization: (componentName: string) => {
-    startMeasure: () => void;
-    endMeasure: () => void;
-    metrics: PerformanceMetrics | null;
-  };
-  useMemoryOptimization: () => {
-    checkMemoryUsage: () => number;
-    clearCache: () => void;
-  };
-  useFrameRateOptimization: () => {
-    frameRate: number;
-    shouldSkipRender: boolean;
-  };
+/**
+ * Visibility optimization using Intersection Observer
+ */
+export function useVisibilityOptimization(
+  threshold: number = 0.1
+): [React.RefObject<HTMLDivElement>, boolean] {
+  const elementRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold }
+    );
+
+    const element = elementRef.current;
+    if (element) {
+      observer.observe(element);
+    }
+
+    return () => {
+      if (element) {
+        observer.unobserve(element);
+      }
+    };
+  }, [threshold]);
+
+  return [elementRef, isVisible];
 }
 
 /**
- * Performance optimization hook for heavy chart components
- * Provides memoization, debouncing, and render optimization
+ * Render performance measurement
  */
-export function usePerformanceOptimization(): UsePerformanceOptimizationReturn {
-  // Visibility optimization using Intersection Observer
-  const useVisibilityOptimization = useCallback(
-    (threshold: number = 0.1): [React.RefObject<HTMLDivElement>, boolean] => {
-      const elementRef = useRef<HTMLDivElement>(null);
-      const [isVisible, setIsVisible] = useState(false);
+export function useRenderOptimization(componentName: string) {
+  const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
+  const startTimeRef = useRef<number>(0);
 
-      useEffect(() => {
-        const observer = new IntersectionObserver(
-          ([entry]) => {
-            setIsVisible(entry.isIntersecting);
-          },
-          { threshold }
-        );
-
-        const element = elementRef.current;
-        if (element) {
-          observer.observe(element);
-        }
-
-        return () => {
-          if (element) {
-            observer.unobserve(element);
-          }
-        };
-      }, [threshold]);
-
-      return [elementRef, isVisible];
-    },
-    []
-  );
-
-  // Render performance measurement
-  const useRenderOptimization = useCallback((componentName: string) => {
-    const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
-    const startTimeRef = useRef<number>(0);
-
-    const startMeasure = useCallback(() => {
-      startTimeRef.current = performance.now();
-    }, []);
-
-    const endMeasure = useCallback(() => {
-      const endTime = performance.now();
-      const renderTime = endTime - startTimeRef.current;
-
-      // Get memory usage if available
-      const memoryInfo = (performance as any).memory;
-      const memoryUsage = memoryInfo ? memoryInfo.usedJSHeapSize / 1024 / 1024 : 0;
-
-      setMetrics({
-        renderTime,
-        memoryUsage,
-        frameRate: 60, // Will be updated by frame rate optimization
-        componentName,
-      });
-
-      // Log performance warnings
-      if (renderTime > 16.67) {
-        // More than one frame at 60fps
-        console.warn(`⚠️ ${componentName}: Slow render detected: ${renderTime.toFixed(2)}ms`);
-      }
-    }, [componentName]);
-
-    return { startMeasure, endMeasure, metrics };
+  const startMeasure = useCallback(() => {
+    startTimeRef.current = performance.now();
   }, []);
 
-  // Memory optimization
-  const useMemoryOptimization = useCallback(() => {
-    const cache = useRef(new Map());
+  const endMeasure = useCallback(() => {
+    const endTime = performance.now();
+    const renderTime = endTime - startTimeRef.current;
 
-    const checkMemoryUsage = useCallback((): number => {
-      const memoryInfo = (performance as any).memory;
-      if (memoryInfo) {
-        const usedMB = memoryInfo.usedJSHeapSize / 1024 / 1024;
-        const limitMB = memoryInfo.jsHeapSizeLimit / 1024 / 1024;
-        const usage = (usedMB / limitMB) * 100;
+    // Get memory usage if available
+    const memoryInfo = (performance as unknown as { memory?: { usedJSHeapSize?: number } }).memory;
+    const memoryUsage = memoryInfo?.usedJSHeapSize ? memoryInfo.usedJSHeapSize / 1024 / 1024 : 0;
 
-        // Clear cache if memory usage is high
-        if (usage > 80) {
+    setMetrics({
+      renderTime,
+      memoryUsage,
+      frameRate: 60, // Will be updated by frame rate optimization
+      componentName,
+    });
+
+    // Log performance warnings in development only
+    if (process.env.NODE_ENV === 'development' && renderTime > 16.67) {
+      // More than one frame at 60fps
+      console.warn(`⚠️ ${componentName}: Slow render detected: ${renderTime.toFixed(2)}ms`);
+    }
+  }, [componentName]);
+
+  return { startMeasure, endMeasure, metrics };
+}
+
+/**
+ * Memory optimization
+ */
+export function useMemoryOptimization() {
+  const cache = useRef(new Map());
+
+  const checkMemoryUsage = useCallback((): number => {
+    const memoryInfo = (performance as unknown as { 
+      memory?: { 
+        usedJSHeapSize?: number;
+        jsHeapSizeLimit?: number;
+      } 
+    }).memory;
+    
+    if (memoryInfo?.usedJSHeapSize && memoryInfo?.jsHeapSizeLimit) {
+      const usedMB = memoryInfo.usedJSHeapSize / 1024 / 1024;
+      const limitMB = memoryInfo.jsHeapSizeLimit / 1024 / 1024;
+      const usage = (usedMB / limitMB) * 100;
+
+      // Clear cache if memory usage is high
+      if (usage > 80) {
+        if (process.env.NODE_ENV === 'development') {
           console.warn('🧠 High memory usage detected, clearing cache...');
-          cache.current.clear();
         }
-
-        return usage;
+        cache.current.clear();
       }
-      return 0;
-    }, []);
 
-    const clearCache = useCallback(() => {
-      cache.current.clear();
-    }, []);
-
-    return { checkMemoryUsage, clearCache };
+      return usage;
+    }
+    return 0;
   }, []);
 
-  // Frame rate optimization
-  const useFrameRateOptimization = useCallback(() => {
-    const [frameRate, setFrameRate] = useState(60);
-    const [shouldSkipRender, setShouldSkipRender] = useState(false);
-    const frameCountRef = useRef(0);
-    const lastTimeRef = useRef(performance.now());
+  const clearCache = useCallback(() => {
+    cache.current.clear();
+  }, []);
 
-    useEffect(() => {
-      let animationId: number;
+  return { checkMemoryUsage, clearCache };
+}
 
-      const measureFrameRate = () => {
-        const now = performance.now();
-        frameCountRef.current++;
+/**
+ * Frame rate optimization
+ */
+export function useFrameRateOptimization() {
+  const [frameRate, setFrameRate] = useState(60);
+  const [shouldSkipRender, setShouldSkipRender] = useState(false);
+  const frameCountRef = useRef(0);
+  const lastTimeRef = useRef(performance.now());
 
-        if (now - lastTimeRef.current >= 1000) {
-          const currentFrameRate = frameCountRef.current;
-          setFrameRate(currentFrameRate);
+  useEffect(() => {
+    let animationId: number;
 
-          // Skip renders if frame rate is too low
-          setShouldSkipRender(currentFrameRate < 30);
+    const measureFrameRate = () => {
+      const now = performance.now();
+      frameCountRef.current++;
 
-          frameCountRef.current = 0;
-          lastTimeRef.current = now;
-        }
+      if (now - lastTimeRef.current >= 1000) {
+        const currentFrameRate = frameCountRef.current;
+        setFrameRate(currentFrameRate);
 
-        animationId = requestAnimationFrame(measureFrameRate);
-      };
+        // Skip renders if frame rate is too low
+        setShouldSkipRender(currentFrameRate < 30);
+
+        frameCountRef.current = 0;
+        lastTimeRef.current = now;
+      }
 
       animationId = requestAnimationFrame(measureFrameRate);
+    };
 
-      return () => {
-        cancelAnimationFrame(animationId);
-      };
-    }, []);
+    animationId = requestAnimationFrame(measureFrameRate);
 
-    return { frameRate, shouldSkipRender };
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
   }, []);
 
-  return {
-    useVisibilityOptimization,
-    useRenderOptimization,
-    useMemoryOptimization,
-    useFrameRateOptimization,
-  };
+  return { frameRate, shouldSkipRender };
 }
 
 /**
@@ -207,4 +192,16 @@ export function useChartOptimization<T extends Record<string, any>>(
 
     return { optimizedData, statistics };
   }, [data, maxDataPoints]);
+}
+
+/**
+ * Main performance optimization hook that combines all optimizations
+ */
+export function usePerformanceOptimization() {
+  return {
+    useVisibilityOptimization,
+    useRenderOptimization,
+    useMemoryOptimization,
+    useFrameRateOptimization,
+  };
 }

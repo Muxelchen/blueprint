@@ -58,11 +58,15 @@ const mockData: TreemapData[] = [
 interface TreemapProps {
   data?: TreemapData[];
   title?: string;
+  height?: number | string;
+  className?: string;
 }
 
 const TreemapComponent: React.FC<TreemapProps> = ({
   data = mockData,
   title = 'Market Share Analysis',
+  height = 600,
+  className = '',
 }) => {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
@@ -172,9 +176,14 @@ const TreemapComponent: React.FC<TreemapProps> = ({
     );
   };
 
+  const containerHeight = typeof height === 'number' ? `${height}px` : height;
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-4">
+    <div 
+      className={`bg-white p-4 rounded-lg shadow-lg flex flex-col ${className}`}
+      style={{ height: containerHeight, minHeight: '500px' }}
+    >
+      <div className="flex justify-between items-center mb-3 flex-shrink-0">
         <h3 className="text-lg font-semibold">{title}</h3>
         <div className="flex items-center space-x-2">
           <button
@@ -206,7 +215,8 @@ const TreemapComponent: React.FC<TreemapProps> = ({
         </div>
       </div>
 
-      <div className="h-80">
+      {/* Treemap - Takes remaining space */}
+      <div className="flex-1 mb-3 min-h-[250px]">
         <ResponsiveContainer width="100%" height="100%">
           <RechartsTreemap
             data={data}
@@ -221,9 +231,9 @@ const TreemapComponent: React.FC<TreemapProps> = ({
       </div>
 
       {/* Department breakdown */}
-      <div className="mt-6">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Department Breakdown</h4>
-        <div className="grid grid-cols-2 gap-4">
+      <div className="flex-shrink-0">
+        <h4 className="text-sm font-medium text-gray-700 mb-2">Department Breakdown</h4>
+        <div className="grid grid-cols-2 gap-2">
           {mockData.map(category => {
             const total = category.children
               ? category.children.reduce((sum: number, child: TreemapData) => sum + child.size, 0)
@@ -237,24 +247,24 @@ const TreemapComponent: React.FC<TreemapProps> = ({
             return (
               <div
                 key={category.name}
-                className={`p-3 rounded-lg cursor-pointer transition-all ${
+                className={`p-2 rounded-lg cursor-pointer transition-all ${
                   isSelected
                     ? 'bg-blue-50 border-2 border-blue-200'
                     : 'bg-gray-50 hover:bg-gray-100'
                 }`}
                 onClick={() => setSelectedNode(isSelected ? null : category.name)}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-sm">{category.name}</span>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-xs">{category.name}</span>
                   <span className="text-xs text-gray-500">{percentage}%</span>
                 </div>
                 <div className="flex justify-between text-xs text-gray-600">
                   <span>Size: {total.toLocaleString()}</span>
                   <span>Items: {category.children ? category.children.length : 1}</span>
                 </div>
-                <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                <div className="mt-1 w-full bg-gray-200 rounded-full h-1">
                   <div
-                    className="h-2 rounded-full transition-all duration-500"
+                    className="h-1 rounded-full transition-all duration-500"
                     style={{
                       width: `${percentage}%`,
                       backgroundColor: category.color || '#3B82F6',
@@ -268,16 +278,16 @@ const TreemapComponent: React.FC<TreemapProps> = ({
       </div>
 
       {/* Statistics */}
-      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+      <div className="mt-3 p-3 bg-gray-50 rounded-lg flex-shrink-0">
         <div className="grid grid-cols-3 gap-4 text-center text-sm">
           <div>
-            <p className="font-bold text-lg">
+            <p className="font-bold text-base">
               {mockData
                 .flatMap(cat => cat.children || [])
                 .reduce((sum, item) => sum + item.size, 0)
                 .toLocaleString()}
             </p>
-            <p className="text-gray-600">Total Size</p>
+            <p className="text-gray-600 text-xs">Total Size</p>
           </div>
           <div>
             {(() => {
@@ -292,8 +302,8 @@ const TreemapComponent: React.FC<TreemapProps> = ({
               );
               return (
                 <>
-                  <p className="font-bold text-lg">{largest.name}</p>
-                  <p className="text-gray-600">Largest Dept</p>
+                  <p className="font-bold text-base">{largest.name}</p>
+                  <p className="text-gray-600 text-xs">Largest Dept</p>
                   <p className="text-xs text-gray-500">({largest.total.toLocaleString()})</p>
                 </>
               );
@@ -312,8 +322,8 @@ const TreemapComponent: React.FC<TreemapProps> = ({
               );
               return (
                 <>
-                  <p className="font-bold text-lg">{smallest.name}</p>
-                  <p className="text-gray-600">Smallest Dept</p>
+                  <p className="font-bold text-base">{smallest.name}</p>
+                  <p className="text-gray-600 text-xs">Smallest Dept</p>
                   <p className="text-xs text-gray-500">({smallest.total.toLocaleString()})</p>
                 </>
               );
@@ -323,7 +333,7 @@ const TreemapComponent: React.FC<TreemapProps> = ({
       </div>
 
       {/* Instructions */}
-      <div className="mt-4 text-xs text-gray-500 text-center">
+      <div className="text-xs text-gray-500 text-center flex-shrink-0">
         Click on rectangles to select • Switch between department and detailed view • Hover for
         details
       </div>

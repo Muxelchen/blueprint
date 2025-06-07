@@ -21,7 +21,7 @@ interface KPIData {
   format: 'number' | 'currency' | 'percentage';
   trend: 'up' | 'down' | 'stable';
   changePercent: number;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
   description?: string;
 }
@@ -288,7 +288,7 @@ const KPICard: React.FC<KPICardProps> = ({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer ${config.padding} flex flex-col w-full relative overflow-hidden`}
+      className={`bg-surface border border-border rounded-lg shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${config.padding} flex flex-col w-full relative overflow-hidden`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{ height: config.height, minHeight: config.height }}
@@ -304,12 +304,12 @@ const KPICard: React.FC<KPICardProps> = ({
           </div>
           <div className="min-w-0 flex-1">
             <h3
-              className={`font-semibold text-gray-900 ${config.titleSize} truncate leading-tight`}
+              className={`font-semibold text-text-primary ${config.titleSize} truncate leading-tight`}
             >
               {kpi.title}
             </h3>
             {config.showDescription && kpi.description && (
-              <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{kpi.description}</p>
+              <p className="text-xs text-text-secondary mt-0.5 line-clamp-1">{kpi.description}</p>
             )}
           </div>
         </div>
@@ -330,7 +330,7 @@ const KPICard: React.FC<KPICardProps> = ({
       {/* Main Value */}
       <div className="mb-3 flex-grow flex flex-col justify-center">
         <div
-          className={`font-bold text-gray-900 transition-all duration-500 ${config.valueSize} leading-none`}
+          className={`font-bold text-text-primary transition-all duration-500 ${config.valueSize} leading-none`}
           style={{
             color: isHovered ? kpi.color : undefined,
             transform: isHovered ? 'scale(1.05)' : 'scale(1)',
@@ -341,8 +341,8 @@ const KPICard: React.FC<KPICardProps> = ({
 
         {showTrend && size !== 'small' && (
           <div className="flex items-center space-x-2 mt-2 opacity-70 transition-opacity duration-200">
-            <span className="text-xs text-gray-600">vs last:</span>
-            <span className="text-xs font-medium text-gray-900">{formattedPreviousValue}</span>
+            <span className="text-xs text-text-secondary">vs last:</span>
+            <span className="text-xs font-medium text-text-primary">{formattedPreviousValue}</span>
           </div>
         )}
       </div>
@@ -351,12 +351,12 @@ const KPICard: React.FC<KPICardProps> = ({
       {config.showTarget && kpi.target && (
         <div className="mb-3 flex-shrink-0">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-gray-600">Target</span>
+            <span className="text-xs text-text-secondary">Target</span>
             <span className="text-xs font-medium" style={{ color: kpi.color }}>
               {targetProgress.toFixed(0)}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-surface-secondary rounded-full h-2 overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-1000 ease-out"
               style={{
@@ -371,7 +371,7 @@ const KPICard: React.FC<KPICardProps> = ({
 
       {/* Mini Trend Chart */}
       {config.showChart && (
-        <div className="mt-auto flex-shrink-0 bg-gray-50 rounded-lg p-2">
+        <div className="mt-auto flex-shrink-0 bg-surface-secondary rounded-lg p-2">
           <div
             className="flex items-end justify-between gap-1"
             style={{ height: `${config.chartHeight}px` }}
@@ -408,7 +408,7 @@ const KPICard: React.FC<KPICardProps> = ({
               );
             })}
           </div>
-          <div className="text-xs text-gray-500 text-center mt-1">{config.chartBars}d trend</div>
+          <div className="text-xs text-text-secondary text-center mt-1">{config.chartBars}d trend</div>
         </div>
       )}
 

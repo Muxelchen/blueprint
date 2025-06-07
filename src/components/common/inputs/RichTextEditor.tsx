@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import DOMPurify from 'dompurify';
+import { useRichTextEditor } from '../../../hooks/useRichTextEditor';
 import {
   Bold,
   Italic,
@@ -82,6 +84,15 @@ export interface RichTextEditorState {
   wordCount: number;
   charCount: number;
 }
+
+// Helper function to sanitize HTML content
+const sanitizeHTML = (html: string): string => {
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'code', 'pre', 'blockquote', 'span', 'div'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'style', 'class', 'target'],
+    ALLOW_DATA_ATTR: false,
+  });
+};
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
   value: controlledValue,
@@ -828,7 +839,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     : maxHeight
                   : undefined,
               }}
-              dangerouslySetInnerHTML={{ __html: state.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(state.content) }}
             />
           ) : (
             <div
@@ -853,7 +864,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               onKeyDown={handleKeyDown}
               spellCheck={spellCheck}
               data-placeholder={placeholder}
-              dangerouslySetInnerHTML={{ __html: state.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(state.content) }}
             />
           )}
 
@@ -886,39 +897,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   );
 };
 
-// Hook for managing rich text editor state
-export const useRichTextEditor = (initialContent?: string) => {
-  const [content, setContent] = useState(initialContent || '');
-  const [textContent, setTextContent] = useState('');
 
-  const updateContent = useCallback((html: string, text: string) => {
-    setContent(html);
-    setTextContent(text);
-  }, []);
-
-  const clear = useCallback(() => {
-    setContent('');
-    setTextContent('');
-  }, []);
-
-  const insertText = useCallback((text: string) => {
-    setContent(prev => prev + text);
-  }, []);
-
-  const insertHTML = useCallback((html: string) => {
-    setContent(prev => prev + html);
-  }, []);
-
-  return {
-    content,
-    textContent,
-    setContent,
-    updateContent,
-    clear,
-    insertText,
-    insertHTML,
-  };
-};
 
 // Example usage component
 export const ExampleRichTextEditors: React.FC = () => {
@@ -1106,3 +1085,4 @@ export const ExampleRichTextEditors: React.FC = () => {
 };
 
 export default RichTextEditor;
+export { useRichTextEditor };

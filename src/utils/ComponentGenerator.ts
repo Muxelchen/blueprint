@@ -157,12 +157,11 @@ export default ${name};`;
 
   private getResponsiveClasses(type: string): string {
     const typeClasses: Record<string, string> = {
-      widget: 'w-full bg-white rounded-lg border border-gray-200 p-4 md:p-6',
-      form: 'w-full max-w-md mx-auto bg-white rounded-lg shadow-sm p-6',
-      layout: 'min-h-screen bg-gray-50',
-      'data-viz': 'w-full bg-white rounded-lg border border-gray-200 p-4',
-      input:
-        'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+      widget: 'w-full bg-surface rounded-lg border border-border p-4 md:p-6',
+      form: 'w-full max-w-md mx-auto bg-surface rounded-lg shadow-sm p-6',
+      layout: 'min-h-screen bg-background',
+      'data-viz': 'w-full bg-surface rounded-lg border border-border p-4',
+      input: 'w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent bg-surface',
     };
 
     return typeClasses[type] || 'w-full';

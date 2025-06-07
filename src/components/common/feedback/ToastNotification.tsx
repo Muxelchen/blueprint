@@ -185,7 +185,7 @@ const ToastComponent: React.FC<ToastComponentProps> = ({ toast }) => {
     >
       {/* Progress bar */}
       {!toast.persistent && toast.duration && (
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-black bg-opacity-10">
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-surface-secondary/10">
           <div
             className={`h-full transition-all duration-100 ease-linear ${getProgressBarColor()}`}
             style={{ width: `${progress}%` }}
@@ -197,13 +197,13 @@ const ToastComponent: React.FC<ToastComponentProps> = ({ toast }) => {
         <div className="flex-shrink-0 mt-0.5">{getIcon()}</div>
 
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm">{toast.title}</div>
-          {toast.message && <div className="text-sm opacity-90 mt-1">{toast.message}</div>}
+          <div className="font-semibold text-sm text-text-primary">{toast.title}</div>
+          {toast.message && <div className="text-sm text-text-secondary mt-1">{toast.message}</div>}
 
           {toast.action && (
             <button
               onClick={toast.action.onClick}
-              className="text-sm font-medium underline hover:no-underline mt-2 block"
+              className="text-sm font-medium text-accent hover:text-accent-hover mt-2 block"
             >
               {toast.action.label}
             </button>
@@ -212,9 +212,9 @@ const ToastComponent: React.FC<ToastComponentProps> = ({ toast }) => {
 
         <button
           onClick={handleClose}
-          className="flex-shrink-0 p-1 rounded-md hover:bg-black hover:bg-opacity-10 transition-colors"
+          className="flex-shrink-0 p-1 rounded-md hover:bg-surface-secondary/10 transition-colors"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4 text-text-secondary" />
         </button>
       </div>
     </div>

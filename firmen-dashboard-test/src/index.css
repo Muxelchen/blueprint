@@ -1,0 +1,322 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', sans-serif;
+  }
+
+  body {
+    @apply bg-secondary-50 text-secondary-900 dark:bg-gray-900 dark:text-white transition-colors duration-300;
+  }
+}
+
+@layer components {
+  /* Performance-optimized button styles */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
+    /* Use will-change for GPU acceleration only when needed */
+    will-change: transform, box-shadow;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 dark:bg-primary-500 dark:hover:bg-primary-600;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary-200 text-secondary-800 hover:bg-secondary-300 focus:ring-secondary-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:focus:ring-gray-500;
+  }
+
+  .btn-accent {
+    @apply btn bg-accent-600 text-white hover:bg-accent-700 focus:ring-accent-500 dark:bg-accent-500 dark:hover:bg-accent-600;
+  }
+
+  /* Performance-optimized card styles */
+  .card {
+    @apply bg-white rounded-lg shadow-lg border border-secondary-200 p-6 dark:bg-gray-800 dark:border-gray-700 dark:shadow-xl transition-colors duration-300;
+    will-change: transform, box-shadow;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:ring-primary-400 transition-colors duration-200;
+  }
+
+  /* Optimized interactive hover effects */
+  .hover-lift {
+    transition:
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+    will-change: transform;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .hover-glow {
+    transition: box-shadow 0.3s ease-out;
+    will-change: box-shadow;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  }
+
+  .hover-bounce {
+    transition: transform 0.15s ease-out;
+    will-change: transform;
+  }
+
+  .hover-bounce:hover {
+    transform: scale(1.05);
+  }
+
+  .hover-bounce:active {
+    transform: scale(0.95);
+  }
+
+  /* Optimized widget styles */
+  .interactive-widget {
+    transition:
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out,
+      border-color 0.2s ease-out;
+    will-change: transform;
+  }
+
+  .interactive-widget:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: rgb(147, 197, 253);
+  }
+
+  /* Dark mode navigation styles */
+  .nav-link {
+    @apply text-secondary-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors duration-200 px-3 py-2 rounded-lg;
+  }
+
+  .nav-link:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+
+  .nav-link.active {
+    @apply text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900;
+  }
+
+  /* Enhanced chart containers */
+  .chart-container {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-secondary-200 dark:border-gray-700 transition-colors duration-300;
+    will-change: transform, box-shadow;
+  }
+
+  .chart-container:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: rgb(147, 197, 253);
+  }
+
+  /* Enhanced table styles */
+  .table-header {
+    @apply bg-secondary-50 dark:bg-gray-700 text-secondary-900 dark:text-gray-200;
+  }
+
+  .table-row {
+    @apply bg-white dark:bg-gray-800 hover:bg-secondary-50 dark:hover:bg-gray-700 border-b border-secondary-200 dark:border-gray-700 transition-colors duration-150;
+  }
+
+  /* Dark mode modal and overlay styles */
+  .modal-overlay {
+    @apply bg-black bg-opacity-50 dark:bg-opacity-70;
+  }
+
+  .modal-content {
+    @apply bg-white dark:bg-gray-800 border border-secondary-200 dark:border-gray-700;
+  }
+
+  /* Custom scrollbar for dark mode */
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 hover:bg-gray-500 rounded transition-colors duration-200;
+  }
+
+  /* Dark mode text colors */
+  .text-primary-dark {
+    @apply text-secondary-900 dark:text-white;
+  }
+
+  .text-secondary-dark {
+    @apply text-secondary-600 dark:text-gray-400;
+  }
+
+  .text-muted-dark {
+    @apply text-secondary-500 dark:text-gray-500;
+  }
+
+  /* Optimized animation classes - use sparingly */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  /* Performance-optimized hover state for special cases */
+  .performance-hover {
+    transition:
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+    will-change: transform;
+  }
+
+  .performance-hover:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@layer utilities {
+  /* Minimal, performance-focused keyframes */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Cool ProgressBar animations */
+  @keyframes wave {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes slide {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(0%) scaleX(1.5);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes stripes {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 40px 0;
+    }
+  }
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) scaleX(0);
+    }
+    20% {
+      transform: translateX(-100%) scaleX(1);
+    }
+    80% {
+      transform: translateX(100%) scaleX(1);
+    }
+    100% {
+      transform: translateX(100%) scaleX(0);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 5px currentColor;
+    }
+    50% {
+      box-shadow:
+        0 0 20px currentColor,
+        0 0 30px currentColor;
+    }
+  }
+
+  /* GPU-optimized utilities */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  .smooth-transitions {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Performance utilities */
+  .reduce-motion {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Respect user motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

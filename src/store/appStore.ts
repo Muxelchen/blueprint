@@ -11,8 +11,20 @@ interface AppState {
   clearNotifications: () => void;
 }
 
+// Initialize dark mode from localStorage or system preference
+const getInitialDarkMode = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  const savedMode = localStorage.getItem('darkMode');
+  if (savedMode !== null) {
+    return JSON.parse(savedMode);
+  }
+  
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+};
+
 export const useAppStore = create<AppState>(set => ({
-  isDarkMode: false,
+  isDarkMode: getInitialDarkMode(),
   user: { name: 'John Doe', email: 'john@example.com' },
   notifications: 3,
   toggleDarkMode: () => set(state => ({ isDarkMode: !state.isDarkMode })),

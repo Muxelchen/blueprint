@@ -143,14 +143,14 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-surface border border-border p-6 rounded-lg shadow-lg">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div className="h-16 bg-gray-200 rounded mb-4"></div>
+          <div className="h-6 bg-surface-secondary rounded w-3/4 mb-4"></div>
+          <div className="h-16 bg-surface-secondary rounded mb-4"></div>
           <div className="space-y-2">
-            <div className="h-4 bg-gray-200 rounded"></div>
-            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-            <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+            <div className="h-4 bg-surface-secondary rounded"></div>
+            <div className="h-4 bg-surface-secondary rounded w-5/6"></div>
+            <div className="h-4 bg-surface-secondary rounded w-4/6"></div>
           </div>
         </div>
       </div>
@@ -160,7 +160,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
   if (!currentWeather) return null;
 
   return (
-    <div className="bg-gradient-to-br from-blue-400 to-blue-600 text-white p-6 rounded-lg shadow-lg">
+    <div className="bg-gradient-to-br from-accent to-accent-hover text-white p-6 rounded-lg shadow-lg">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold">Weather</h3>

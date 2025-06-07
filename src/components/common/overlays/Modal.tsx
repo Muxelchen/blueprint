@@ -202,14 +202,18 @@ export const ExampleModals: React.FC = () => {
   const warningModal = useModal();
 
   const handleConfirmAction = () => {
-    console.log('Action confirmed!');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Action confirmed!');
+    }
     confirmModal.closeModal();
     successModal.openModal();
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted!');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Form submitted!');
+    }
     formModal.closeModal();
     successModal.openModal();
   };

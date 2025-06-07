@@ -66,17 +66,13 @@ const AreaChart: React.FC<AreaChartProps> = ({
     { dataKey: 'conversions', color: '#EF4444', name: 'Conversions', opacity: 0.9 },
   ];
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; dataKey: string; color: string }>; label?: string }) => {
     if (active && payload && payload.length > 0) {
       return (
         <div
-          className={`p-3 border rounded-lg shadow-lg ${compact ? 'text-xs' : 'text-sm'} ${
-            isDarkMode
-              ? 'bg-gray-800 border-gray-600 text-white'
-              : 'bg-white border-gray-200 text-gray-800'
-          }`}
+          className={`p-3 border rounded-lg shadow-lg ${compact ? 'text-xs' : 'text-sm'} bg-surface border-border text-text-primary`}
         >
-          <p className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+          <p className="font-semibold mb-2 text-text-primary">
             {`${label}`}
           </p>
           <div className="space-y-1">
@@ -90,11 +86,11 @@ const AreaChart: React.FC<AreaChartProps> = ({
                       className="w-2 h-2 rounded-full mr-2"
                       style={{ backgroundColor: item.color }}
                     ></div>
-                    <span className="truncate">
+                    <span className="truncate text-text-secondary">
                       {compact ? item.name.split(' ')[0] : item.name}:
                     </span>
                   </div>
-                  <span className="font-bold ml-2">
+                  <span className="font-bold ml-2 text-text-primary">
                     {compact && item.value >= 1000
                       ? `${(item.value / 1000).toFixed(1)}k`
                       : item.value?.toLocaleString() || '0'}
@@ -144,16 +140,14 @@ const AreaChart: React.FC<AreaChartProps> = ({
                 className={`flex items-center px-2 py-1 rounded text-xs transition-all ${
                   isHidden
                     ? 'opacity-50'
-                    : isDarkMode
-                      ? 'bg-gray-700 hover:bg-gray-600'
-                      : 'bg-gray-100 hover:bg-gray-200'
+                    : 'bg-surface-secondary hover:bg-surface-hover'
                 }`}
               >
                 <div
                   className="w-2 h-2 rounded-full mr-1"
                   style={{ backgroundColor: area.color }}
                 ></div>
-                <span className={isHidden ? 'line-through' : ''}>{area.name.split(' ')[0]}</span>
+                <span className={`${isHidden ? 'line-through' : ''} text-text-secondary`}>{area.name.split(' ')[0]}</span>
               </button>
             );
           })}
@@ -175,16 +169,10 @@ const AreaChart: React.FC<AreaChartProps> = ({
               onMouseLeave={() => setActiveArea(null)}
               className={`flex items-center px-3 py-2 rounded-lg border transition-all ${
                 isHidden
-                  ? isDarkMode
-                    ? 'bg-gray-700 border-gray-600 opacity-50'
-                    : 'bg-gray-100 border-gray-300 opacity-50'
+                  ? 'bg-surface-secondary border-border-secondary opacity-50'
                   : isActive
-                    ? isDarkMode
-                      ? 'bg-blue-900 border-blue-700 shadow-md'
-                      : 'bg-blue-50 border-blue-300 shadow-md'
-                    : isDarkMode
-                      ? 'bg-gray-800 border-gray-600 hover:bg-gray-700'
-                      : 'bg-white border-gray-200 hover:bg-gray-50'
+                    ? 'bg-accent/10 border-accent shadow-md'
+                    : 'bg-surface border-border hover:bg-surface-hover'
               }`}
             >
               <div
@@ -194,10 +182,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
               <span
                 className={`text-sm ${
                   isHidden
-                    ? isDarkMode
-                      ? 'line-through text-gray-500'
-                      : 'line-through text-gray-400'
-                    : 'font-medium'
+                    ? 'line-through text-text-tertiary'
+                    : 'font-medium text-text-primary'
                 }`}
               >
                 {area.name}

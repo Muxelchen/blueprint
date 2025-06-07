@@ -111,8 +111,8 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
   }
 
   return (
-    <div className={`bg-white p-6 rounded-lg shadow-lg ${compact ? 'p-4' : ''}`}>
-      <h3 className="text-lg font-semibold mb-4 text-center">{title}</h3>
+    <div className={`bg-surface border border-border p-6 rounded-lg shadow-lg ${compact ? 'p-4' : ''}`}>
+      <h3 className="text-lg font-semibold mb-4 text-center text-text-primary">{title}</h3>
 
       <div className="relative" style={{ height: height || outerRadius + 40 }}>
         <ResponsiveContainer width="100%" height="100%">
@@ -125,13 +125,13 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
               endAngle={endAngle}
               innerRadius={innerRadius}
               outerRadius={outerRadius}
-              fill="#8884d8"
+              fill="var(--color-accent)"
               dataKey="value"
               animationDuration={animate ? 1500 : 0}
               animationEasing="ease-out"
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={index === 0 ? dynamicColor : entry.color} />
+                <Cell key={`cell-${index}`} fill={index === 0 ? dynamicColor : 'var(--color-surface-secondary)'} />
               ))}
             </Pie>
           </PieChart>
@@ -141,13 +141,13 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
         <div className="absolute inset-0 flex items-center justify-center" style={{ top: '20%' }}>
           <div className="text-center">
             <div
-              className={`transition-all duration-1000 ${animate ? 'scale-110' : ''}`}
+              className={`transition-all duration-1000 ${animate ? 'scale-110' : ''} font-bold text-text-primary`}
               style={{ color: dynamicColor, fontSize: labelFontSize }}
             >
               {Math.round(animatedValue)}
               {unit}
             </div>
-            <div className="text-sm text-gray-500 mt-1">
+            <div className="text-sm text-text-secondary mt-1">
               of {maxValue}
               {unit}
             </div>
@@ -192,27 +192,27 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
       {showStatusIndicators && (
         <div className="mt-6 grid grid-cols-4 gap-2 text-center">
           <div
-            className={`p-2 rounded ${percentage >= 80 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}
+            className={`p-2 rounded ${percentage >= 80 ? 'bg-success/10 text-success' : 'bg-surface-secondary text-text-tertiary'}`}
           >
-            <div className="w-3 h-3 bg-green-500 rounded-full mx-auto mb-1"></div>
+            <div className="w-3 h-3 bg-success rounded-full mx-auto mb-1"></div>
             Great
           </div>
           <div
-            className={`p-2 rounded ${percentage >= 60 && percentage < 80 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-500'}`}
+            className={`p-2 rounded ${percentage >= 60 && percentage < 80 ? 'bg-warning/10 text-warning' : 'bg-surface-secondary text-text-tertiary'}`}
           >
-            <div className="w-3 h-3 bg-yellow-500 rounded-full mx-auto mb-1"></div>
+            <div className="w-3 h-3 bg-warning rounded-full mx-auto mb-1"></div>
             Good
           </div>
           <div
-            className={`p-2 rounded ${percentage >= 40 && percentage < 60 ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-500'}`}
+            className={`p-2 rounded ${percentage >= 40 && percentage < 60 ? 'bg-accent/10 text-accent' : 'bg-surface-secondary text-text-tertiary'}`}
           >
-            <div className="w-3 h-3 bg-orange-500 rounded-full mx-auto mb-1"></div>
+            <div className="w-3 h-3 bg-accent rounded-full mx-auto mb-1"></div>
             Fair
           </div>
           <div
-            className={`p-2 rounded ${percentage < 40 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-500'}`}
+            className={`p-2 rounded ${percentage < 40 ? 'bg-error/10 text-error' : 'bg-surface-secondary text-text-tertiary'}`}
           >
-            <div className="w-3 h-3 bg-red-500 rounded-full mx-auto mb-1"></div>
+            <div className="w-3 h-3 bg-error rounded-full mx-auto mb-1"></div>
             Poor
           </div>
         </div>
@@ -220,24 +220,24 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
 
       {/* Statistics */}
       {showStatistics && (
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+        <div className="mt-4 p-4 bg-surface-secondary rounded-lg">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <p
-                className="font-bold"
+                className="font-bold text-text-primary"
                 style={{ color: dynamicColor, fontSize: statisticsFontSize }}
               >
                 {Math.round(animatedValue)}
               </p>
-              <p className="text-gray-600">Current</p>
+              <p className="text-text-secondary">Current</p>
             </div>
             <div>
-              <p className="font-bold text-gray-800">{maxValue}</p>
-              <p className="text-gray-600">Maximum</p>
+              <p className="font-bold text-text-primary">{maxValue}</p>
+              <p className="text-text-secondary">Maximum</p>
             </div>
             <div>
-              <p className="font-bold text-gray-800">{Math.round(percentage)}%</p>
-              <p className="text-gray-600">Progress</p>
+              <p className="font-bold text-text-primary">{Math.round(percentage)}%</p>
+              <p className="text-text-secondary">Progress</p>
             </div>
           </div>
         </div>
@@ -246,11 +246,11 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
       {/* Progress bar alternative view */}
       {showProgressBar && (
         <div className="mt-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-1">
+          <div className="flex justify-between text-sm text-text-secondary mb-1">
             <span>Progress</span>
             <span>{Math.round(percentage)}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full" style={{ height: progressBarHeight }}>
+          <div className="w-full bg-surface-secondary rounded-full" style={{ height: progressBarHeight }}>
             <div
               className="rounded-full transition-all duration-1500 ease-out"
               style={{

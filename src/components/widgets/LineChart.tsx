@@ -263,7 +263,7 @@ const LineChart: React.FC<LineChartProps> = ({
       {/* Line toggles - Enhanced responsive design */}
       {showToggles && (
         <div
-          className={`flex flex-wrap gap-1 ${dimensions.marginBottomChart} p-2 bg-gray-50 rounded-lg flex-shrink-0`}
+          className={`flex flex-wrap gap-1 ${dimensions.marginBottomChart} p-2 bg-surface-secondary rounded-lg flex-shrink-0`}
         >
           {Object.entries(activeLines).map(([key, isActive]) => (
             <button
@@ -271,8 +271,8 @@ const LineChart: React.FC<LineChartProps> = ({
               onClick={() => toggleLine(key as keyof typeof activeLines)}
               className={`px-2 py-1 ${dimensions.fontSize} rounded transition-all ${
                 isActive
-                  ? 'bg-blue-100 text-blue-800 shadow-sm'
-                  : 'bg-white text-gray-600 hover:bg-gray-100'
+                  ? 'bg-accent/10 text-accent shadow-sm'
+                  : 'bg-surface text-text-secondary hover:bg-surface-hover'
               }`}
             >
               <span
@@ -446,7 +446,7 @@ const LineChart: React.FC<LineChartProps> = ({
               const isVisitors = key === 'visitors';
 
               return (
-                <div key={key} className="bg-gray-50 p-2 rounded-lg">
+                <div key={key} className="bg-surface-secondary p-2 rounded-lg">
                   <div className="flex items-center mb-1">
                     <div
                       className={`w-2 h-2 rounded-full mr-1 ${
@@ -459,47 +459,35 @@ const LineChart: React.FC<LineChartProps> = ({
                               : 'bg-purple-500'
                       }`}
                     ></div>
-                    <span className={`font-medium ${dimensions.fontSize} capitalize truncate`}>
+                    <span className={`font-medium ${dimensions.fontSize} capitalize text-text-primary`}>
                       {key}
                     </span>
                   </div>
-
-                  <div className={`space-y-0.5 ${dimensions.fontSize}`}>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Max:</span>
-                      <span className="font-bold">
-                        {isVisitors
-                          ? stats.max >= 1000
-                            ? `${(stats.max / 1000).toFixed(0)}k`
-                            : stats.max.toLocaleString()
-                          : stats.max >= 1000
-                            ? `$${(stats.max / 1000).toFixed(0)}k`
-                            : `$${stats.max.toLocaleString()}`}
-                      </span>
-                    </div>
-                    {dimensions.showDetailedStats && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Avg:</span>
-                        <span className="font-bold">
-                          {isVisitors
-                            ? stats.avg >= 1000
-                              ? `${(stats.avg / 1000).toFixed(0)}k`
-                              : Math.round(stats.avg).toLocaleString()
-                            : stats.avg >= 1000
-                              ? `$${(stats.avg / 1000).toFixed(0)}k`
-                              : `$${Math.round(stats.avg).toLocaleString()}`}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Trend:</span>
-                      <span
-                        className={`font-bold ${stats.trend >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                      >
-                        {stats.trend >= 0 ? '↗' : '↘'} {Math.abs(stats.trend).toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
+                              <div className="space-y-1">
+              <div className="flex justify-between">
+                <span className="text-text-secondary text-xs">Max:</span>
+                <span className="font-bold text-text-primary text-xs">
+                  {isVisitors ? stats.max.toLocaleString() : `$${stats.max.toLocaleString()}`}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-text-secondary text-xs">Avg:</span>
+                <span className="text-text-primary text-xs">
+                  {isVisitors ? Math.round(stats.avg) : `$${Math.round(stats.avg).toLocaleString()}`}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-text-secondary text-xs">Trend:</span>
+                <span
+                  className={`text-xs font-medium ${
+                    stats.trend >= 0 ? 'text-success' : 'text-error'
+                  }`}
+                >
+                  {stats.trend >= 0 ? '+' : ''}
+                  {stats.trend.toFixed(1)}%
+                </span>
+              </div>
+            </div>
                 </div>
               );
             })}

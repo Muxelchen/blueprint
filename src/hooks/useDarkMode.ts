@@ -1,37 +1,49 @@
 import { useEffect } from 'react';
 import { useAppStore } from '../store/appStore';
 
+const STORAGE_KEY = 'darkMode';
+
 export const useDarkMode = () => {
   const { isDarkMode, toggleDarkMode } = useAppStore();
 
   useEffect(() => {
-    // Load dark mode preference from localStorage on mount
-    const savedMode = localStorage.getItem('blueprint-dark-mode');
-    if (savedMode) {
-      const isDark = JSON.parse(savedMode);
-      if (isDark !== isDarkMode) {
-        toggleDarkMode();
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      const savedMode = localStorage.getItem(STORAGE_KEY);
+      if (!savedMode) {
+        if (e.matches && !isDarkMode) {
+          toggleDarkMode();
+        } else if (!e.matches && isDarkMode) {
+          toggleDarkMode();
+        }
       }
-    }
-  }, []);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [isDarkMode, toggleDarkMode]);
 
   useEffect(() => {
     // Apply dark mode to document root
+    const root = document.documentElement;
     if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      document.body.classList.add('dark');
+      root.classList.add('dark');
+      root.classList.remove('light');
+      root.style.colorScheme = 'dark';
     } else {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark');
+      root.classList.add('light');
+      root.classList.remove('dark');
+      root.style.colorScheme = 'light';
     }
 
     // Save preference to localStorage
-    localStorage.setItem('blueprint-dark-mode', JSON.stringify(isDarkMode));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(isDarkMode));
 
     // Update meta theme-color for mobile browsers
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', isDarkMode ? '#1f2937' : '#ffffff');
+      metaThemeColor.setAttribute('content', isDarkMode ? 'var(--background)' : 'var(--background)');
     }
   }, [isDarkMode]);
 

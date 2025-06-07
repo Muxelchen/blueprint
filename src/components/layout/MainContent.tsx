@@ -14,6 +14,19 @@ interface WidgetAreaProps {
   variant?: 'default' | 'gradient' | 'bordered' | 'minimal';
 }
 
+interface StatsCardProps {
+  title: string;
+  value: string | number;
+  change?: string;
+  trend?: 'up' | 'down' | 'neutral';
+  icon?: React.ComponentType<{ className?: string }>;
+}
+
+interface ChartPlaceholderProps {
+  title: string;
+  height?: string;
+}
+
 // Widget Area Component
 const WidgetArea: React.FC<WidgetAreaProps> = ({
   title,
@@ -30,10 +43,10 @@ const WidgetArea: React.FC<WidgetAreaProps> = ({
   };
 
   const variantClasses = {
-    default: 'bg-white border border-secondary-200 shadow-sm',
-    gradient: 'bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-200',
-    bordered: 'bg-white border-2 border-primary-200',
-    minimal: 'bg-white',
+    default: 'bg-surface border border-border shadow-sm dark:bg-surface dark:border-border',
+    gradient: 'bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-200 dark:from-primary-900 dark:to-accent-900 dark:border-primary-700',
+    bordered: 'bg-surface border-2 border-primary-200 dark:bg-surface dark:border-primary-700',
+    minimal: 'bg-surface dark:bg-surface',
   };
 
   return (
@@ -51,7 +64,7 @@ const WidgetArea: React.FC<WidgetAreaProps> = ({
     >
       {title && (
         <div className="flex items-center justify-between mb-4 flex-shrink-0">
-          <h3 className="text-lg font-semibold text-secondary-900">{title}</h3>
+          <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">{title}</h3>
         </div>
       )}
       <div className="flex-1 min-h-0 overflow-hidden">{children}</div>
@@ -60,31 +73,25 @@ const WidgetArea: React.FC<WidgetAreaProps> = ({
 };
 
 // Stats Card Component
-const StatsCard: React.FC<{
-  title: string;
-  value: string | number;
-  change?: string;
-  trend?: 'up' | 'down' | 'neutral';
-  icon?: React.ComponentType<any>;
-}> = ({ title, value, change, trend = 'neutral', icon: Icon }) => {
+const StatsCard: React.FC<StatsCardProps> = ({ title, value, change, trend = 'neutral', icon: Icon }) => {
   const trendColors = {
-    up: 'text-success-600',
-    down: 'text-error-600',
-    neutral: 'text-secondary-600',
+    up: 'text-success dark:text-success-dark',
+    down: 'text-error dark:text-error-dark',
+    neutral: 'text-text-secondary dark:text-text-secondary',
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 border border-secondary-200 hover:shadow-md transition-shadow">
+    <div className="bg-surface dark:bg-surface rounded-lg p-6 border border-border hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-medium text-secondary-600">{title}</h4>
+        <h4 className="text-sm font-medium text-text-secondary dark:text-text-secondary">{title}</h4>
         {Icon && (
-          <div className="p-2 bg-primary-100 rounded-lg">
-            <Icon className="w-5 h-5 text-primary-600" />
+          <div className="p-2 bg-accent-light/10 rounded-lg">
+            <Icon className="w-5 h-5 text-accent dark:text-accent-dark" />
           </div>
         )}
       </div>
       <div className="space-y-2">
-        <p className="text-2xl font-bold text-secondary-900">{value}</p>
+        <p className="text-2xl font-bold text-text-primary dark:text-text-primary">{value}</p>
         {change && <p className={`text-sm ${trendColors[trend]}`}>{change}</p>}
       </div>
     </div>
@@ -156,18 +163,18 @@ const ActivityFeed: React.FC = () => {
           key={activity.id}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="flex items-start space-x-3 p-3 rounded-lg hover:bg-secondary-50 transition-colors"
+          className="flex items-start space-x-3 p-3 rounded-lg hover:bg-secondary-50 dark:hover:bg-gray-700 transition-colors"
         >
           <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
             {activity.avatar}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-secondary-900">
+            <p className="text-sm text-secondary-900 dark:text-white">
               <span className="font-medium">{activity.user}</span>{' '}
-              <span className="text-secondary-600">{activity.action}</span>{' '}
+              <span className="text-secondary-600 dark:text-gray-400">{activity.action}</span>{' '}
               <span className="font-medium">{activity.target}</span>
             </p>
-            <p className="text-xs text-secondary-500 mt-1">{activity.time}</p>
+            <p className="text-xs text-secondary-500 dark:text-gray-500 mt-1">{activity.time}</p>
           </div>
         </motion.div>
       ))}
@@ -176,18 +183,15 @@ const ActivityFeed: React.FC = () => {
 };
 
 // Chart Placeholder Component
-const ChartPlaceholder: React.FC<{ title: string; height?: string }> = ({
-  title,
-  height = 'h-64',
-}) => {
+const ChartPlaceholder: React.FC<ChartPlaceholderProps> = ({ title, height = 'h-64' }) => {
   return (
     <div
-      className={`${height} bg-secondary-50 rounded-lg flex items-center justify-center border-2 border-dashed border-secondary-300`}
+      className={`${height} bg-surface-secondary dark:bg-surface-secondary rounded-lg flex items-center justify-center border-2 border-dashed border-border`}
     >
       <div className="text-center">
-        <div className="w-12 h-12 bg-secondary-200 rounded-lg mx-auto mb-3 flex items-center justify-center">
+        <div className="w-12 h-12 bg-surface-secondary dark:bg-surface-secondary rounded-lg mx-auto mb-3 flex items-center justify-center">
           <svg
-            className="w-6 h-6 text-secondary-400"
+            className="w-6 h-6 text-text-tertiary dark:text-text-tertiary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -200,8 +204,8 @@ const ChartPlaceholder: React.FC<{ title: string; height?: string }> = ({
             />
           </svg>
         </div>
-        <p className="text-sm font-medium text-secondary-600">{title}</p>
-        <p className="text-xs text-secondary-500 mt-1">Chart component will render here</p>
+        <p className="text-sm font-medium text-text-secondary dark:text-text-secondary">{title}</p>
+        <p className="text-xs text-text-tertiary dark:text-text-tertiary mt-1">Chart component will render here</p>
       </div>
     </div>
   );
@@ -210,7 +214,7 @@ const ChartPlaceholder: React.FC<{ title: string; height?: string }> = ({
 // Main Content Component
 const MainContent: React.FC<MainContentProps> = ({ children, className = '' }) => {
   return (
-    <main className={`flex-1 p-6 bg-secondary-50 min-h-screen ${className}`}>
+    <main className={`flex-1 p-6 bg-background min-h-screen ${className}`}>
       <div className="max-w-7xl mx-auto">
         {/* Default Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

@@ -403,7 +403,7 @@ const PieChart: React.FC<PieChartProps> = ({
   return (
     <div
       ref={chartRef}
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${dimensions.containerPadding} ${
+      className={`bg-surface border border-border rounded-lg shadow-sm ${dimensions.containerPadding} ${
         isAnimating ? 'opacity-75 pointer-events-none' : ''
       }`}
       style={{ minHeight: dimensions.minHeight }}
@@ -411,12 +411,12 @@ const PieChart: React.FC<PieChartProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
-          <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          <h3 className={`font-semibold text-gray-900 dark:text-white ${dimensions.titleSize}`}>
+          <TrendingUp className="w-5 h-5 text-accent" />
+          <h3 className={`font-semibold text-text-primary ${dimensions.titleSize}`}>
             {title}
           </h3>
           {isVirtualized && (
-            <span className="px-2 py-1 text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded">
+            <span className="px-2 py-1 text-xs bg-accent/10 text-accent rounded">
               Virtualized
             </span>
           )}

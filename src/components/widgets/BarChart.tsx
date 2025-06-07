@@ -41,15 +41,15 @@ interface BarChartProps {
 const MemoizedTooltip = memo(({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-        <p className="font-semibold text-gray-800 mb-2">{`${label}`}</p>
+      <div className="bg-surface p-3 border border-border rounded-lg shadow-lg">
+        <p className="font-semibold text-text-primary mb-2">{`${label}`}</p>
         {payload.map((item: any, index: number) => (
           <div key={index} className="flex items-center justify-between mb-1">
             <div className="flex items-center">
               <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }} />
-              <span className="text-sm">{item.name}:</span>
+              <span className="text-sm text-text-secondary">{item.name}:</span>
             </div>
-            <span className="font-bold ml-4">${item.value?.toLocaleString() || '0'}</span>
+            <span className="font-bold ml-4 text-text-primary">${item.value?.toLocaleString() || '0'}</span>
           </div>
         ))}
       </div>
@@ -72,20 +72,20 @@ const MemoizedStatisticsPanel = memo(
   }) => (
     <div
       className={`mt-6 p-4 rounded-lg transition-all duration-300 ${
-        isChartHovered ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'
+        isChartHovered ? 'bg-accent/10 border border-accent/20' : 'bg-surface-secondary'
       }`}
     >
       <div className="flex items-center justify-between mb-3">
         <h4
           className={`text-sm font-medium transition-colors duration-300 ${
-            isChartHovered ? 'text-blue-800' : 'text-gray-700'
+            isChartHovered ? 'text-accent' : 'text-text-primary'
           }`}
         >
           Performance Summary
         </h4>
         <TrendingUp
           className={`w-4 h-4 transition-all duration-300 ${
-            isChartHovered ? 'text-blue-500 animate-pulse' : 'text-gray-500'
+            isChartHovered ? 'text-accent animate-pulse' : 'text-text-secondary'
           }`}
         />
       </div>
@@ -93,12 +93,12 @@ const MemoizedStatisticsPanel = memo(
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
         <div
           className={`transition-all duration-300 p-2 rounded ${
-            isChartHovered ? 'transform scale-105 bg-white shadow-sm' : ''
+            isChartHovered ? 'transform scale-105 bg-surface shadow-sm' : ''
           }`}
         >
           <p
             className={`font-bold text-lg transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-600' : 'text-green-600'
+              isChartHovered ? 'text-accent' : 'text-success'
             }`}
           >
             $
@@ -107,7 +107,7 @@ const MemoizedStatisticsPanel = memo(
           </p>
           <p
             className={`transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-700' : 'text-gray-600'
+              isChartHovered ? 'text-accent' : 'text-text-secondary'
             }`}
           >
             Total Sales
@@ -116,12 +116,12 @@ const MemoizedStatisticsPanel = memo(
 
         <div
           className={`transition-all duration-300 p-2 rounded ${
-            isChartHovered ? 'transform scale-105 bg-white shadow-sm' : ''
+            isChartHovered ? 'transform scale-105 bg-surface shadow-sm' : ''
           }`}
         >
           <p
             className={`font-bold text-lg transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-600' : 'text-green-600'
+              isChartHovered ? 'text-accent' : 'text-success'
             }`}
           >
             $
@@ -130,7 +130,7 @@ const MemoizedStatisticsPanel = memo(
           </p>
           <p
             className={`transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-700' : 'text-gray-600'
+              isChartHovered ? 'text-accent' : 'text-text-secondary'
             }`}
           >
             Total Revenue
@@ -139,12 +139,12 @@ const MemoizedStatisticsPanel = memo(
 
         <div
           className={`transition-all duration-300 p-2 rounded ${
-            isChartHovered ? 'transform scale-105 bg-white shadow-sm' : ''
+            isChartHovered ? 'transform scale-105 bg-surface shadow-sm' : ''
           }`}
         >
           <p
             className={`font-bold text-lg transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-600' : 'text-gray-800'
+              isChartHovered ? 'text-accent' : 'text-text-primary'
             }`}
           >
             $
@@ -155,7 +155,7 @@ const MemoizedStatisticsPanel = memo(
           </p>
           <p
             className={`transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-700' : 'text-gray-600'
+              isChartHovered ? 'text-accent' : 'text-text-secondary'
             }`}
           >
             Avg Sales
@@ -164,12 +164,12 @@ const MemoizedStatisticsPanel = memo(
 
         <div
           className={`transition-all duration-300 p-2 rounded ${
-            isChartHovered ? 'transform scale-105 bg-white shadow-sm' : ''
+            isChartHovered ? 'transform scale-105 bg-surface shadow-sm' : ''
           }`}
         >
           <p
             className={`font-bold text-lg transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-600' : 'text-purple-600'
+              isChartHovered ? 'text-accent' : 'text-warning'
             }`}
           >
             $
@@ -178,7 +178,7 @@ const MemoizedStatisticsPanel = memo(
           </p>
           <p
             className={`transition-colors duration-300 ${
-              isChartHovered ? 'text-blue-700' : 'text-gray-600'
+              isChartHovered ? 'text-accent' : 'text-text-secondary'
             }`}
           >
             Total Profit
@@ -297,10 +297,10 @@ export const BarChart: React.FC<BarChartProps> = memo(
 
     if (!isVisible) {
       return (
-        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
+        <div className={`bg-surface rounded-lg shadow-sm border border-border p-6 ${className}`}>
           <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-surface-secondary rounded w-1/4 mb-4"></div>
+            <div className="h-64 bg-surface-secondary rounded"></div>
           </div>
         </div>
       );
@@ -308,7 +308,7 @@ export const BarChart: React.FC<BarChartProps> = memo(
 
     return (
       <div
-        className={`bg-white rounded-lg shadow-sm border border-gray-200 ${compact ? 'p-2 sm:p-3' : 'p-3 sm:p-6'} transition-all duration-300 hover:shadow-md h-full flex flex-col ${className}`}
+        className={`bg-surface rounded-lg shadow-sm border border-border ${compact ? 'p-2 sm:p-3' : 'p-3 sm:p-6'} transition-all duration-300 hover:shadow-md h-full flex flex-col ${className}`}
         style={{
           minHeight: `${dimensions.containerMinHeight}px`,
           height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto',
@@ -316,7 +316,7 @@ export const BarChart: React.FC<BarChartProps> = memo(
       >
         <div className="flex items-center justify-between mb-3 sm:mb-4 flex-shrink-0 gap-2">
           <h3
-            className={`${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-lg'} font-semibold text-gray-800 truncate flex-1`}
+            className={`${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-lg'} font-semibold text-text-primary truncate flex-1`}
           >
             {title}
           </h3>
@@ -324,21 +324,21 @@ export const BarChart: React.FC<BarChartProps> = memo(
             <div className="flex space-x-1 sm:space-x-2 flex-shrink-0">
               <button
                 onClick={() => setIsVisible(!isVisible)}
-                className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                className="p-1.5 sm:p-2 text-text-secondary hover:text-accent hover:bg-accent/10 rounded-lg transition-all duration-200"
                 title="Toggle visibility"
               >
                 <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
               <button
                 onClick={handleExport}
-                className="p-1.5 sm:p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200"
+                className="p-1.5 sm:p-2 text-text-secondary hover:text-success hover:bg-success/10 rounded-lg transition-all duration-200"
                 title="Export data"
               >
                 <Download className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
               <button
                 onClick={handleReset}
-                className="p-1.5 sm:p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200"
+                className="p-1.5 sm:p-2 text-text-secondary hover:text-warning hover:bg-warning/10 rounded-lg transition-all duration-200"
                 title="Reset chart"
               >
                 <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -363,16 +363,16 @@ export const BarChart: React.FC<BarChartProps> = memo(
                 bottom: compact ? 5 : 10,
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
               <XAxis
                 dataKey="name"
-                tick={{ fontSize: compact ? 9 : 10 }}
-                stroke="#6b7280"
+                tick={{ fontSize: compact ? 9 : 10, fill: 'var(--color-text-secondary)' }}
+                stroke="var(--color-text-secondary)"
                 interval={compact && data.length > 6 ? 1 : 0}
               />
               <YAxis
-                tick={{ fontSize: compact ? 9 : 10 }}
-                stroke="#6b7280"
+                tick={{ fontSize: compact ? 9 : 10, fill: 'var(--color-text-secondary)' }}
+                stroke="var(--color-text-secondary)"
                 width={compact ? 35 : 40}
               />
               <Tooltip content={<MemoizedTooltip />} />

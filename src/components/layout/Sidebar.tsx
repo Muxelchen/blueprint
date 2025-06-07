@@ -163,8 +163,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
               onClick={() => toggleSubmenu(item.name)}
               className={`w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 itemIsActive || isSubmenuOpen
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100'
+                  ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
+                  : 'text-secondary-600 dark:text-gray-300 hover:text-secondary-900 dark:hover:text-white hover:bg-secondary-100 dark:hover:bg-gray-700'
               }`}
             >
               <item.icon className={`${isCollapsed ? 'w-6 h-6' : 'w-5 h-5 mr-3'} flex-shrink-0`} />
@@ -175,10 +175,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     <span
                       className={`ml-2 px-2 py-0.5 text-xs rounded-full font-medium ${
                         item.badge === 'New'
-                          ? 'bg-success-100 text-success-700'
+                          ? 'bg-success-100 dark:bg-success-900 text-success-700 dark:text-success-300'
                           : item.badge === 'Alert'
-                            ? 'bg-error-100 text-error-700'
-                            : 'bg-secondary-200 text-secondary-700'
+                            ? 'bg-error-100 dark:bg-error-900 text-error-700 dark:text-error-300'
+                            : 'bg-secondary-200 dark:bg-gray-700 text-secondary-700 dark:text-gray-300'
                       }`}
                     >
                       {item.badge}
@@ -197,8 +197,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
               to={item.href}
               className={`w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 itemIsActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100'
+                  ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
+                  : 'text-secondary-600 dark:text-gray-300 hover:text-secondary-900 dark:hover:text-white hover:bg-secondary-100 dark:hover:bg-gray-700'
               }`}
             >
               <item.icon className={`${isCollapsed ? 'w-6 h-6' : 'w-5 h-5 mr-3'} flex-shrink-0`} />
@@ -209,10 +209,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     <span
                       className={`ml-2 px-2 py-0.5 text-xs rounded-full font-medium ${
                         item.badge === 'New'
-                          ? 'bg-success-100 text-success-700'
+                          ? 'bg-success-100 dark:bg-success-900 text-success-700 dark:text-success-300'
                           : item.badge === 'Alert'
-                            ? 'bg-error-100 text-error-700'
-                            : 'bg-secondary-200 text-secondary-700'
+                            ? 'bg-error-100 dark:bg-error-900 text-error-700 dark:text-error-300'
+                            : 'bg-secondary-200 dark:bg-gray-700 text-secondary-700 dark:text-gray-300'
                       }`}
                     >
                       {item.badge}
@@ -225,7 +225,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
 
           {/* Tooltip for collapsed state */}
           {isCollapsed && (
-            <div className="absolute left-full ml-2 px-2 py-1 bg-secondary-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+            <div className="absolute left-full ml-2 px-2 py-1 bg-secondary-900 dark:bg-gray-700 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
               {item.name}
             </div>
           )}
@@ -248,8 +248,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     to={subItem.href}
                     className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
                       isActive(subItem.href)
-                        ? 'bg-primary-50 text-primary-700 font-medium'
-                        : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-50'
+                        ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 font-medium'
+                        : 'text-secondary-600 dark:text-gray-400 hover:text-secondary-900 dark:hover:text-white hover:bg-secondary-50 dark:hover:bg-gray-700'
                     }`}
                   >
                     {subItem.name}
@@ -286,31 +286,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
           width: isCollapsed ? 80 : 280,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-secondary-200 shadow-lg lg:relative lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-800 border-r border-secondary-200 dark:border-gray-700 shadow-lg lg:relative lg:translate-x-0 ${
           isCollapsed ? 'lg:w-20' : 'lg:w-64'
         } w-64 flex flex-col`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-secondary-200">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-secondary-200 dark:border-gray-700">
           {!isCollapsed && (
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
                 <Star className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-secondary-900">Blueprint</span>
+              <span className="text-xl font-bold text-secondary-900 dark:text-white">Blueprint</span>
             </Link>
           )}
 
           {/* Desktop collapse button */}
           <button
             onClick={toggleCollapse}
-            className="hidden lg:flex p-1.5 rounded-lg hover:bg-secondary-100 transition-colors"
+            className="hidden lg:flex p-1.5 rounded-lg hover:bg-secondary-100 dark:hover:bg-gray-700 transition-colors"
             aria-label="Toggle sidebar"
           >
             {isCollapsed ? (
-              <ChevronRight className="w-4 h-4 text-secondary-600" />
+              <ChevronRight className="w-4 h-4 text-secondary-600 dark:text-gray-300" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-secondary-600" />
+              <ChevronDown className="w-4 h-4 text-secondary-600 dark:text-gray-300" />
             )}
           </button>
         </div>
@@ -321,7 +321,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             {/* Main navigation */}
             <div className="space-y-1">
               {!isCollapsed && (
-                <h3 className="px-3 text-xs font-semibold text-secondary-500 uppercase tracking-wider mb-2">
+                <h3 className="px-3 text-xs font-semibold text-secondary-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                   Main
                 </h3>
               )}
@@ -329,12 +329,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             </div>
 
             {/* Divider */}
-            <div className="my-4 border-t border-secondary-200"></div>
+            <div className="my-4 border-t border-secondary-200 dark:border-gray-700"></div>
 
             {/* Secondary navigation */}
             <div className="space-y-1">
               {!isCollapsed && (
-                <h3 className="px-3 text-xs font-semibold text-secondary-500 uppercase tracking-wider mb-2">
+                <h3 className="px-3 text-xs font-semibold text-secondary-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                   Tools
                 </h3>
               )}
@@ -344,14 +344,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         </div>
 
         {/* Bottom navigation */}
-        <div className="border-t border-secondary-200 p-3 space-y-1">
+        <div className="border-t border-secondary-200 dark:border-gray-700 p-3 space-y-1">
           {bottomNavigation.map(item => renderNavItem(item))}
         </div>
 
         {/* Status indicator */}
         {!isCollapsed && (
-          <div className="px-3 py-2 border-t border-secondary-200">
-            <div className="flex items-center space-x-2 text-xs text-secondary-500">
+          <div className="px-3 py-2 border-t border-secondary-200 dark:border-gray-700">
+            <div className="flex items-center space-x-2 text-xs text-secondary-500 dark:text-gray-400">
               <div className="w-2 h-2 bg-success-500 rounded-full"></div>
               <span>System Online</span>
             </div>

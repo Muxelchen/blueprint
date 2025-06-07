@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 export interface WebSocketMessage {
   id: string;
   type: string;
-  payload: any;
+  payload: unknown;
   timestamp: number;
 }
 
@@ -88,7 +88,7 @@ class WebSocketService {
    * @param type Message type
    * @param payload Message payload
    */
-  public send(type: string, payload: any = {}): void {
+  public send(type: string, payload: unknown = {}): void {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       this.debugLog('Cannot send message, socket is not open');
       return;
@@ -299,8 +299,8 @@ class WebSocketService {
   /**
    * Log debug messages if debug is enabled
    */
-  private debugLog(message: string, ...data: any[]): void {
-    if (this.options.debug) {
+  private debugLog(message: string, ...data: unknown[]): void {
+    if (this.options.debug && process.env.NODE_ENV === 'development') {
       console.log(`[WebSocket] ${message}`, ...data);
     }
   }

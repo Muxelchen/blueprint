@@ -166,10 +166,10 @@ function useProvideNotifications(
       // Handle notification history
       else if (lastMessage.type === 'NOTIFICATION_HISTORY') {
         const history = lastMessage.payload;
-        if (history && Array.isArray(history.notifications)) {
+        if (history && typeof history === 'object' && 'notifications' in history && Array.isArray((history as any).notifications)) {
           setState(prev => {
             // Combine existing notifications with new ones, remove duplicates
-            const combined = [...prev.notifications, ...history.notifications];
+            const combined = [...prev.notifications, ...(history as any).notifications];
             const unique = combined.filter(
               (notification, index, self) => self.findIndex(n => n.id === notification.id) === index
             );

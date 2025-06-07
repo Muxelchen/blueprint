@@ -376,27 +376,27 @@ export const StatusIndicator: React.FC<{
     const configs = {
       loading: {
         icon: <Loader2 className="w-4 h-4 animate-spin" />,
-        color: 'text-blue-600',
-        bgColor: 'bg-blue-50',
-        borderColor: 'border-blue-200',
+        color: 'text-accent dark:text-accent-dark',
+        bgColor: 'bg-accent-light/10',
+        borderColor: 'border-accent/20',
       },
       success: {
         icon: <CheckCircle className="w-4 h-4" />,
-        color: 'text-green-600',
-        bgColor: 'bg-green-50',
-        borderColor: 'border-green-200',
+        color: 'text-success dark:text-success-dark',
+        bgColor: 'bg-success-light/10',
+        borderColor: 'border-success/20',
       },
       error: {
         icon: <XCircle className="w-4 h-4" />,
-        color: 'text-red-600',
-        bgColor: 'bg-red-50',
-        borderColor: 'border-red-200',
+        color: 'text-error dark:text-error-dark',
+        bgColor: 'bg-error-light/10',
+        borderColor: 'border-error/20',
       },
       warning: {
         icon: <AlertCircle className="w-4 h-4" />,
-        color: 'text-yellow-600',
-        bgColor: 'bg-yellow-50',
-        borderColor: 'border-yellow-200',
+        color: 'text-warning dark:text-warning-dark',
+        bgColor: 'bg-warning-light/10',
+        borderColor: 'border-warning/20',
       },
     };
     return configs[status];

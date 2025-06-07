@@ -178,14 +178,14 @@ const DonutChart: React.FC<DonutChartProps> = ({
 
   return (
     <div
-      className={`bg-white ${compact ? 'p-3' : 'p-6'} rounded-lg shadow-lg`}
+      className={`bg-surface border border-border ${compact ? 'p-3' : 'p-6'} rounded-lg shadow-lg`}
       style={{
         minHeight: `${dimensions.containerMinHeight}px`,
         height: size === 'large' ? `${dimensions.containerMinHeight}px` : 'auto',
       }}
     >
       <h3
-        className={`${compact ? 'text-sm' : 'text-lg'} font-semibold ${compact ? 'mb-2' : 'mb-4'} text-center`}
+        className={`${compact ? 'text-sm' : 'text-lg'} font-semibold ${compact ? 'mb-2' : 'mb-4'} text-center text-text-primary`}
       >
         {title}
       </h3>
@@ -201,7 +201,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
               label={compact ? false : <CustomLabel />}
               outerRadius={dimensions.outerRadius}
               innerRadius={dimensions.innerRadius}
-              fill="#8884d8"
+              fill="var(--color-accent)"
               dataKey="value"
               onMouseEnter={onPieEnter}
               onMouseLeave={onPieLeave}
@@ -212,7 +212,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                 <Cell
                   key={`cell-${index}`}
                   fill={entry.color}
-                  stroke={activeIndex === index ? '#ffffff' : 'none'}
+                  stroke={activeIndex === index ? 'var(--color-surface)' : 'none'}
                   strokeWidth={activeIndex === index ? (compact ? 2 : 3) : 0}
                   style={{
                     filter:

@@ -308,24 +308,24 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="bg-surface border border-border p-6 rounded-lg shadow-lg">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
         <div className="flex items-center space-x-2">
           {showPercentage && (
-            <span className="text-lg font-bold text-gray-900 transition-all duration-300">
+            <span className="text-lg font-bold text-text-primary transition-all duration-300">
               {mainAnimatedValue.toFixed(1)}%
             </span>
           )}
-          <TrendingUp className="w-4 h-4 text-green-500" />
+          <TrendingUp className="w-4 h-4 text-success" />
         </div>
       </div>
 
       {/* Main Progress Bar */}
       <div className="mb-6">
-        <div className="w-full bg-gray-200 rounded-full h-8 relative overflow-hidden">
+        <div className="w-full bg-surface-secondary rounded-full h-8 relative overflow-hidden">
           <div
-            className="h-8 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 rounded-full transition-all duration-2000 ease-out relative overflow-hidden"
+            className="h-8 bg-gradient-to-r from-accent via-accent to-accent-hover rounded-full transition-all duration-2000 ease-out relative overflow-hidden"
             style={{ width: `${mainAnimatedValue}%` }}
           >
             {/* Main bar wave effect */}
@@ -348,18 +348,18 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {/* Animation Variants Showcase */}
       <div className="space-y-6 mb-8">
-        <h4 className="text-md font-medium text-gray-800">Animation Variants</h4>
+        <h4 className="text-md font-medium text-text-primary">Animation Variants</h4>
         {animationVariants.map((item, index) => (
           <div key={item.name} className="space-y-2">
             <div className="flex justify-between items-center">
               <div>
-                <span className="text-sm font-medium text-gray-700">{item.name}</span>
-                <p className="text-xs text-gray-500">{item.description}</p>
+                <span className="text-sm font-medium text-text-secondary">{item.name}</span>
+                <p className="text-xs text-text-secondary">{item.description}</p>
               </div>
-              <span className="text-sm font-bold text-gray-900">{60 + index * 10}%</span>
+              <span className="text-sm font-bold text-text-primary">{60 + index * 10}%</span>
             </div>
             <div
-              className="w-full bg-gray-200 rounded-full relative overflow-hidden"
+              className="w-full bg-surface-secondary rounded-full relative overflow-hidden"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
@@ -380,7 +380,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {/* System Metrics */}
       <div className="space-y-4 mb-8">
-        <h4 className="text-md font-medium text-gray-800 flex items-center">
+        <h4 className="text-md font-medium text-text-primary flex items-center">
           <Activity className="w-4 h-4 mr-2" />
           System Metrics
         </h4>
@@ -388,18 +388,18 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
           const itemPercentage = (item.value / 100) * 100;
           const Icon = item.icon;
           return (
-            <div key={index} className="group p-3 rounded-lg hover:bg-gray-50 transition-colors">
+            <div key={index} className="group p-3 rounded-lg hover:bg-surface-hover transition-colors">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center space-x-2">
-                  <Icon className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">{item.label}</span>
+                  <Icon className="w-4 h-4 text-text-secondary" />
+                  <span className="text-sm font-medium text-text-primary">{item.label}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs text-green-600 font-medium">{item.trend}</span>
-                  <span className="text-sm font-bold text-gray-900">{item.value}%</span>
+                  <span className="text-xs text-success font-medium">{item.trend}</span>
+                  <span className="text-sm font-bold text-text-primary">{item.value}%</span>
                 </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-4 relative overflow-hidden">
+              <div className="w-full bg-surface-secondary rounded-full h-4 relative overflow-hidden">
                 <div
                   className={`h-4 rounded-full transition-all duration-1000 ease-out ${colorClasses[item.color]} relative overflow-hidden`}
                   style={{
@@ -422,16 +422,16 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {/* Circular Progress */}
       <div className="mb-8">
-        <h4 className="text-md font-medium text-gray-800 mb-4">Circular Progress</h4>
+        <h4 className="text-md font-medium text-text-primary mb-4">Circular Progress</h4>
         <div className="flex justify-center">
           <div className="relative w-32 h-32">
             <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="54" stroke="#e5e7eb" strokeWidth="8" fill="none" />
+              <circle cx="60" cy="60" r="54" stroke="var(--color-surface-secondary)" strokeWidth="8" fill="none" />
               <circle
                 cx="60"
                 cy="60"
                 r="54"
-                stroke={`rgb(59 130 246)`}
+                stroke="var(--color-accent)"
                 strokeWidth="8"
                 fill="none"
                 strokeLinecap="round"
@@ -441,7 +441,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
               />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xl font-bold text-gray-900">{percentage.toFixed(0)}%</span>
+              <span className="text-xl font-bold text-text-primary">{percentage.toFixed(0)}%</span>
             </div>
           </div>
         </div>
@@ -449,17 +449,17 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {/* Progress Statistics */}
       <div className="grid grid-cols-3 gap-4 text-center">
-        <div className="bg-blue-50 p-3 rounded-lg">
-          <div className="text-2xl font-bold text-blue-900">{percentage.toFixed(1)}%</div>
-          <div className="text-xs text-blue-600">Current</div>
+        <div className="bg-accent/10 p-3 rounded-lg">
+          <div className="text-2xl font-bold text-accent">{percentage.toFixed(1)}%</div>
+          <div className="text-xs text-accent">Current</div>
         </div>
-        <div className="bg-green-50 p-3 rounded-lg">
-          <div className="text-2xl font-bold text-green-900">{max}</div>
-          <div className="text-xs text-green-600">Target</div>
+        <div className="bg-success/10 p-3 rounded-lg">
+          <div className="text-2xl font-bold text-success">{max}</div>
+          <div className="text-xs text-success">Target</div>
         </div>
-        <div className="bg-orange-50 p-3 rounded-lg">
-          <div className="text-2xl font-bold text-orange-900">{(max - value).toFixed(0)}</div>
-          <div className="text-xs text-orange-600">Remaining</div>
+        <div className="bg-warning/10 p-3 rounded-lg">
+          <div className="text-2xl font-bold text-warning">{(max - value).toFixed(0)}</div>
+          <div className="text-xs text-warning">Remaining</div>
         </div>
       </div>
     </div>

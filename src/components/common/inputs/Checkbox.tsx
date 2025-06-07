@@ -196,19 +196,19 @@ const Checkbox: React.FC<CheckboxProps> = ({
 
     const stateClasses = (() => {
       if (disabled) {
-        return 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-50';
+        return 'bg-surface-secondary border-border-secondary cursor-not-allowed opacity-50';
       }
 
       if (invalid) {
-        return 'border-red-500 focus:ring-red-500';
+        return 'border-error focus:ring-error';
       }
 
       if (state.isChecked || state.isIndeterminate) {
-        return `${variantConfig.checked} text-white`;
+        return `${variantConfig.checked} text-text-on-primary`;
       }
 
       return `
-        bg-white ${variantConfig.border} ${variantConfig.hover}
+        bg-surface ${variantConfig.border} ${variantConfig.hover}
         ${state.isFocused ? `ring-2 ring-offset-2 ${variantConfig.focus}` : ''}
       `;
     })();

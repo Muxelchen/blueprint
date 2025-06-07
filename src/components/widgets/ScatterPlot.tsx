@@ -38,6 +38,8 @@ const mockData: ScatterData[] = [
 interface ScatterPlotProps {
   data?: ScatterData[];
   title?: string;
+  height?: number | string;
+  className?: string;
 }
 
 interface CategoryColors {
@@ -47,6 +49,8 @@ interface CategoryColors {
 const ScatterPlot: React.FC<ScatterPlotProps> = ({
   data = mockData,
   title = 'Performance vs Engagement Analysis',
+  height = 480,
+  className = '',
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [hoveredPoint, setHoveredPoint] = useState<any>(null);
@@ -164,9 +168,14 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
   // Uncomment the statistics section below to show detailed analytics
   // const stats = getStatistics();
 
+  const containerHeight = typeof height === 'number' ? `${height}px` : height;
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-4">
+    <div 
+      className={`bg-white p-4 rounded-lg shadow-lg flex flex-col ${className}`}
+      style={{ height: containerHeight, minHeight: '400px' }}
+    >
+      <div className="flex justify-between items-center mb-3 flex-shrink-0">
         <h3 className="text-lg font-semibold">{title}</h3>
         <div className="flex items-center space-x-2">
           <button
@@ -185,7 +194,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       </div>
 
       {/* Category filter */}
-      <div className="flex space-x-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-3 flex-shrink-0">
         <button
           onClick={() => setSelectedCategory(null)}
           className={`px-3 py-1 text-xs rounded-lg border transition-colors ${
@@ -220,7 +229,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         ))}
       </div>
 
-      <div className="h-80">
+      {/* Chart - Takes remaining space */}
+      <div className="flex-1 mb-3 min-h-[250px]">
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }} data={filteredData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -237,44 +247,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
         </ResponsiveContainer>
       </div>
 
-      {/* Legend with category filtering */}
-      <div className="flex flex-wrap justify-center gap-2 mb-4">
-        <button
-          onClick={() => setSelectedCategory(null)}
-          className={`px-3 py-1 text-xs rounded-lg border transition-colors ${
-            selectedCategory === null
-              ? 'bg-blue-100 text-blue-700 border-blue-300'
-              : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-          }`}
-        >
-          All Categories
-        </button>
-
-        {Object.keys(categoryColors).map(category => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
-            className={`flex items-center px-3 py-1 text-xs rounded-lg border transition-colors ${
-              selectedCategory === category
-                ? 'bg-gray-200 text-gray-800 border-gray-400'
-                : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-            }`}
-            style={{
-              backgroundColor: selectedCategory === category ? categoryColors[category] : undefined,
-              color: selectedCategory === category ? 'white' : undefined,
-            }}
-          >
-            <div
-              className="w-3 h-3 rounded-full mr-2"
-              style={{ backgroundColor: categoryColors[category] }}
-            ></div>
-            Category {category}
-          </button>
-        ))}
-      </div>
-
       {/* Statistics for each category */}
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-3 flex-shrink-0">
         {Object.keys(categoryColors).map(category => {
           const categoryData = filteredData.filter((d: any) => d.category === category);
           if (categoryData.length === 0) return null;
@@ -285,13 +259,13 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
             categoryData.reduce((sum: number, d: any) => sum + d.y, 0) / categoryData.length;
 
           return (
-            <div key={category} className="bg-gray-50 p-3 rounded-lg">
-              <div className="flex items-center mb-2">
+            <div key={category} className="bg-gray-50 p-2 rounded-lg">
+              <div className="flex items-center mb-1">
                 <div
                   className="w-3 h-3 rounded-full mr-2"
                   style={{ backgroundColor: categoryColors[category] }}
                 ></div>
-                <span className="font-medium text-sm">Category {category}</span>
+                <span className="font-medium text-xs">Category {category}</span>
               </div>
               <div className="space-y-1 text-xs">
                 <div>
@@ -310,7 +284,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       </div>
 
       {/* Instructions */}
-      <div className="mt-4 text-xs text-gray-500 text-center">
+      <div className="text-xs text-gray-500 text-center flex-shrink-0">
         Click on points to select them • Hover for details • Filter by category above
       </div>
     </div>

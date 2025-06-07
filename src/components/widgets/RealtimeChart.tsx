@@ -31,6 +31,8 @@ interface RealtimeChartProps {
   websocketChannel?: string;
   dataType?: string;
   useMockServer?: boolean;
+  height?: number | string;
+  className?: string;
 }
 
 // 🚀 Optimized Memoized Components
@@ -128,6 +130,8 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
   websocketChannel = 'system-metrics',
   dataType = 'SYSTEM_METRICS',
   useMockServer = true,
+  height = 480,
+  className = '',
 }) => {
   // 🎯 Performance Optimizations
   const { useVisibilityOptimization, useRenderOptimization, useMemoryOptimization } =
@@ -280,13 +284,20 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
 
   // 🎨 Don't render if not visible (performance optimization)
   if (!isVisible) {
-    return <div ref={chartRef} style={{ height: '400px' }} />;
+    return <div ref={chartRef} style={{ height: typeof height === 'number' ? `${height}px` : height }} className={className} />;
   }
 
+  const containerHeight = typeof height === 'number' ? `${height}px` : height;
+  const chartHeight = typeof height === 'number' ? Math.max(200, height - 280) : '200px'; // Reserve space for controls and stats
+
   return (
-    <div ref={chartRef} className="p-6 bg-white rounded-lg shadow-lg">
+    <div 
+      ref={chartRef} 
+      className={`p-4 bg-white rounded-lg shadow-lg flex flex-col ${className}`}
+      style={{ height: containerHeight, minHeight: '400px' }}
+    >
       {/* Header with performance metrics */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3 flex-shrink-0">
         <div>
           <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
           <div className="flex items-center text-xs text-gray-500 space-x-4">
@@ -307,10 +318,12 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
       </div>
 
       {/* Current Values */}
-      <MemoizedCurrentValues latest={latest} averages={averages} />
+      <div className="flex-shrink-0 mb-3">
+        <MemoizedCurrentValues latest={latest} averages={averages} />
+      </div>
 
-      {/* Chart */}
-      <div className="h-64 mb-4">
+      {/* Chart - Takes remaining space */}
+      <div className="flex-1 mb-3 min-h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={optimizedData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -346,10 +359,12 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
       </div>
 
       {/* Alerts */}
-      <MemoizedAlerts latest={latest} />
+      <div className="flex-shrink-0">
+        <MemoizedAlerts latest={latest} />
+      </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 flex-shrink-0">
         <div className="flex items-center space-x-2">
           <button
             onClick={togglePlayback}
@@ -406,7 +421,7 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
 
       {/* Performance Statistics */}
       {statistics && (
-        <div className="mt-4 p-3 bg-gray-50 rounded text-xs text-gray-600">
+        <div className="mt-3 p-3 bg-gray-50 rounded text-xs text-gray-600 flex-shrink-0">
           <div className="grid grid-cols-3 gap-4">
             <div>
               <span className="font-medium">Avg Values:</span>

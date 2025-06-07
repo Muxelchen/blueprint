@@ -90,21 +90,21 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
   }, []);
 
   return (
-    <header className="bg-white border-b border-secondary-200 shadow-sm sticky top-0 z-30">
+    <header className="bg-white dark:bg-gray-800 border-b border-secondary-200 dark:border-gray-700 shadow-sm sticky top-0 z-30">
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
         {/* Left section - Logo and Menu */}
         <div className="flex items-center space-x-4">
           {/* Mobile menu button */}
           <button
             onClick={onMenuToggle}
-            className="lg:hidden p-2 rounded-lg hover:bg-secondary-100 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-gray-700 transition-colors"
             aria-label="Toggle menu"
           >
             <motion.div animate={{ rotate: isSidebarOpen ? 90 : 0 }} transition={{ duration: 0.2 }}>
               {isSidebarOpen ? (
-                <X className="w-5 h-5 text-secondary-600" />
+                <X className="w-5 h-5 text-secondary-600 dark:text-gray-300" />
               ) : (
-                <Menu className="w-5 h-5 text-secondary-600" />
+                <Menu className="w-5 h-5 text-secondary-600 dark:text-gray-300" />
               )}
             </motion.div>
           </button>
@@ -114,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="hidden sm:block text-xl font-bold text-secondary-900">Blueprint</span>
+            <span className="hidden sm:block text-xl font-bold text-secondary-900 dark:text-white">Blueprint</span>
           </Link>
 
           {/* Desktop navigation */}
@@ -127,8 +127,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                   to={item.href}
                   className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100'
+                      ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
+                      : 'text-secondary-600 dark:text-gray-300 hover:text-secondary-900 dark:hover:text-white hover:bg-secondary-100 dark:hover:bg-gray-700'
                   }`}
                 >
                   <item.icon className="w-4 h-4 mr-2" />
@@ -142,11 +142,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
         {/* Center - Search (hidden on mobile) */}
         <div className="hidden md:flex flex-1 max-w-md mx-8">
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-secondary-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-secondary-400 dark:text-gray-500" />
             <input
               type="text"
               placeholder="Search..."
-              className="w-full pl-10 pr-4 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-secondary-50"
+              className="w-full pl-10 pr-4 py-2 border border-secondary-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-secondary-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
         </div>
@@ -154,18 +154,18 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
         {/* Right section - Notifications and User */}
         <div className="flex items-center space-x-2">
           {/* Mobile search button */}
-          <button className="md:hidden p-2 rounded-lg hover:bg-secondary-100 transition-colors">
-            <Search className="w-5 h-5 text-secondary-600" />
+          <button className="md:hidden p-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-gray-700 transition-colors">
+            <Search className="w-5 h-5 text-secondary-600 dark:text-gray-300" />
           </button>
 
           {/* Notifications */}
           <div className="relative" ref={notificationRef}>
             <button
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-              className="relative p-2 rounded-lg hover:bg-secondary-100 transition-colors"
+              className="relative p-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-gray-700 transition-colors"
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 text-secondary-600" />
+              <Bell className="w-5 h-5 text-secondary-600 dark:text-gray-300" />
               {unreadCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
@@ -185,30 +185,30 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-secondary-200 py-2 z-50"
+                  className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-secondary-200 dark:border-gray-700 py-2 z-50"
                 >
-                  <div className="px-4 py-2 border-b border-secondary-200">
-                    <h3 className="text-sm font-semibold text-secondary-900">Notifications</h3>
+                  <div className="px-4 py-2 border-b border-secondary-200 dark:border-gray-700">
+                    <h3 className="text-sm font-semibold text-secondary-900 dark:text-white">Notifications</h3>
                   </div>
                   <div className="max-h-80 overflow-y-auto">
                     {notifications.map(notification => (
                       <div
                         key={notification.id}
-                        className={`px-4 py-3 hover:bg-secondary-50 cursor-pointer border-l-4 ${
+                        className={`px-4 py-3 hover:bg-secondary-50 dark:hover:bg-gray-700 cursor-pointer border-l-4 ${
                           notification.read
                             ? 'border-transparent'
-                            : 'border-primary-500 bg-primary-50/30'
+                            : 'border-primary-500 bg-primary-50/30 dark:bg-primary-900/30'
                         }`}
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <h4 className="text-sm font-medium text-secondary-900">
+                            <h4 className="text-sm font-medium text-secondary-900 dark:text-white">
                               {notification.title}
                             </h4>
-                            <p className="text-sm text-secondary-600 mt-1">
+                            <p className="text-sm text-secondary-600 dark:text-gray-300 mt-1">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-secondary-400 mt-2">{notification.time}</p>
+                            <p className="text-xs text-secondary-400 dark:text-gray-500 mt-2">{notification.time}</p>
                           </div>
                           {!notification.read && (
                             <div className="w-2 h-2 bg-primary-500 rounded-full mt-1 ml-2"></div>
@@ -217,8 +217,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                       </div>
                     ))}
                   </div>
-                  <div className="px-4 py-2 border-t border-secondary-200">
-                    <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                  <div className="px-4 py-2 border-t border-secondary-200 dark:border-gray-700">
+                    <button className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
                       View all notifications
                     </button>
                   </div>
@@ -231,18 +231,18 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="flex items-center space-x-2 p-1 rounded-lg hover:bg-secondary-100 transition-colors"
+              className="flex items-center space-x-2 p-1 rounded-lg hover:bg-secondary-100 dark:hover:bg-gray-700 transition-colors"
               aria-label="User menu"
             >
               <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                 <User className="w-5 h-5 text-white" />
               </div>
               <div className="hidden sm:block text-left">
-                <p className="text-sm font-medium text-secondary-900">{user.name}</p>
-                <p className="text-xs text-secondary-500">{user.role}</p>
+                <p className="text-sm font-medium text-secondary-900 dark:text-white">{user.name}</p>
+                <p className="text-xs text-secondary-500 dark:text-gray-400">{user.role}</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 text-secondary-400 transition-transform ${
+                className={`w-4 h-4 text-secondary-400 dark:text-gray-500 transition-transform ${
                   isUserMenuOpen ? 'rotate-180' : ''
                 }`}
               />
@@ -256,17 +256,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-secondary-200 py-2 z-50"
+                  className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-secondary-200 dark:border-gray-700 py-2 z-50"
                 >
-                  <div className="px-4 py-3 border-b border-secondary-200">
-                    <p className="text-sm font-medium text-secondary-900">{user.name}</p>
-                    <p className="text-sm text-secondary-500">{user.email}</p>
+                  <div className="px-4 py-3 border-b border-secondary-200 dark:border-gray-700">
+                    <p className="text-sm font-medium text-secondary-900 dark:text-white">{user.name}</p>
+                    <p className="text-sm text-secondary-500 dark:text-gray-400">{user.email}</p>
                   </div>
 
                   <div className="py-2">
                     <Link
                       to="/profile"
-                      className="flex items-center px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-100"
+                      className="flex items-center px-4 py-2 text-sm text-secondary-700 dark:text-gray-300 hover:bg-secondary-100 dark:hover:bg-gray-700"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       <User className="w-4 h-4 mr-3" />
@@ -274,7 +274,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                     </Link>
                     <Link
                       to="/settings"
-                      className="flex items-center px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-100"
+                      className="flex items-center px-4 py-2 text-sm text-secondary-700 dark:text-gray-300 hover:bg-secondary-100 dark:hover:bg-gray-700"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       <Settings className="w-4 h-4 mr-3" />
@@ -282,8 +282,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isSidebarOpen }) => {
                     </Link>
                   </div>
 
-                  <div className="border-t border-secondary-200 py-2">
-                    <button className="flex items-center w-full px-4 py-2 text-sm text-error-600 hover:bg-error-50">
+                  <div className="border-t border-secondary-200 dark:border-gray-700 py-2">
+                    <button className="flex items-center w-full px-4 py-2 text-sm text-error-600 dark:text-red-400 hover:bg-error-50 dark:hover:bg-red-900/20">
                       <LogOut className="w-4 h-4 mr-3" />
                       Sign out
                     </button>

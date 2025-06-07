@@ -59,9 +59,9 @@ export const useAnalytics = (config: AnalyticsConfig = {}): UseAnalyticsReturn =
 
       // In a real implementation, you would send this to your analytics service
       // e.g., Google Analytics, Mixpanel, custom backend, etc.
-      if (config.debug) {
-        console.log('[Analytics]', event);
-      }
+        if (config.debug && process.env.NODE_ENV === 'development') {
+    console.log('[Analytics]', event);
+  }
 
       // Add to recent events for reference/debugging
       setRecentEvents(prev => [...prev.slice(-9), event]);

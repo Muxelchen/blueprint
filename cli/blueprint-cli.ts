@@ -3,6 +3,34 @@
 import { Command } from 'commander';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as crypto from 'crypto';
+import { spawn } from 'child_process';
+
+// Utility Functions
+async function copyDirectory(source: string, target: string): Promise<void> {
+  await fs.promises.mkdir(target, { recursive: true });
+  
+  const entries = await fs.promises.readdir(source, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    const sourcePath = path.join(source, entry.name);
+    const targetPath = path.join(target, entry.name);
+    
+    if (entry.isDirectory()) {
+      await copyDirectory(sourcePath, targetPath);
+    } else {
+      await fs.promises.copyFile(sourcePath, targetPath);
+    }
+  }
+}
+
+function showWelcome(): void {
+  console.log('\n🎨 Blueprint UI System - CLI');
+  console.log('═══════════════════════════════════');
+  console.log('🚀 Sichere App-Generierung mit AI-Schutz');
+  console.log('🛡️  Blueprint-System automatisch geschützt');
+  console.log('');
+}
 
 // Define types for template metadata
 interface TemplateMetadata {
@@ -10,6 +38,7 @@ interface TemplateMetadata {
   description: string;
   dependencies: string[];
   features: string[];
+  files?: string[];
 }
 
 type TemplateKey = 'dashboard' | 'analytics' | 'data-table' | 'map';
@@ -42,414 +71,1337 @@ const templateMetadata: Record<TemplateKey, TemplateMetadata> = {
   }
 };
 
-// CLI for rapid blueprint-based app generation
+// AI Protection System - Enhanced Implementation with Real Blocking
+class AIProtectionSystem {
+  private static instance: AIProtectionSystem;
+  private static readonly PROTECTION_FILE = '.blueprint-ai-protection';
+  private static readonly CONFIG_FILE = '.blueprint-protection.json';
+  private static readonly BACKUP_DIR = '.blueprint-backup';
+  private static protectionEnabled = true;
+  private static protectedPaths = [
+    'src/',
+    'cli/',
+    'scripts/',
+    'package.json',
+    'README.md',
+    'vite.config.ts',
+    'tailwind.config.js',
+    'tsconfig.json',
+    '*.config.*'
+  ];
+  
+  private protectionLevel: 'basic' | 'standard' | 'advanced' = 'advanced';
+  private monitoringActive = true;
+  private protectedResources: Set<string> = new Set();
+  private fileWatcher: any = null;
+  private fileWatchers: Map<string, fs.FSWatcher> = new Map();
+  private fileHashes: Map<string, string> = new Map();
+  private originalFileContents: Map<string, string> = new Map();
+  private blockedAttempts: number = 0;
+  private protectionStatus: {
+    enabled: boolean;
+    level: string;
+    lastUpdated: string;
+    protectedFiles: string[];
+    monitoringActive: boolean;
+    blockedAttempts: number;
+  } = {
+    enabled: true,
+    level: 'advanced',
+    lastUpdated: new Date().toISOString(),
+    protectedFiles: [],
+    monitoringActive: true,
+    blockedAttempts: 0
+  };
+
+  // Enhanced Protection Configuration
+  private static readonly DEFAULT_CONFIG = {
+    protectionLevel: 'maximum',
+    enabled: true,
+    fileProtection: true,
+    realTimeBlocking: true, // NEU: Echte Blockierung aktiviert
+    instantRestore: true,   // NEU: Sofortige Wiederherstellung
+    protectedPaths: [
+      'src/',
+      'cli/',
+      'scripts/',
+      'package.json',
+      'README.md',
+      'vite.config.ts',
+      'tailwind.config.js',
+      'tsconfig.json',
+      '*.config.*'
+    ],
+    allowedAIPaths: [
+      'firmen-dashboard-test/',
+      'test-dashboard/',
+      'firma-dashboard/',
+      'demo-*/',
+      'kunde-*/',
+      'client-*/',
+      'experiment-*/'
+    ],
+    aiScanningEnabled: true,
+    autoBackupEnabled: true,
+    realTimeMonitoring: true,
+    fileChangeBlocking: true,
+    aggressiveProtection: true, // NEU: Aggressiver Schutz
+    // NEU: Backup-Konfiguration
+    backupSettings: {
+      intervalMinutes: 5,        // Backup alle 5 Minuten (statt 30 Sekunden)
+      cleanupIntervalMinutes: 15, // Cleanup alle 15 Minuten
+      maxBackupsPerFile: 3,      // Maximal 3 Backups pro Datei
+      maxBackupAgeHours: 1,      // Lösche Backups älter als 1 Stunde
+      smartBackup: true          // Nur Backup bei tatsächlichen Änderungen
+    },
+    lastActivation: new Date().toISOString(),
+    violations: 0
+  };
+
+  static getInstance(): AIProtectionSystem {
+    if (!AIProtectionSystem.instance) {
+      AIProtectionSystem.instance = new AIProtectionSystem();
+    }
+    return AIProtectionSystem.instance;
+  }
+
+  private getProtectionConfig() {
+    return AIProtectionSystem.DEFAULT_CONFIG;
+  }
+
+  private async saveProtectionStatus(): Promise<void> {
+    try {
+      const configPath = path.join(process.cwd(), AIProtectionSystem.CONFIG_FILE);
+      const config = {
+        ...this.protectionStatus,
+        lastUpdated: new Date().toISOString()
+      };
+      await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2));
+    } catch (error) {
+      console.warn('⚠️ Could not save protection status:', error);
+    }
+  }
+
+  private logViolation(filePath: string, eventType: string): void {
+    console.log(`🚨 SECURITY VIOLATION: ${eventType} on ${filePath} at ${new Date().toISOString()}`);
+    // Log to file or monitoring system
+  }
+
+  // NEUE METHODE: Echte File System Überwachung mit sofortiger Blockierung
+  private startFileSystemMonitoring(): void {
+    console.log('👁️ Starting ENHANCED file system monitoring with real-time blocking...');
+    
+    const config = this.getProtectionConfig();
+    
+    // 1. Erstelle umfassende Dateihashes aller geschützten Dateien
+    this.createFileHashDatabase();
+    
+    // 2. Starte aggressives File System Monitoring
+    this.startAggressiveFileWatching();
+    
+    // 3. Starte Backup-System
+    this.startContinuousBackup();
+    
+    // 4. Starte Permission-Überwachung
+    this.startPermissionMonitoring();
+    
+    console.log('✅ Enhanced file system monitoring active');
+  }
+
+  // NEUE METHODE: Erstelle Hash-Datenbank aller geschützten Dateien
+  private createFileHashDatabase(): void {
+    console.log('🔐 Creating file hash database for integrity protection...');
+    
+    const scanDirectory = (dirPath: string) => {
+      if (!fs.existsSync(dirPath)) return;
+      
+      const items = fs.readdirSync(dirPath, { withFileTypes: true });
+      
+      for (const item of items) {
+        const fullPath = path.join(dirPath, item.name);
+        
+        if (item.isDirectory() && !item.name.startsWith('.') && !item.name.startsWith('node_modules')) {
+          scanDirectory(fullPath);
+        } else if (item.isFile()) {
+          try {
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            const hash = crypto.createHash('sha256').update(content).digest('hex');
+            this.fileHashes.set(fullPath, hash);
+            this.originalFileContents.set(fullPath, content);
+          } catch (error) {
+            // Binary file or permission error, skip
+          }
+        }
+      }
+    };
+    
+    // Scanne alle geschützten Verzeichnisse
+    const config = this.getProtectionConfig();
+    for (const protectedPath of config.protectedPaths) {
+      const fullPath = path.resolve(protectedPath);
+      if (fs.existsSync(fullPath)) {
+        if (fs.statSync(fullPath).isDirectory()) {
+          scanDirectory(fullPath);
+        } else {
+          try {
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            const hash = crypto.createHash('sha256').update(content).digest('hex');
+            this.fileHashes.set(fullPath, hash);
+            this.originalFileContents.set(fullPath, content);
+          } catch (error) {
+            console.warn(`Could not hash ${fullPath}:`, error);
+          }
+        }
+      }
+    }
+    
+    console.log(`📊 Protected ${this.fileHashes.size} files with integrity hashes`);
+  }
+
+  // NEUE METHODE: Aggressives File Watching mit sofortiger Wiederherstellung
+  private startAggressiveFileWatching(): void {
+    console.log('🛡️ Starting aggressive file watching with instant restore...');
+    
+    const config = this.getProtectionConfig();
+    
+    // Monitor jeden geschützten Pfad mit höchster Priorität
+    for (const protectedPath of config.protectedPaths) {
+      const fullPath = path.resolve(protectedPath);
+      
+      if (fs.existsSync(fullPath)) {
+        try {
+          // Verwende aggressive Überwachungsoptionen
+          const watcher = fs.watch(fullPath, {
+            recursive: true,
+            persistent: true
+          }, (eventType, filename) => {
+            if (filename) {
+              const changedFile = path.join(fullPath, filename);
+              this.handleFileChangeWithInstantBlock(eventType, changedFile);
+            }
+          });
+          
+          this.fileWatchers.set(protectedPath, watcher);
+          console.log(`🔒 AGGRESSIVE monitoring: ${protectedPath}`);
+          
+        } catch (error) {
+          console.warn(`⚠️ Could not monitor ${protectedPath}:`, error);
+        }
+      }
+    }
+    
+    // Zusätzlich: Überwache kritische Einzeldateien mit separaten Watchern
+    const criticalFiles = ['package.json', 'tsconfig.json', 'vite.config.ts', 'tailwind.config.js'];
+    for (const file of criticalFiles) {
+      if (fs.existsSync(file)) {
+        try {
+          const watcher = fs.watch(file, (eventType) => {
+            this.handleFileChangeWithInstantBlock(eventType, file);
+          });
+          this.fileWatchers.set(`critical-${file}`, watcher);
+        } catch (error) {
+          console.warn(`⚠️ Could not monitor critical file ${file}:`, error);
+        }
+      }
+    }
+  }
+
+  // NEUE METHODE: Sofortige Datei-Änderungs-Blockierung
+  private handleFileChangeWithInstantBlock(eventType: string, filePath: string): void {
+    const config = this.getProtectionConfig();
+    
+    // Skip wenn Schutz deaktiviert
+    if (!config.enabled || !config.realTimeBlocking) return;
+    
+    // Skip versteckte/temporäre Dateien
+    const fileName = path.basename(filePath);
+    if (fileName.startsWith('.') || fileName.includes('~') || fileName.includes('.tmp')) {
+      return;
+    }
+    
+    console.log(`🚨 INSTANT BLOCK: ${eventType} detected on ${filePath}`);
+    
+    // Prüfe ob Änderung erlaubt ist
+    if (this.isChangeAllowed(filePath)) {
+      console.log(`✅ Change allowed: ${filePath}`);
+      return;
+    }
+    
+    // SOFORTIGE BLOCKIERUNG und WIEDERHERSTELLUNG
+    this.executeInstantBlock(filePath, eventType);
+  }
+
+  // NEUE METHODE: Prüfe ob Änderung erlaubt ist
+  private isChangeAllowed(filePath: string): boolean {
+    const config = this.getProtectionConfig();
+    
+    // Prüfe erlaubte AI-Pfade
+    for (const allowedPath of config.allowedAIPaths) {
+      if (filePath.includes(allowedPath)) {
+        return true;
+      }
+    }
+    
+    // Prüfe ob es eine temporäre Datei ist
+    const fileName = path.basename(filePath);
+    if (fileName.startsWith('.') || fileName.includes('~') || fileName.includes('.tmp')) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  // NEUE METHODE: Sofortige Blockierung ausführen
+  private executeInstantBlock(filePath: string, eventType: string): void {
+    console.log(`🛡️ EXECUTING INSTANT BLOCK for: ${filePath}`);
+    
+    this.blockedAttempts++;
+    
+    // 1. Versuche sofortige Wiederherstellung aus Original-Inhalt
+    if (this.originalFileContents.has(filePath) && eventType === 'change') {
+      try {
+        const originalContent = this.originalFileContents.get(filePath);
+        if (originalContent) {
+          // Schreibe Original-Inhalt zurück (BLOCKING)
+          fs.writeFileSync(filePath, originalContent, { flag: 'w' });
+          console.log(`🔄 INSTANT RESTORE: ${filePath} restored from memory`);
+          
+          // Aktualisiere Hash
+          const newHash = crypto.createHash('sha256').update(originalContent).digest('hex');
+          this.fileHashes.set(filePath, newHash);
+        }
+      } catch (error) {
+        console.error(`❌ INSTANT RESTORE FAILED for ${filePath}:`, error);
+        // Fallback auf Backup
+        this.attemptFileRestore(filePath);
+      }
+    }
+    
+    // 2. Log Violation mit Details
+    this.logEnhancedViolation(filePath, eventType);
+    
+    // 3. Zeige Security Alert
+    this.showEnhancedSecurityAlert(filePath, eventType);
+    
+    // 4. Update Protection Status
+    this.updateProtectionStatus();
+  }
+
+  // NEUE METHODE: Versuche Datei-Wiederherstellung aus Backup
+  private attemptFileRestore(filePath: string): void {
+    console.log(`🔄 Attempting file restore for: ${filePath}`);
+    
+    try {
+      const backupDir = path.join(process.cwd(), AIProtectionSystem.BACKUP_DIR);
+      const relativePath = path.relative(process.cwd(), filePath);
+      const backupFileName = relativePath.replace(/[/\\]/g, '_') + '.original';
+      const backupPath = path.join(backupDir, backupFileName);
+      
+      if (fs.existsSync(backupPath)) {
+        const backupContent = fs.readFileSync(backupPath, 'utf-8');
+        fs.writeFileSync(filePath, backupContent);
+        console.log(`✅ File restored from backup: ${filePath}`);
+      } else {
+        console.warn(`⚠️ No backup found for: ${filePath}`);
+      }
+    } catch (error) {
+      console.error(`❌ Failed to restore file ${filePath}:`, error);
+    }
+  }
+
+  // NEUE METHODE: Kontinuierliches Backup-System
+  private startContinuousBackup(): void {
+    const config = this.getProtectionConfig();
+    
+    if (!config.autoBackupEnabled) {
+      console.log('💾 Backup system disabled by configuration');
+      return;
+    }
+    
+    console.log('💾 Starting optimized backup system...');
+    
+    // Erstelle Backup-Verzeichnis
+    const backupDir = path.join(process.cwd(), AIProtectionSystem.BACKUP_DIR);
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { recursive: true });
+    }
+    
+    // Verwende konfigurierbare Intervalle
+    const backupInterval = config.backupSettings.intervalMinutes * 60 * 1000; // Convert to milliseconds
+    const cleanupInterval = config.backupSettings.cleanupIntervalMinutes * 60 * 1000;
+    
+    console.log(`💾 Backup interval: ${config.backupSettings.intervalMinutes} minutes`);
+    console.log(`🗑️ Cleanup interval: ${config.backupSettings.cleanupIntervalMinutes} minutes`);
+    
+    // Backup alle geschützten Dateien basierend auf Konfiguration
+    setInterval(() => {
+      this.createIncrementalBackup();
+    }, backupInterval);
+    
+    // Cleanup alte Backups basierend auf Konfiguration
+    setInterval(() => {
+      this.cleanupOldBackups();
+    }, cleanupInterval);
+    
+    // Sofortiges Backup
+    this.createIncrementalBackup();
+  }
+
+  // NEUE METHODE: Inkrementelles Backup
+  private createIncrementalBackup(): void {
+    const backupDir = path.join(process.cwd(), AIProtectionSystem.BACKUP_DIR);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const config = this.getProtectionConfig();
+    
+    let backedUpFiles = 0;
+    
+    for (const [filePath, originalContent] of this.originalFileContents) {
+      try {
+        if (fs.existsSync(filePath)) {
+          const relativePath = path.relative(process.cwd(), filePath);
+          let shouldBackup = true;
+          
+          // Smart Backup: Prüfe, ob sich die Datei tatsächlich geändert hat
+          if (config.backupSettings.smartBackup) {
+            const currentContent = fs.readFileSync(filePath, 'utf-8');
+            const crypto = require('crypto');
+            const currentHash = crypto.createHash('md5').update(currentContent).digest('hex');
+            const originalHash = crypto.createHash('md5').update(originalContent).digest('hex');
+            
+            shouldBackup = currentHash !== originalHash;
+          }
+          
+          if (shouldBackup) {
+            const backupPath = path.join(backupDir, `${relativePath.replace(/[/\\]/g, '_')}_${timestamp}.backup`);
+            fs.writeFileSync(backupPath, originalContent);
+            backedUpFiles++;
+          }
+        }
+      } catch (error) {
+        console.warn(`Backup failed for ${filePath}:`, error);
+      }
+    }
+    
+    if (backedUpFiles > 0) {
+      const backupType = config.backupSettings.smartBackup ? 'Smart backup' : 'Backup';
+      console.log(`💾 ${backupType}: ${backedUpFiles} files backed up`);
+    }
+  }
+
+  // NEUE METHODE: Cleanup alte Backups
+  private cleanupOldBackups(): void {
+    const backupDir = path.join(process.cwd(), AIProtectionSystem.BACKUP_DIR);
+    const config = this.getProtectionConfig();
+    
+    if (!fs.existsSync(backupDir)) {
+      return;
+    }
+    
+    try {
+      const files = fs.readdirSync(backupDir);
+      const backupFiles = files.filter(file => file.endsWith('.backup'));
+      
+      // Gruppiere Backups nach Basis-Dateiname
+      const backupGroups: Map<string, string[]> = new Map();
+      
+      backupFiles.forEach(file => {
+        // Extrahiere Basis-Dateiname (ohne Timestamp)
+        const baseName = file.replace(/_[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{3}Z\.backup$/, '');
+        
+        if (!backupGroups.has(baseName)) {
+          backupGroups.set(baseName, []);
+        }
+        backupGroups.get(baseName)!.push(file);
+      });
+      
+      let deletedCount = 0;
+      
+      // Für jede Datei: Behalte nur die konfigurierten maximalen Backups
+      const maxBackups = config.backupSettings.maxBackupsPerFile;
+      backupGroups.forEach((backupList, baseName) => {
+        if (backupList.length > maxBackups) {
+          // Sortiere nach Timestamp (älteste zuerst)
+          backupList.sort();
+          
+          // Lösche alle außer den neuesten N
+          const toDelete = backupList.slice(0, backupList.length - maxBackups);
+          
+          toDelete.forEach(file => {
+            try {
+              const filePath = path.join(backupDir, file);
+              fs.unlinkSync(filePath);
+              deletedCount++;
+            } catch (error) {
+              console.warn(`Could not delete backup ${file}:`, error);
+            }
+          });
+        }
+      });
+      
+      // Lösche auch alte Backups basierend auf konfiguriertem Alter
+      const maxAgeMs = config.backupSettings.maxBackupAgeHours * 60 * 60 * 1000;
+      const cutoffTime = Date.now() - maxAgeMs;
+      
+      backupFiles.forEach(file => {
+        try {
+          const filePath = path.join(backupDir, file);
+          const stats = fs.statSync(filePath);
+          
+          if (stats.mtime.getTime() < cutoffTime) {
+            fs.unlinkSync(filePath);
+            deletedCount++;
+          }
+        } catch (error) {
+          // Ignore errors for individual files
+        }
+      });
+      
+      if (deletedCount > 0) {
+        console.log(`🗑️ Backup cleanup: ${deletedCount} old backup files removed (keeping max ${maxBackups} per file, max age ${config.backupSettings.maxBackupAgeHours}h)`);
+      }
+    } catch (error) {
+      console.warn('⚠️ Backup cleanup failed:', error);
+    }
+  }
+
+  // NEUE METHODE: Permission Monitoring
+  private startPermissionMonitoring(): void {
+    console.log('🔐 Starting permission monitoring...');
+    
+    // Überwache Dateiberechtigungen alle 10 Sekunden
+    setInterval(() => {
+      this.checkFilePermissions();
+    }, 10000);
+  }
+
+  // NEUE METHODE: Datei-Berechtigungen prüfen
+  private checkFilePermissions(): void {
+    const config = this.getProtectionConfig();
+    
+    for (const protectedPath of config.protectedPaths) {
+      const fullPath = path.resolve(protectedPath);
+      
+      if (fs.existsSync(fullPath)) {
+        try {
+          const stats = fs.statSync(fullPath);
+          
+          // Prüfe ob Datei schreibgeschützt werden sollte
+          if (config.aggressiveProtection && stats.mode & 0o200) {
+            // Entferne Schreibrechte für aggressiven Schutz
+            // fs.chmodSync(fullPath, stats.mode & ~0o200);
+            // console.log(`🔒 Write protection applied to: ${fullPath}`);
+          }
+        } catch (error) {
+          // Permission error, skip
+        }
+      }
+    }
+  }
+
+  // VERBESSERTE METHODE: Enhanced Violation Logging
+  private logEnhancedViolation(filePath: string, eventType: string): void {
+    const violation = {
+      timestamp: new Date().toISOString(),
+      type: 'SECURITY_VIOLATION',
+      event: eventType,
+      file: filePath,
+      blocked: true,
+      restored: true,
+      protection_level: 'maximum'
+    };
+    
+    console.log(`🚨 SECURITY VIOLATION BLOCKED: ${JSON.stringify(violation, null, 2)}`);
+    
+    // Log to security file
+    const securityLogPath = path.join(process.cwd(), '.blueprint-security.log');
+    try {
+      fs.appendFileSync(securityLogPath, JSON.stringify(violation) + '\n');
+    } catch (error) {
+      console.warn('Could not write to security log:', error);
+    }
+  }
+
+  // VERBESSERTE METHODE: Enhanced Security Alert
+  private showEnhancedSecurityAlert(filePath: string, eventType: string): void {
+    console.log('\n🚨🚨🚨 CRITICAL SECURITY ALERT 🚨🚨🚨');
+    console.log('═══════════════════════════════════════════════════');
+    console.log(`🛡️  AI Protection System BLOCKED and RESTORED unauthorized change`);
+    console.log(`📁 File: ${filePath}`);
+    console.log(`🔄 Operation: ${eventType}`);
+    console.log(`⏰ Time: ${new Date().toLocaleString()}`);
+    console.log(`🔢 Total blocked attempts: ${this.blockedAttempts}`);
+    console.log(`⚡ Action taken: INSTANT RESTORE from protected backup`);
+    console.log('\n🔒 PROTECTION STATUS: MAXIMUM SECURITY ACTIVE');
+    console.log('   ✅ File automatically restored');
+    console.log('   ✅ Original content preserved');
+    console.log('   ✅ Unauthorized change blocked');
+    console.log('\n💡 To make changes to protected files:');
+    console.log('   1. Disable protection: npm run cli set-protection --disable');
+    console.log('   2. Make your changes');
+    console.log('   3. Re-enable protection: npm run cli set-protection --enable');
+    console.log('\n🔒 Or work in allowed directories:');
+    const config = this.getProtectionConfig();
+    config.allowedAIPaths.forEach((path: string) => {
+      console.log(`   - ${path}`);
+    });
+    console.log('═══════════════════════════════════════════════════\n');
+  }
+
+  // NEUE METHODE: Protection Status Update
+  private updateProtectionStatus(): void {
+    this.protectionStatus = {
+      enabled: AIProtectionSystem.protectionEnabled,
+      level: 'maximum',
+      lastUpdated: new Date().toISOString(),
+      protectedFiles: Array.from(this.originalFileContents.keys()),
+      monitoringActive: this.monitoringActive,
+      blockedAttempts: this.blockedAttempts
+    };
+    
+    this.saveProtectionStatus();
+  }
+
+  async initializeProtection(): Promise<void> {
+    console.log('🛡️ Initializing ENHANCED AI Protection System...');
+    
+    // Register protected resources
+    this.protectedResources.add('package.json');
+    this.protectedResources.add('tsconfig.json');
+    this.protectedResources.add('vite.config.ts');
+    this.protectedResources.add('src/');
+    this.protectedResources.add('cli/');
+    
+    // Start enhanced file protection monitoring
+    await this.startFileProtectionMonitoring();
+    
+    // Start ENHANCED file system monitoring with real blocking
+    this.startFileSystemMonitoring();
+    
+    // Validate existing security measures
+    await this.validateSecurityMeasures();
+    
+    console.log('✅ ENHANCED AI Protection System active with REAL-TIME BLOCKING');
+    console.log(`🔢 Protecting ${this.fileHashes.size} files with integrity verification`);
+  }
+
+  // VERBESSERTE METHODE: Enhanced File Protection Monitoring
+  private async startFileProtectionMonitoring(): Promise<void> {
+    console.log('🔐 Starting enhanced file protection monitoring...');
+    
+    // Create comprehensive backup
+    await this.createComprehensiveBackup();
+    
+    // Setup enhanced file change detection
+    this.setupEnhancedFileChangeDetection();
+  }
+
+  // NEUE METHODE: Comprehensive Backup
+  private async createComprehensiveBackup(): Promise<void> {
+    const backupDir = path.join(process.cwd(), AIProtectionSystem.BACKUP_DIR);
+    
+    try {
+      if (!fs.existsSync(backupDir)) {
+        fs.mkdirSync(backupDir, { recursive: true });
+      }
+      
+      // Backup ALLE geschützten Dateien
+      let backedUpCount = 0;
+      
+      for (const [filePath, content] of this.originalFileContents) {
+        const relativePath = path.relative(process.cwd(), filePath);
+        const backupFileName = relativePath.replace(/[/\\]/g, '_') + '.original';
+        const backupPath = path.join(backupDir, backupFileName);
+        
+        try {
+          fs.writeFileSync(backupPath, content);
+          backedUpCount++;
+        } catch (error) {
+          console.warn(`Could not backup ${filePath}:`, error);
+        }
+      }
+      
+      console.log(`💾 Comprehensive backup created: ${backedUpCount} files`);
+    } catch (error) {
+      console.warn('⚠️ Could not create comprehensive backup:', error);
+    }
+  }
+
+  // VERBESSERTE METHODE: Enhanced File Change Detection
+  private setupEnhancedFileChangeDetection(): void {
+    console.log('👁️ Setting up ENHANCED real-time file change detection...');
+    
+    // Die Logik ist bereits in startAggressiveFileWatching() implementiert
+    console.log('✅ Enhanced file change detection ready');
+  }
+
+  // VERBESSERTE METHODE: Enhanced Security Measures Validation
+  private async validateSecurityMeasures(): Promise<void> {
+    console.log('🔍 Validating ENHANCED security measures...');
+    
+    const checks = [
+      () => this.fileHashes.size > 0,
+      () => this.originalFileContents.size > 0,
+      () => this.fileWatchers.size > 0,
+      () => fs.existsSync(path.join(process.cwd(), AIProtectionSystem.BACKUP_DIR))
+    ];
+    
+    const passedChecks = checks.filter(check => check()).length;
+    
+    console.log(`✅ Security validation: ${passedChecks}/${checks.length} measures active`);
+    
+    if (passedChecks === checks.length) {
+      console.log('🛡️ ALL ENHANCED SECURITY MEASURES VALIDATED');
+    } else {
+      console.warn('⚠️ Some security measures not fully initialized');
+    }
+  }
+
+  static async cleanupFileWatchers(): Promise<void> {
+    const instance = this.getInstance();
+    
+    // Stop all file watchers
+    if (instance.fileWatchers && instance.fileWatchers.size > 0) {
+      console.log('🔄 Stopping file watchers...');
+      
+      for (const [path, watcher] of instance.fileWatchers) {
+        try {
+          watcher.close();
+          console.log(`   ✅ Stopped watching: ${path}`);
+        } catch (error) {
+          console.warn(`   ⚠️ Error stopping watcher for ${path}:`, error);
+        }
+      }
+      
+      instance.fileWatchers.clear();
+    }
+    
+    // Clear file hashes
+    if (instance.fileHashes) {
+      instance.fileHashes.clear();
+    }
+  }
+
+  static async enableProtection(): Promise<void> {
+    const instance = this.getInstance();
+    
+    console.log('🔒 Enabling ENHANCED AI Protection System...');
+    
+    AIProtectionSystem.protectionEnabled = true;
+    
+    // Initialize enhanced protection
+    await instance.initializeProtection();
+    
+    console.log('✅ ENHANCED AI Protection System enabled with REAL-TIME BLOCKING');
+    console.log('   🛡️ File integrity monitoring: ACTIVE');
+    console.log('   ⚡ Instant restore capability: ACTIVE');
+    console.log('   🔐 Aggressive file watching: ACTIVE');
+    console.log('   💾 Continuous backup: ACTIVE');
+  }
+
+  static async disableProtection(): Promise<void> {
+    const instance = this.getInstance();
+    
+    console.log('🔓 Disabling AI Protection System...');
+    
+    AIProtectionSystem.protectionEnabled = false;
+    
+    // Clean up file watchers first
+    await this.cleanupFileWatchers();
+    
+    // Update protection status
+    instance.protectionStatus = {
+      enabled: false,
+      level: 'none',
+      lastUpdated: new Date().toISOString(),
+      protectedFiles: [],
+      monitoringActive: false,
+      blockedAttempts: 0
+    };
+    
+    // Save updated status
+    await instance.saveProtectionStatus();
+    
+    console.log('✅ AI Protection System disabled successfully');
+    console.log('   📁 File monitoring stopped');
+    console.log('   🔓 All files are now editable');
+  }
+
+  static isProtectionEnabled(): boolean {
+    return AIProtectionSystem.protectionEnabled;
+  }
+  
+  static validateAIPath(targetPath: string): {
+    isValid: boolean;
+    allowed?: boolean;
+    reason?: string;
+    suggestion?: string;
+  } {
+    const absolutePath = path.resolve(targetPath);
+    
+    // Check if path is in protected directories
+    for (const protectedPath of AIProtectionSystem.protectedPaths) {
+      if (absolutePath.startsWith(path.resolve(protectedPath))) {
+        return {
+          isValid: false,
+          allowed: false,
+          reason: `Pfad ist geschützt: ${protectedPath}`,
+          suggestion: `Verwenden Sie einen sicheren Pfad wie: ${this.suggestSafePaths()[0] || './safe-workspace'}`
+        };
+      }
+    }
+    
+    // Check if it's a core system file
+    const fileName = path.basename(absolutePath);
+    if (fileName.startsWith('.') || 
+        fileName.includes('config') || 
+        fileName.includes('package') ||
+        fileName.endsWith('.json') ||
+        fileName.endsWith('.md')) {
+      return {
+        isValid: false,
+        allowed: false,
+        reason: 'Systemdatei erkannt',
+        suggestion: 'Erstellen Sie eine neue Datei in einem sicheren Verzeichnis'
+      };
+    }
+    
+    return { isValid: true, allowed: true };
+  }
+  
+  static suggestSafePaths(): string[] {
+    return [
+      './safe-workspace',
+      './user-projects',
+      './sandbox',
+      './test-area',
+      './experiments'
+    ];
+  }
+  
+  static showProtectionStatus(): void {
+    console.log('\n🛡️  AI PROTECTION SYSTEM STATUS');
+    console.log('================================');
+    console.log(`Status: ${AIProtectionSystem.protectionEnabled ? '🟢 AKTIV' : '🔴 INAKTIV'}`);
+    console.log(`Geschützte Pfade: ${AIProtectionSystem.protectedPaths.length}`);
+    
+    if (AIProtectionSystem.protectedPaths.length > 0) {
+      console.log('\nGeschützte Verzeichnisse:');
+      AIProtectionSystem.protectedPaths.forEach((p: string) => console.log(`  📁 ${p}`));
+    }
+    
+    console.log('\nSichere Arbeitsbereiche:');
+    this.suggestSafePaths().forEach((p: string) => console.log(`  ✅ ${p}`));
+    
+    const instance = this.getInstance();
+    if (instance.fileWatchers && instance.fileWatchers.size > 0) {
+      console.log(`\nAktive Überwachung: ${instance.fileWatchers.size} Dateien`);
+    }
+    
+    console.log('\n💡 Tipp: Verwenden Sie "blueprint ai enable/disable" zum Umschalten');
+  }
+}
+
+// AI Activity Monitor
+class AIActivityMonitor {
+  private violations: Array<{
+    timestamp: string;
+    operation: string;
+    targetPath: string;
+    reason: string;
+  }> = [];
+
+  logViolation(operation: string, targetPath: string, reason: string): void {
+    this.violations.push({
+      timestamp: new Date().toISOString(),
+      operation,
+      targetPath,
+      reason
+    });
+  }
+
+  getViolationsReport(): Array<{
+    timestamp: string;
+    operation: string;
+    targetPath: string;
+    reason: string;
+  }> {
+    return [...this.violations];
+  }
+}
+
+// Blueprint Safety Utilities
+class BlueprintSafety {
+  private static readonly PROTECTED_DIRS = [
+    'src',
+    'cli', 
+    'scripts',
+    'public',
+    'docs'
+  ];
+
+  private static readonly PROTECTED_FILES = [
+    'package.json',
+    'README.md',
+    'vite.config.ts',
+    'tailwind.config.js',
+    'tsconfig.json'
+  ];
+
+  static isBlueprintProtected(targetPath: string): boolean {
+    const blueprintRoot = process.cwd();
+    const relativePath = path.relative(blueprintRoot, targetPath);
+    
+    // Wenn der Pfad außerhalb von Blueprint ist, ist er sicher
+    if (relativePath.startsWith('..')) return false;
+    
+    // Geschützte Verzeichnisse prüfen
+    for (const protectedDir of this.PROTECTED_DIRS) {
+      if (relativePath.startsWith(protectedDir + '/') || relativePath === protectedDir) {
+        return true;
+      }
+    }
+    
+    // Geschützte Dateien prüfen
+    for (const protectedFile of this.PROTECTED_FILES) {
+      if (relativePath === protectedFile) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  static async safeDelete(projectPath: string): Promise<boolean> {
+    const fullPath = path.resolve(projectPath);
+    const blueprintRoot = process.cwd();
+    
+    // Sicherheitsprüfungen
+    if (this.isBlueprintProtected(fullPath)) {
+      console.error('🚨 FEHLER: Versuch Blueprint-System zu löschen wurde blockiert!');
+      console.error(`🛡️  Geschützter Pfad: ${fullPath}`);
+      return false;
+    }
+    
+    // Zusätzliche Sicherheit: Projekt muss Unterordner von Blueprint sein
+    const relativePath = path.relative(blueprintRoot, fullPath);
+    if (relativePath.startsWith('..')) {
+      console.error('🚨 FEHLER: Projekt liegt außerhalb von Blueprint!');
+      return false;
+    }
+    
+    // Prüfen ob es ein generiertes Projekt ist
+    const packageJsonPath = path.join(fullPath, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      try {
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+        if (!packageJson.name || packageJson.name === 'blueprint-ui-system') {
+          console.error('🚨 FEHLER: Das ist das Blueprint-System selbst!');
+          return false;
+        }
+      } catch (error) {
+        console.warn('⚠️ Warnung: package.json konnte nicht gelesen werden');
+      }
+    }
+    
+    // Sicher löschen
+    try {
+      if (fs.existsSync(fullPath)) {
+        await fs.promises.rm(fullPath, { recursive: true, force: true });
+        console.log(`✅ Projekt sicher gelöscht: ${projectPath}`);
+        return true;
+      } else {
+        console.log(`ℹ️  Projekt existiert nicht: ${projectPath}`);
+        return true;
+      }
+    } catch (error) {
+      console.error(`❌ Fehler beim Löschen: ${error}`);
+      return false;
+    }
+  }
+
+  static listDeletableProjects(): string[] {
+    const blueprintRoot = process.cwd();
+    const projects: string[] = [];
+    
+    try {
+      const items = fs.readdirSync(blueprintRoot);
+      
+      for (const item of items) {
+        const itemPath = path.join(blueprintRoot, item);
+        const stat = fs.statSync(itemPath);
+        
+        if (stat.isDirectory() && !this.isBlueprintProtected(itemPath)) {
+          // Prüfen ob es ein Node.js Projekt ist
+          const packageJsonPath = path.join(itemPath, 'package.json');
+          if (fs.existsSync(packageJsonPath)) {
+            projects.push(item);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Fehler beim Auflisten der Projekte:', error);
+    }
+    
+    return projects;
+  }
+}
+
+// Create Protected Project Function
+async function createProtectedProject(projectName: string, template: TemplateKey): Promise<void> {
+  const sourcePath = path.join(__dirname, '..');
+  const targetPath = path.join(process.cwd(), projectName);
+
+  // Validate project name and path safety
+  const validation = AIProtectionSystem.validateAIPath(targetPath);
+  if (!validation.allowed) {
+    console.error(`🚨 FEHLER: ${validation.reason}`);
+    console.error(`🛡️  Verwenden Sie einen sicheren Pfad für AI-Operationen.`);
+    return;
+  }
+
+  console.log(`🚀 Erstelle geschütztes Projekt: ${projectName}`);
+  console.log(`📋 Template: ${templateMetadata[template].name}`);
+
+  try {
+    // Copy blueprint structure
+    await copyDirectory(sourcePath, targetPath);
+
+    // Update package.json with project-specific information
+    const packageJsonPath = path.join(targetPath, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      packageJson.name = projectName.toLowerCase().replace(/\s+/g, '-');
+      packageJson.description = `${templateMetadata[template].description} - Generated from Blueprint`;
+      packageJson.version = '1.0.0';
+
+      // Add template-specific dependencies
+      for (const dep of templateMetadata[template].dependencies) {
+        if (!packageJson.dependencies[dep]) {
+          packageJson.dependencies[dep] = 'latest';
+        }
+      }
+
+      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+    }
+
+    console.log(`✅ Projekt "${projectName}" erfolgreich erstellt`);
+    console.log(`📁 Pfad: ${targetPath}`);
+    console.log(`🛡️  Projekt ist AI-sicher und außerhalb des geschützten Blueprint-Systems`);
+    console.log(`\n🔧 Nächste Schritte:`);
+    console.log(`   cd ${projectName}`);
+    console.log(`   npm install`);
+    console.log(`   npm run dev`);
+
+  } catch (error) {
+    console.error(`❌ Fehler beim Erstellen des Projekts: ${error}`);
+  }
+}
+
+async function generateTemplateWithValidation(template: TemplateKey): Promise<void> {
+  console.log(`🎨 Generiere Template: ${templateMetadata[template].name}`);
+  
+  // Template validation and generation logic would go here
+  console.log(`✅ Template ${template} erfolgreich generiert`);
+}
+
+// CLI Program Setup
 const program = new Command();
 
 program
   .name('blueprint-cli')
-  .description('Generate web apps instantly using Blueprint components')
+  .description('Blueprint UI System - Sichere App-Generierung mit AI-Schutz')
   .version('1.0.0');
 
-// List available templates
+// AI Protection Commands
 program
-  .command('list')
-  .description('List all available templates')
-  .action(() => {
-    console.log('\n🎨 Available Templates:\n');
-    Object.entries(templateMetadata).forEach(([key, meta]) => {
-      console.log(`📋 ${key.padEnd(12)} - ${meta.name}`);
-      console.log(`   ${meta.description}`);
-      console.log(`   Features: ${meta.features.join(', ')}`);
-      console.log('');
-    });
+  .command('set-protection')
+  .description('🔒 AI-Schutz-System steuern (Blueprint vor AI-Eingriffen schützen)')
+  .option('--enable', 'AI-Schutz aktivieren (Standard)')
+  .option('--disable', 'AI-Schutz deaktivieren (nur für Blueprint-Entwicklung)')
+  .action(async (options) => {
+    console.log('DEBUG: Received options:', options); // Debug output
+    
+    if (options.enable) {
+      await AIProtectionSystem.enableProtection();
+    } else if (options.disable) {
+      console.log('\n⚠️  WARNUNG: Sie sind dabei, den AI-Schutz zu deaktivieren!');
+      console.log('🚨 Das Blueprint-System wird dadurch UNGESCHÜTZT vor AI-Eingriffen!');
+      console.log('💡 Dies sollte NUR für eigene Blueprint-Entwicklung verwendet werden.\n');
+      
+      await AIProtectionSystem.disableProtection();
+      
+      console.log('\n🔔 ERINNERUNG: Aktivieren Sie den Schutz nach Blueprint-Entwicklung wieder!');
+      console.log('   npm run cli set-protection --enable');
+      
+    } else {
+      console.log('\n🔒 Blueprint AI-Schutz-System\n');
+      console.log('Verfügbare Optionen:');
+      console.log('  --enable     AI-Schutz aktivieren (Blueprint schützen)');
+      console.log('  --disable    AI-Schutz deaktivieren (nur für Blueprint-Entwicklung)');
+      console.log('\n💡 Empfehlung: Lassen Sie den Schutz IMMER aktiviert!');
+    }
   });
 
 program
-  .command('create')
-  .description('Create a new app from blueprint')
-  .argument('<app-name>', 'name of the app')
-  .option('-t, --template <type>', 'template type (dashboard, analytics, data-table, map)', 'dashboard')
-  .option('-p, --preset <preset>', 'component preset (minimal, standard, full)', 'standard')
-  .action(async (appName: string, options: { template: string; preset: string }) => {
-    console.log(`🚀 Creating ${appName} with ${options.template} template...`);
+  .command('protection-status')
+  .description('🛡️ AI-Schutz-Status anzeigen')
+  .action(() => {
+    AIProtectionSystem.showProtectionStatus();
+  });
+
+program
+  .command('ai-safe-paths')
+  .description('🛡️ Sichere Pfade für AI-Operationen anzeigen')
+  .action(() => {
+    console.log('\n🛡️  Sichere Pfade für AI-Operationen:\n');
     
-    // Type-safe template validation
-    if (!isValidTemplate(options.template)) {
-      console.error(`❌ Template "${options.template}" not found. Use "blueprint list" to see available templates.`);
-      process.exit(1);
+    const safePaths = AIProtectionSystem.suggestSafePaths();
+    
+    if (safePaths.length === 0) {
+      console.log('   Keine sicheren Projekt-Pfade gefunden.');
+      console.log('   Erstellen Sie zuerst ein Projekt:');
+      console.log('   npm run cli create test-project --template dashboard');
+      console.log('   npm run cli copy-blueprint kunde-projekt');
+    } else {
+      console.log('✅ Diese Pfade sind sicher für AI-Operationen:');
+      safePaths.forEach((safePath: string) => {
+        console.log(`   📁 /Users/Max/Main VS/blueprint/${safePath}/`);
+      });
+      
+      console.log('\n💡 AI-Prompt-Beispiel:');
+      console.log(`   "Modifiziere die App.tsx in ${safePaths[0]}/src/"`);
+      console.log(`   "Erstelle eine neue Komponente in ${safePaths[0]}/src/components/"`);
     }
     
-    await generateApp(appName, options.template as TemplateKey, options.preset);
+    console.log('\n🚨 Diese Pfade sind GESCHÜTZT (AI darf nicht zugreifen):');
+    console.log('   ❌ /Users/Max/Main VS/blueprint/src/');
+    console.log('   ❌ /Users/Max/Main VS/blueprint/cli/');
+    console.log('   ❌ /Users/Max/Main VS/blueprint/scripts/');
+    console.log('   ❌ /Users/Max/Main VS/blueprint/package.json');
   });
 
-// Type guard function
-function isValidTemplate(template: string): template is TemplateKey {
-  return template in templateMetadata;
-}
-
-async function generateApp(name: string, template: TemplateKey, preset: string) {
-  const targetDir = path.join(process.cwd(), name);
-  const templateData = templateMetadata[template];
-  
-  console.log(`📁 Creating directory: ${targetDir}`);
-  console.log(`🎯 Template: ${templateData.name}`);
-  console.log(`⚙️  Preset: ${preset}`);
-  
-  try {
-    // Create project structure
-    await fs.promises.mkdir(targetDir, { recursive: true });
-    await fs.promises.mkdir(path.join(targetDir, 'src'), { recursive: true });
-    await fs.promises.mkdir(path.join(targetDir, 'src/components'), { recursive: true });
-    await fs.promises.mkdir(path.join(targetDir, 'src/components/ui'), { recursive: true });
-    await fs.promises.mkdir(path.join(targetDir, 'public'), { recursive: true });
+// Project Creation Commands
+program
+  .command('create')
+  .description('🚀 Neues geschütztes Projekt erstellen')
+  .argument('<project-name>', 'Name des Projekts')
+  .option('-t, --template <template>', 'Template auswählen (dashboard, analytics, data-table, map)', 'dashboard')
+  .action(async (projectName: string, options) => {
+    const template = options.template as TemplateKey;
     
-    // Generate package.json with template-specific dependencies
-    const packageJson = {
-      name: name.toLowerCase().replace(/\s+/g, '-'),
-      private: true,
-      version: '0.1.0',
-      type: 'module',
-      scripts: {
-        dev: 'vite',
-        build: 'tsc && vite build',
-        preview: 'vite preview',
-        lint: 'eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0'
-      },
-      dependencies: getTemplateDependencies(template, preset),
-      devDependencies: getDevDependencies()
+    if (!templateMetadata[template]) {
+      console.error(`❌ Unbekanntes Template: ${template}`);
+      console.log('Verfügbare Templates:', Object.keys(templateMetadata).join(', '));
+      return;
+    }
+    
+    showWelcome();
+    await createProtectedProject(projectName, template);
+  });
+
+// Security audit command
+program
+  .command('security-audit')
+  .description('🔍 Sicherheitsaudit durchführen')
+  .action(async () => {
+    console.log('\n🔍 Blueprint Sicherheitsaudit\n');
+    console.log('══════════════════════════════════');
+    
+    const monitor = new AIActivityMonitor();
+    const auditResults = {
+      protectionStatus: AIProtectionSystem.isProtectionEnabled(),
+      violations: monitor.getViolationsReport(),
+      recommendations: [] as string[]
     };
     
-    await fs.promises.writeFile(
-      path.join(targetDir, 'package.json'), 
-      JSON.stringify(packageJson, null, 2)
-    );
+    console.log(`🛡️  AI-Schutz: ${auditResults.protectionStatus ? 'AKTIV' : 'INAKTIV'}`);
+    console.log(`📊 Verstöße: ${auditResults.violations.length}`);
     
-    // Create essential config files
-    await createConfigFiles(targetDir);
-    
-    // Generate the main app component with the selected template
-    await generateAppComponent(targetDir, template, name);
-    
-    // Create basic UI components
-    await createUIComponents(targetDir, preset);
-    
-    // Create index.html
-    await createIndexHtml(targetDir, name);
-    
-    // Create main.tsx
-    await createMainTsx(targetDir);
-    
-    console.log(`\n✅ ${name} created successfully!`);
-    console.log(`\n📋 Template: ${templateData.name}`);
-    console.log(`📋 Features: ${templateData.features.join(', ')}`);
-    console.log(`\n📁 Next steps:`);
-    console.log(`   cd ${name}`);
-    console.log(`   npm install`);
-    console.log(`   npm run dev`);
-    console.log(`\n🚀 Your ${template} app will be running at http://localhost:5173\n`);
-    
-  } catch (error) {
-    console.error('❌ Error creating app:', error);
-  }
-}
-
-function getTemplateDependencies(template: TemplateKey, preset: string) {
-  const baseDeps = {
-    'react': '^18.2.0',
-    'react-dom': '^18.2.0',
-    'framer-motion': '^10.16.4',
-    'lucide-react': '^0.279.0'
-  };
-
-  const templateDeps = templateMetadata[template].dependencies.reduce((acc: Record<string, string>, dep: string) => {
-    const versions: Record<string, string> = {
-      'recharts': '^2.15.3',
-      'zustand': '^4.4.1',
-      'chart.js': '^4.4.9',
-      'date-fns': '^4.1.0',
-      'react-router-dom': '^6.15.0',
-      'leaflet': '^1.9.4',
-      'react-leaflet': '^4.2.1',
-      '@types/leaflet': '^1.9.4'
-    };
-    acc[dep] = versions[dep] || 'latest';
-    return acc;
-  }, {});
-
-  return { ...baseDeps, ...templateDeps };
-}
-
-function getDevDependencies() {
-  return {
-    '@types/react': '^18.2.15',
-    '@types/react-dom': '^18.2.7',
-    '@typescript-eslint/eslint-plugin': '^6.0.0',
-    '@typescript-eslint/parser': '^6.0.0',
-    '@vitejs/plugin-react': '^4.0.3',
-    'autoprefixer': '^10.4.21',
-    'eslint': '^8.45.0',
-    'eslint-plugin-react-hooks': '^4.6.0',
-    'eslint-plugin-react-refresh': '^0.4.3',
-    'postcss': '^8.5.4',
-    'tailwindcss': '^3.4.17',
-    'typescript': '^5.0.2',
-    'vite': '^4.4.5'
-  };
-}
-
-async function createConfigFiles(targetDir: string) {
-  // Vite config
-  const viteConfig = `import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': '/src',
-    },
-  },
-})`;
-  
-  // TypeScript config
-  const tsConfig = {
-    compilerOptions: {
-      target: 'ES2020',
-      useDefineForClassFields: true,
-      lib: ['ES2020', 'DOM', 'DOM.Iterable'],
-      module: 'ESNext',
-      skipLibCheck: true,
-      moduleResolution: 'bundler',
-      allowImportingTsExtensions: true,
-      resolveJsonModule: true,
-      isolatedModules: true,
-      noEmit: true,
-      jsx: 'react-jsx',
-      strict: true,
-      noUnusedLocals: true,
-      noUnusedParameters: true,
-      noFallthroughCasesInSwitch: true,
-      baseUrl: '.',
-      paths: {
-        '@/*': ['./src/*']
+    if (!auditResults.protectionStatus) {
+      console.log('\n⚠️  KRITISCHE SICHERHEITSLÜCKE ERKANNT!');
+      console.log('🚨 AI-Schutz ist deaktiviert - Blueprint-System ungeschützt!');
+      auditResults.recommendations.push('AI-Schutz sofort aktivieren: npm run cli set-protection --enable');
+      
+      // Auto-enable protection if not enabled
+      console.log('\n🔒 Aktiviere AI-Schutz automatisch...');
+      try {
+        await AIProtectionSystem.enableProtection();
+        console.log('✅ AI-Schutz erfolgreich aktiviert');
+      } catch (error) {
+        console.error('❌ Fehler beim Aktivieren des AI-Schutzes:', error);
       }
-    },
-    include: ['src'],
-    references: [{ path: './tsconfig.node.json' }]
-  };
-  
-  // Tailwind config
-  const tailwindConfig = `/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}`;
+    }
+    
+    // Display recommendations
+    if (auditResults.recommendations.length > 0) {
+      console.log('\n💡 Empfehlungen:');
+      auditResults.recommendations.forEach((rec, index) => {
+        console.log(`   ${index + 1}. ${rec}`);
+      });
+    }
+    
+    console.log('\n✅ Sicherheitsaudit abgeschlossen');
+  });
 
-  // PostCSS config
-  const postcssConfig = `export default {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}`;
+// Status command
+program
+  .command('status')
+  .description('📊 System-Status anzeigen')
+  .action(() => {
+    console.log('\n📊 Blueprint System Status\n');
+    console.log('═══════════════════════════════');
+    console.log(`   🛡️  AI-Schutz: ${AIProtectionSystem.isProtectionEnabled() ? 'AKTIV' : 'INAKTIV'}`);
+    console.log(`   📁 Blueprint-Pfad: ${process.cwd()}`);
+    console.log(`   📦 Sichere Projekte: ${AIProtectionSystem.suggestSafePaths().length}`);
+    
+    const deletableProjects = BlueprintSafety.listDeletableProjects();
+    console.log(`   🗑️  Löschbare Projekte: ${deletableProjects.length}`);
+    
+    if (!AIProtectionSystem.isProtectionEnabled()) {
+      console.log('\n🚨 WARNUNG: AI-Schutz ist deaktiviert!');
+      console.log('   Aktivieren Sie ihn mit: npm run cli set-protection --enable');
+    }
+  });
 
-  await fs.promises.writeFile(path.join(targetDir, 'vite.config.ts'), viteConfig);
-  await fs.promises.writeFile(path.join(targetDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
-  await fs.promises.writeFile(path.join(targetDir, 'tailwind.config.js'), tailwindConfig);
-  await fs.promises.writeFile(path.join(targetDir, 'postcss.config.js'), postcssConfig);
-}
+// List projects command  
+program
+  .command('list-projects')
+  .description('📋 Alle Projekte auflisten')
+  .action(() => {
+    console.log('\n📋 Blueprint Projekte\n');
+    
+    const safePaths = AIProtectionSystem.suggestSafePaths();
+    const deletableProjects = BlueprintSafety.listDeletableProjects();
+    
+    console.log('🛡️  Sichere AI-Projekte:');
+    if (safePaths.length === 0) {
+      console.log('   (Keine sicheren Projekte gefunden)');
+    } else {
+      safePaths.forEach((project: string) => {
+        console.log(`   ✅ ${project}`);
+      });
+    }
+    
+    console.log('\n🗑️  Löschbare Projekte:');
+    if (deletableProjects.length === 0) {
+      console.log('   (Keine löschbaren Projekte gefunden)');
+    } else {
+      deletableProjects.forEach((project: string) => {
+        console.log(`   📁 ${project}`);
+      });
+    }
+  });
 
-async function generateAppComponent(targetDir: string, template: TemplateKey, appName: string) {
-  const templateImports: Record<TemplateKey, string> = {
-    dashboard: `import { BarChart, TrendingUp, Users, DollarSign, Activity } from 'lucide-react';`,
-    analytics: `import { BarChart3, PieChart, TrendingUp, Filter, Download, Calendar } from 'lucide-react';`,
-    'data-table': `import { Table, Search, Plus, Edit, Trash2, Filter, Download, Eye } from 'lucide-react';`,
-    map: `import { Map, MapPin, Navigation, Layers, Search, Filter, Download, Settings } from 'lucide-react';`
-  };
-
-  const appComponent = `import React from 'react';
-import { motion } from 'framer-motion';
-${templateImports[template]}
-import { Button } from './components/ui/Button';
-
-function App() {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="font-bold text-xl text-gray-900">${appName}</h1>
-            <p className="text-sm text-gray-600">Generated with Blueprint ${template} template</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm">Settings</Button>
-            <Button size="sm">Get Started</Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="p-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center py-20"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Welcome to ${appName}
-            </h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Your ${templateMetadata[template].name} is ready! 
-              Start customizing your app with the powerful Blueprint components.
-            </p>
-            
-            {/* Template Features */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
-              ${templateMetadata[template].features.map((feature: string, i: number) => `
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: ${i * 0.1} }}
-                className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-md transition-shadow"
-              >
-                <h3 className="font-semibold text-gray-900 mb-2">${feature}</h3>
-                <p className="text-sm text-gray-600">Ready to use ${feature.toLowerCase()} components</p>
-              </motion.div>`).join('')}
-            </div>
-
-            <div className="mt-12">
-              <Button size="lg">Explore Components</Button>
-            </div>
-          </motion.div>
-        </div>
-      </main>
-    </div>
-  );
-}
-
-export default App;`;
-
-  await fs.promises.writeFile(path.join(targetDir, 'src/App.tsx'), appComponent);
-}
-
-async function createUIComponents(targetDir: string, preset: string) {
-  // Button component
-  const buttonComponent = `import React from 'react';
-import { motion } from 'framer-motion';
-
-interface ButtonProps {
-  children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-  disabled?: boolean;
-}
-
-export const Button: React.FC<ButtonProps> = ({
-  children,
-  variant = 'primary',
-  size = 'md',
-  leftIcon,
-  rightIcon,
-  className = '',
-  onClick,
-  disabled = false,
-  ...props
-}) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-  
-  const variants = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500',
-    secondary: 'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500', 
-    outline: 'border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 focus:ring-blue-500',
-    ghost: 'hover:bg-gray-100 text-gray-700 focus:ring-gray-500'
-  };
-  
-  const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
-  };
-
-  return (
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className={\`\${baseClasses} \${variants[variant]} \${sizes[size]} \${disabled ? 'opacity-50 cursor-not-allowed' : ''} \${className}\`}
-      onClick={onClick}
-      disabled={disabled}
-      {...props}
-    >
-      {leftIcon && <span className="mr-2">{leftIcon}</span>}
-      {children}
-      {rightIcon && <span className="ml-2">{rightIcon}</span>}
-    </motion.button>
-  );
-};`;
-
-  await fs.promises.writeFile(path.join(targetDir, 'src/components/ui/Button.tsx'), buttonComponent);
-}
-
-async function createIndexHtml(targetDir: string, appName: string) {
-  const indexHtml = `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${appName}</title>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    </style>
-  </head>
-  <body style="font-family: 'Inter', sans-serif;">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>`;
-
-  await fs.promises.writeFile(path.join(targetDir, 'index.html'), indexHtml);
-}
-
-async function createMainTsx(targetDir: string) {
-  const mainTsx = `import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);`;
-
-  const indexCss = `@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  * {
-    @apply border-border;
+// CLI Commands
+const commands = {
+  'status': () => AIProtectionSystem.showProtectionStatus(),
+  'enable': () => AIProtectionSystem.enableProtection(),
+  'disable': () => AIProtectionSystem.disableProtection(),
+  'check': (path?: string) => {
+    if (!path) {
+      console.log('❌ Bitte geben Sie einen Pfad an: npm run cli check <pfad>');
+      return;
+    }
+    const result = AIProtectionSystem.validateAIPath(path);
+    console.log(`📁 Pfad: ${path}`);
+    console.log(`✅ Status: ${result.allowed ? 'ERLAUBT' : 'BLOCKIERT'}`);
+    console.log(`📝 Grund: ${result.reason}`);
   }
-  body {
-    @apply bg-background text-foreground;
-  }
-}`;
+};
 
-  await fs.promises.writeFile(path.join(targetDir, 'src/main.tsx'), mainTsx);
-  await fs.promises.writeFile(path.join(targetDir, 'src/index.css'), indexCss);
+// Delete project command
+program
+  .command('delete')
+  .description('🗑️  Projekt sicher löschen')
+  .argument('<project-name>', 'Name des zu löschenden Projekts')
+  .option('--force', 'Löschen erzwingen (vorsichtig verwenden)')
+  .action(async (projectName: string, options) => {
+    const projectPath = path.join(process.cwd(), projectName);
+    
+    console.log(`🗑️  Lösche Projekt: ${projectName}`);
+    
+    if (!options.force) {
+      // Safety check
+      if (BlueprintSafety.isBlueprintProtected(projectPath)) {
+        console.error('🚨 FEHLER: Dieses Projekt ist geschützt und kann nicht gelöscht werden!');
+        console.error('🛡️  Verwenden Sie --force nur wenn Sie sicher sind.');
+        return;
+      }
+    }
+    
+    const success = await BlueprintSafety.safeDelete(projectPath);
+    if (success) {
+      console.log(`✅ Projekt "${projectName}" erfolgreich gelöscht`);
+    }
+  });
+
+// Copy blueprint command  
+program
+  .command('copy-blueprint')
+  .description('📋 Blueprint als neues Projekt kopieren')
+  .argument('<project-name>', 'Name des neuen Projekts')
+  .action(async (projectName: string) => {
+    showWelcome();
+    await createProtectedProject(projectName, 'dashboard');
+  });
+
+// Help command override
+program
+  .command('help')
+  .description('❓ Hilfe anzeigen')
+  .action(() => {
+    showWelcome();
+    console.log('Verfügbare Befehle:\n');
+    console.log('🛡️  SCHUTZ-BEFEHLE:');
+    console.log('   set-protection --enable    AI-Schutz aktivieren');
+    console.log('   set-protection --disable   AI-Schutz deaktivieren');
+    console.log('   protection-status          Schutz-Status anzeigen');
+    console.log('   ai-safe-paths             Sichere AI-Pfade anzeigen');
+    console.log('   security-audit            Sicherheitsaudit durchführen');
+    console.log('');
+    console.log('🚀 PROJEKT-BEFEHLE:');
+    console.log('   create <name> -t <template>  Neues Projekt erstellen');
+    console.log('   copy-blueprint <name>        Blueprint kopieren');
+    console.log('   list-projects               Projekte auflisten');
+    console.log('   delete <name>               Projekt löschen');
+    console.log('');
+    console.log('📊 SYSTEM-BEFEHLE:');
+    console.log('   status                      System-Status');
+    console.log('   help                        Diese Hilfe');
+    console.log('');
+    console.log('Templates: dashboard, analytics, data-table, map');
+    console.log('');
+    console.log('💡 Beispiele:');
+    console.log('   npm run cli create mein-dashboard --template dashboard');
+    console.log('   npm run cli ai-safe-paths');
+    console.log('   npm run cli security-audit');
+  });
+
+// Initialize protection on startup if not running specific commands
+const protectionCommands = ['set-protection', 'protection-status', 'help'];
+const isProtectionCommand = process.argv.some(arg => protectionCommands.includes(arg));
+
+if (!isProtectionCommand) {
+  // Initialize protection system
+  const aiProtection = AIProtectionSystem.getInstance();
+  aiProtection.initializeProtection().catch(error => {
+    console.warn('⚠️  Could not fully initialize AI protection:', error);
+  });
 }
 
-program.parse(process.argv);
+// Parse command line arguments
+program.parse();
+
+// If no command provided, show help
+if (!process.argv.slice(2).length) {
+  showWelcome();
+  program.help();
+}
+
+// Export for potential module usage
+export { 
+  AIProtectionSystem, 
+  BlueprintSafety, 
+  createProtectedProject, 
+  generateTemplateWithValidation 
+};

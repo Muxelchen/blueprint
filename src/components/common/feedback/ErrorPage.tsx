@@ -9,6 +9,8 @@ import {
   WifiOff,
   Settings,
   HelpCircle,
+  FileQuestion,
+  Server,
 } from 'lucide-react';
 
 export type ErrorType =
@@ -80,8 +82,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
       title: 'Page Not Found',
       message:
         'The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-accent dark:text-accent-dark',
+      bgColor: 'bg-accent-light/10',
       suggestions: [
         'Check the URL for typos',
         'Go back to the previous page',
@@ -93,8 +95,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
       icon: <AlertTriangle className="w-16 h-16" />,
       title: 'Internal Server Error',
       message: "Something went wrong on our end. We're working to fix this issue.",
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
+      color: 'text-error dark:text-error-dark',
+      bgColor: 'bg-error-light/10',
       suggestions: [
         'Refresh the page',
         'Try again in a few minutes',
@@ -106,12 +108,12 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
       icon: <WifiOff className="w-16 h-16" />,
       title: 'Network Error',
       message: 'Unable to connect to the server. Please check your internet connection.',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
+      color: 'text-warning dark:text-warning-dark',
+      bgColor: 'bg-warning-light/10',
       suggestions: [
         'Check your internet connection',
-        'Try refreshing the page',
-        'Disable VPN if enabled',
+        'Try using a different network',
+        'Disable your VPN if enabled',
         'Contact your network administrator',
       ],
     },
@@ -119,8 +121,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
       icon: <Settings className="w-16 h-16" />,
       title: 'Access Denied',
       message: "You don't have permission to access this resource.",
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
+      color: 'text-warning dark:text-warning-dark',
+      bgColor: 'bg-warning-light/10',
       suggestions: [
         'Log in with the correct account',
         'Contact an administrator',
@@ -132,8 +134,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
       icon: <Settings className="w-16 h-16" />,
       title: 'Under Maintenance',
       message: 'This service is temporarily unavailable due to scheduled maintenance.',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
+      color: 'text-accent dark:text-accent-dark',
+      bgColor: 'bg-accent-light/10',
       suggestions: [
         'Try again later',
         'Check our status page',
@@ -145,8 +147,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
       icon: <RefreshCw className="w-16 h-16" />,
       title: 'Request Timeout',
       message: 'The request took too long to complete. Please try again.',
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
+      color: 'text-text-secondary dark:text-text-secondary',
+      bgColor: 'bg-surface-secondary',
       suggestions: [
         'Refresh the page',
         'Check your connection',
@@ -158,8 +160,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
       icon: <HelpCircle className="w-16 h-16" />,
       title: 'Something Went Wrong',
       message: 'An unexpected error occurred. Please try again.',
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
+      color: 'text-text-secondary dark:text-text-secondary',
+      bgColor: 'bg-surface-secondary',
       suggestions: [
         'Refresh the page',
         'Go back and try again',

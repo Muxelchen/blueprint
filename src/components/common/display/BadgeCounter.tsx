@@ -3,202 +3,77 @@ import { Minus, Plus } from 'lucide-react';
 
 export interface BadgeCounterProps {
   count: number;
-  maxCount?: number;
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+  max?: number;
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
   showZero?: boolean;
-  animated?: boolean;
-  interactive?: boolean;
-  onCountChange?: (newCount: number) => void;
+  dot?: boolean;
+  pulse?: boolean;
   className?: string;
-  label?: string;
-}
-
-export interface BadgeCounterState {
-  currentCount: number;
-  isAnimating: boolean;
-  history: number[];
+  children?: React.ReactNode;
 }
 
 const BadgeCounter: React.FC<BadgeCounterProps> = ({
-  count: initialCount,
-  maxCount = 99,
-  variant = 'default',
+  count,
+  max = 99,
   size = 'md',
+  variant = 'primary',
   showZero = false,
-  animated = true,
-  interactive = false,
-  onCountChange,
+  dot = false,
+  pulse = false,
   className = '',
-  label,
+  children,
 }) => {
-  const [state, setState] = useState<BadgeCounterState>({
-    currentCount: initialCount,
-    isAnimating: false,
-    history: [initialCount],
-  });
+  // Don't render if count is 0 and showZero is false
+  if (count === 0 && !showZero) {
+    return children ? <>{children}</> : null;
+  }
 
-  // Load count from localStorage if available
-  useEffect(() => {
-    const storageKey = `badge-counter-${label || 'default'}`;
-    const savedCount = localStorage.getItem(storageKey);
-    if (savedCount && !isNaN(Number(savedCount))) {
-      const count = Number(savedCount);
-      setState(prev => ({
-        ...prev,
-        currentCount: count,
-        history: [count],
-      }));
-    }
-  }, [label]);
+  const displayCount = count > max ? `${max}+` : count.toString();
 
-  // Save count to localStorage when it changes
-  useEffect(() => {
-    if (label) {
-      const storageKey = `badge-counter-${label}`;
-      localStorage.setItem(storageKey, state.currentCount.toString());
-    }
-  }, [state.currentCount, label]);
-
-  // Update count when prop changes
-  useEffect(() => {
-    if (initialCount !== state.currentCount) {
-      updateCount(initialCount);
-    }
-  }, [initialCount]);
-
-  const updateCount = useCallback(
-    (newCount: number, animate = true) => {
-      const clampedCount = Math.max(0, newCount);
-
-      setState(prev => {
-        if (animate && animated) {
-          return {
-            currentCount: clampedCount,
-            isAnimating: true,
-            history: [...prev.history.slice(-9), clampedCount], // Keep last 10 values
-          };
-        }
-
-        return {
-          currentCount: clampedCount,
-          isAnimating: false,
-          history: [...prev.history.slice(-9), clampedCount],
-        };
-      });
-
-      if (animate && animated) {
-        setTimeout(() => {
-          setState(prev => ({ ...prev, isAnimating: false }));
-        }, 300);
-      }
-
-      onCountChange?.(clampedCount);
-    },
-    [animated, onCountChange]
-  );
-
-  const increment = useCallback(() => {
-    updateCount(state.currentCount + 1);
-  }, [state.currentCount, updateCount]);
-
-  const decrement = useCallback(() => {
-    updateCount(Math.max(0, state.currentCount - 1));
-  }, [state.currentCount, updateCount]);
-
-  const getDisplayCount = () => {
-    if (state.currentCount > maxCount) {
-      return `${maxCount}+`;
-    }
-    return state.currentCount.toString();
+  const sizeClasses = {
+    sm: dot ? 'w-2 h-2' : 'min-w-[16px] h-4 text-xs px-1',
+    md: dot ? 'w-3 h-3' : 'min-w-[20px] h-5 text-sm px-1.5',
+    lg: dot ? 'w-4 h-4' : 'min-w-[24px] h-6 text-base px-2',
   };
 
-  const getBadgeStyles = () => {
-    const sizeClasses = {
-      sm: 'px-1.5 py-0.5 text-xs min-w-[1.25rem] h-5',
-      md: 'px-2 py-1 text-sm min-w-[1.5rem] h-6',
-      lg: 'px-2.5 py-1.5 text-base min-w-[2rem] h-8',
-    };
-
-    const variantClasses = {
-      default: 'bg-gray-500 text-white',
-      primary: 'bg-blue-500 text-white',
-      secondary: 'bg-gray-600 text-white',
-      success: 'bg-green-500 text-white',
-      warning: 'bg-yellow-500 text-white',
-      error: 'bg-red-500 text-white',
-      info: 'bg-blue-400 text-white',
-    };
-
-    const animationClasses =
-      state.isAnimating && animated
-        ? 'transform scale-110 transition-transform duration-300 ease-out'
-        : 'transition-all duration-200 ease-in-out';
-
-    return `
-      inline-flex items-center justify-center rounded-full font-semibold
-      ${sizeClasses[size]} ${variantClasses[variant]} ${animationClasses}
-    `;
+  const variantClasses = {
+    primary: 'bg-blue-500 text-white dark:bg-blue-600',
+    secondary: 'bg-gray-500 text-white dark:bg-gray-600',
+    success: 'bg-green-500 text-white dark:bg-green-600', 
+    warning: 'bg-yellow-500 text-white dark:bg-yellow-600',
+    error: 'bg-red-500 text-white dark:bg-red-600',
+    info: 'bg-cyan-500 text-white dark:bg-cyan-600',
   };
 
-  const getInteractiveStyles = () => {
-    if (!interactive) return '';
+  const badgeClasses = `
+    inline-flex items-center justify-center rounded-full font-medium
+    ${sizeClasses[size]}
+    ${variantClasses[variant]}
+    ${pulse ? 'animate-pulse' : ''}
+    ${className}
+  `;
 
-    return `
-      cursor-pointer hover:opacity-80 active:scale-95
-      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-    `;
-  };
-
-  const shouldShow = showZero || state.currentCount > 0;
-
-  if (!shouldShow) {
-    return null;
+  if (children) {
+    return (
+      <div className="relative inline-block">
+        {children}
+        <span
+          className={`
+            absolute -top-1 -right-1 z-10
+            ${badgeClasses}
+          `}
+        >
+          {!dot && displayCount}
+        </span>
+      </div>
+    );
   }
 
   return (
-    <div className={`inline-flex items-center gap-2 ${className}`}>
-      {interactive && (
-        <button
-          onClick={decrement}
-          disabled={state.currentCount <= 0}
-          className="p-1 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          aria-label="Decrease count"
-        >
-          <Minus className="w-3 h-3" />
-        </button>
-      )}
-
-      <span
-        className={`${getBadgeStyles()} ${getInteractiveStyles()}`}
-        onClick={interactive ? increment : undefined}
-        onKeyDown={
-          interactive
-            ? e => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  increment();
-                }
-              }
-            : undefined
-        }
-        tabIndex={interactive ? 0 : undefined}
-        role={interactive ? 'button' : undefined}
-        aria-label={`Count: ${state.currentCount}${interactive ? '. Click to increment.' : ''}`}
-      >
-        {getDisplayCount()}
-      </span>
-
-      {interactive && (
-        <button
-          onClick={increment}
-          className="p-1 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
-          aria-label="Increase count"
-        >
-          <Plus className="w-3 h-3" />
-        </button>
-      )}
-    </div>
+    <span className={badgeClasses}>
+      {!dot && displayCount}
+    </span>
   );
 };
 
@@ -333,11 +208,11 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
         >
           <BadgeCounter
             count={count}
-            maxCount={maxCount}
+            max={maxCount}
             variant={variant}
             size={size}
             showZero={showZero}
-            animated={true}
+            dot={true}
           />
         </div>
       )}
@@ -384,7 +259,7 @@ export const ExampleBadges: React.FC = () => {
               </div>
               <div className="flex items-center gap-4">
                 <span>Large:</span>
-                <BadgeCounter count={156} maxCount={99} size="lg" variant="error" />
+                <BadgeCounter count={156} max={99} size="lg" variant="error" />
               </div>
             </div>
           </div>
@@ -393,13 +268,10 @@ export const ExampleBadges: React.FC = () => {
           <div className="space-y-4">
             <h4 className="font-medium">Interactive Counter</h4>
             <div className="space-y-2">
-              <BadgeCounter
-                count={localCount}
-                interactive={true}
-                variant="primary"
-                label="interactive-demo"
-                onCountChange={setLocalCount}
-              />
+                              <BadgeCounter
+                  count={localCount}
+                  variant="primary"
+                />
               <div className="text-sm text-gray-600">Click the badge or use +/- buttons</div>
               <button
                 onClick={() => setLocalCount(0)}

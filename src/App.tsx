@@ -34,6 +34,31 @@ import {
   IconButton,
   PrintButton,
 } from './components/common';
+import {
+  // Input components
+  Checkbox,
+  ToggleSwitch,
+  Slider,
+  DropdownSelect,
+  MultiSelect,
+  DateTimePicker,
+  FileUpload,
+  DragDrop,
+  RichTextEditor,
+  ThemeToggle,
+  LanguageSwitch,
+  InputField,
+} from './components/common/inputs';
+import SearchBar from './components/common/inputs/SearchBar';
+import Rating from './components/common/inputs/Rating';
+import BreadcrumbNav from './components/common/navigation/BreadcrumbNav';
+import ThemeSelector from './components/common/inputs/ThemeSelector';
+import {
+  // Overlay components
+  Modal,
+  Dialog,
+  DropdownMenu,
+} from './components/common/overlays';
 import { DevErrorBoundary } from './components/common/feedback/DevErrorBoundary';
 import { TemplateShowcase } from './components';
 import {
@@ -101,20 +126,18 @@ const WidgetWrapper: React.FC<{ title: string; children: React.ReactNode }> = ({
   title,
   children,
 }) => {
-  const { isDarkMode } = useDarkMode();
-
   return (
-    <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
-      <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+    <div className="card bg-surface border border-border">
+      <h3 className="text-lg font-semibold mb-4 text-text-primary">
         {title}
       </h3>
       <div className="w-full min-h-[240px] overflow-hidden">
         <ErrorBoundary
           fallback={
-            <div className="flex items-center justify-center h-full bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center justify-center h-full bg-error/10 border border-error rounded-lg p-4">
               <div className="text-center">
-                <p className="text-red-800 font-medium">Widget Error</p>
-                <p className="text-red-600 text-sm">Failed to render {title}</p>
+                <p className="text-error font-medium">Widget Error</p>
+                <p className="text-error/80 text-sm">Failed to render {title}</p>
               </div>
             </div>
           }
@@ -133,7 +156,9 @@ const ComponentShowcase: React.FC = () => {
   const { isDarkMode } = useDarkMode();
 
   const handleTabChange = (tabId: string) => {
-    console.log('App.tsx - Tab change handler called with:', tabId);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('App.tsx - Tab change handler called with:', tabId);
+    }
     setActiveTab(tabId);
   };
 
@@ -245,12 +270,10 @@ const ComponentShowcase: React.FC = () => {
         <div className="space-y-8">
           {/* Status Indicators */}
           <div>
-            <h2
-              className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-            >
+            <h2 className="text-2xl font-bold mb-6 text-text-primary">
               Status Indicators
             </h2>
-            <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+            <div className="card bg-surface border-border">
               <div className="flex flex-wrap gap-4">
                 <StatusIndicator status="online" label="Online" />
                 <StatusIndicator status="offline" label="Offline" />
@@ -580,6 +603,38 @@ const ComponentShowcase: React.FC = () => {
             </div>
           </div>
 
+          {/* Breadcrumb Navigation */}
+          <div>
+            <h2
+              className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+            >
+              Breadcrumb Navigation
+            </h2>
+            <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+              <div className="space-y-4">
+                <BreadcrumbNav
+                  items={[
+                    { id: '1', label: 'Dashboard', onClick: () => toast.success('Navigate to Dashboard') },
+                    { id: '2', label: 'Analytics', onClick: () => toast.success('Navigate to Analytics') },
+                    { id: '3', label: 'Reports', onClick: () => toast.success('Navigate to Reports') },
+                    { id: '4', label: 'Monthly Summary' },
+                  ]}
+                />
+                <BreadcrumbNav
+                  showHome={false}
+                  maxItems={3}
+                  items={[
+                    { id: '1', label: 'Projects' },
+                    { id: '2', label: 'Web Development' },
+                    { id: '3', label: 'React Application' },
+                    { id: '4', label: 'Components' },
+                    { id: '5', label: 'Breadcrumb' },
+                  ]}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Notification Center Demo */}
           <div>
             <h2
@@ -594,6 +649,289 @@ const ComponentShowcase: React.FC = () => {
                 below.
               </p>
               <NotificationCenterExample />
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'forms',
+      label: 'Form Components',
+      icon: <User className="w-4 h-4" />,
+      content: (
+        <div className="space-y-8">
+          {/* Input Components */}
+          <div>
+            <h2
+              className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+            >
+              Form & Input Components
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Checkbox */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Checkbox Component
+                </h3>
+                <div className="space-y-3">
+                  <Checkbox label="Default checkbox" />
+                  <Checkbox label="Checked checkbox" checked />
+                  <Checkbox label="Disabled checkbox" disabled />
+                  <Checkbox label="Indeterminate checkbox" indeterminate />
+                </div>
+              </div>
+
+              {/* Toggle Switch */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Toggle Switch
+                </h3>
+                <div className="space-y-3">
+                  <ToggleSwitch label="Default switch" />
+                  <ToggleSwitch label="Enabled switch" checked />
+                  <ToggleSwitch label="Disabled switch" disabled />
+                </div>
+              </div>
+
+              {/* Slider */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Slider Component
+                </h3>
+                <div className="space-y-4">
+                  <Slider min={0} max={100} defaultValue={50} />
+                  <Slider min={0} max={100} defaultValue={20} />
+                </div>
+              </div>
+
+              {/* Dropdown Select */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Dropdown Select
+                </h3>
+                <DropdownSelect
+                  placeholder="Select an option..."
+                  options={[
+                    { value: 'option1', label: 'Option 1' },
+                    { value: 'option2', label: 'Option 2' },
+                    { value: 'option3', label: 'Option 3' },
+                  ]}
+                />
+              </div>
+
+              {/* Multi Select */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Multi Select
+                </h3>
+                <MultiSelect
+                  placeholder="Select multiple options..."
+                  options={[
+                    { value: 'apple', label: 'Apple' },
+                    { value: 'banana', label: 'Banana' },
+                    { value: 'cherry', label: 'Cherry' },
+                    { value: 'date', label: 'Date' },
+                  ]}
+                />
+              </div>
+
+              {/* Date Time Picker */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Date Time Picker
+                </h3>
+                <DateTimePicker placeholder="Select date and time..." />
+              </div>
+
+              {/* File Upload */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  File Upload
+                </h3>
+                <FileUpload 
+                  accept="image/*,.pdf"
+                  maxSize={5 * 1024 * 1024}
+                  onChange={(files) => toast.success(`Selected ${files.length} files`)}
+                />
+              </div>
+
+              {/* Theme Toggle */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Theme Toggle
+                </h3>
+                <ThemeToggle />
+              </div>
+
+              {/* Theme Selector */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} lg:col-span-2`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Theme Selector
+                </h3>
+                <ThemeSelector
+                  showColorPicker
+                  onThemeChange={(themeId) => toast.success(`Theme changed to: ${themeId}`)}
+                  onModeChange={(mode) => toast.success(`Mode changed to: ${mode}`)}
+                />
+              </div>
+
+              {/* Language Switch */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Language Switch
+                </h3>
+                <LanguageSwitch />
+              </div>
+
+              {/* Input Field */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Input Field
+                </h3>
+                <div className="space-y-3">
+                  <InputField placeholder="Basic input field" />
+                  <InputField placeholder="With icon" leftIcon={<User />} />
+                  <InputField placeholder="Password field" type="password" />
+                </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Search Bar
+                </h3>
+                <SearchBar
+                  placeholder="Search with suggestions..."
+                  suggestions={[
+                    { id: '1', title: 'Dashboard', subtitle: 'Main dashboard page', category: 'Navigation' },
+                    { id: '2', title: 'Analytics', subtitle: 'View analytics data', category: 'Data' },
+                    { id: '3', title: 'Settings', subtitle: 'Application settings', category: 'Config' },
+                  ]}
+                  recentSearches={['analytics', 'users', 'revenue']}
+                  onSearch={(query) => toast.success(`Searching for: ${query}`)}
+                />
+              </div>
+
+              {/* Rating Component */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Rating Component
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Star Rating
+                    </label>
+                    <Rating 
+                      defaultValue={3.5} 
+                      allowHalf 
+                      showValue 
+                      onChange={(value) => toast.success(`Rated: ${value} stars`)}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Heart Rating
+                    </label>
+                    <Rating variant="heart" defaultValue={4} />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Read-only Rating
+                    </label>
+                    <Rating value={4.2} readOnly showValue allowHalf />
+                  </div>
+                </div>
+              </div>
+
+              {/* Badge Counter */}
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Badge Counter
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <BadgeCounter count={5} variant="primary">
+                      <Button variant="secondary">Messages</Button>
+                    </BadgeCounter>
+                    <BadgeCounter count={23} variant="error" size="lg">
+                      <Button variant="secondary">Notifications</Button>
+                    </BadgeCounter>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <BadgeCounter count={1} dot variant="success">
+                      <Button variant="secondary">Online Status</Button>
+                    </BadgeCounter>
+                    <BadgeCounter count={156} max={99} variant="warning">
+                      <Button variant="secondary">Unread</Button>
+                    </BadgeCounter>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Rich Text Editor */}
+          <div>
+            <h2
+              className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+            >
+              Rich Text Editor
+            </h2>
+            <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+              <RichTextEditor placeholder="Start typing..." />
+            </div>
+          </div>
+
+          {/* Overlay Components */}
+          <div>
+            <h2
+              className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+            >
+              Overlay Components
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Modal Component
+                </h3>
+                <Button 
+                  onClick={() => {
+                    // Modal functionality would be implemented here
+                    toast.success('Modal would open here');
+                  }}
+                >
+                  Open Modal
+                </Button>
+              </div>
+
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Dialog Component
+                </h3>
+                <Button 
+                  onClick={() => {
+                    // Dialog functionality would be implemented here
+                    toast.success('Dialog would open here');
+                  }}
+                >
+                  Open Dialog
+                </Button>
+              </div>
+
+              <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Dropdown Menu
+                </h3>
+                <DropdownMenu 
+                  trigger={<Button>Open Menu</Button>}
+                  items={[
+                    { id: 'edit', label: 'Edit', onClick: () => toast('Edit clicked') },
+                    { id: 'delete', label: 'Delete', onClick: () => toast('Delete clicked') },
+                    { id: 'share', label: 'Share', onClick: () => toast('Share clicked') },
+                  ]}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -922,7 +1260,6 @@ const TemplatesPage: React.FC = () => {
 // Settings Page Component
 const SettingsPage: React.FC = () => {
   const { isDarkMode, toggleDarkMode, user, notifications, clearNotifications } = useAppStore();
-  const { isDarkMode: darkModeFromHook } = useDarkMode();
 
   return (
     <motion.div
@@ -931,24 +1268,22 @@ const SettingsPage: React.FC = () => {
       exit={{ opacity: 0, y: -20 }}
       className="space-y-6"
     >
-      <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-secondary-900'}`}>
+      <h1 className="text-3xl font-bold text-text-primary">
         Settings
       </h1>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
-          <h3
-            className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-          >
+        <div className="card bg-surface border-border">
+          <h3 className="text-xl font-semibold mb-4 text-text-primary">
             Appearance
           </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                <h4 className="font-medium text-text-primary">
                   Dark Mode
                 </h4>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-secondary-600'}`}>
+                <p className="text-sm text-text-secondary">
                   Toggle dark/light theme
                 </p>
               </div>
@@ -959,8 +1294,8 @@ const SettingsPage: React.FC = () => {
                 }}
                 className={`p-3 rounded-lg transition-all duration-300 ${
                   isDarkMode
-                    ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600'
-                    : 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
+                    ? 'bg-surface-secondary text-warning hover:bg-surface-secondary/80'
+                    : 'bg-warning-light text-warning hover:bg-warning-light/80'
                 }`}
               >
                 {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -969,19 +1304,17 @@ const SettingsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className={`card ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
-          <h3
-            className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-          >
+        <div className="card bg-surface border-border">
+          <h3 className="text-xl font-semibold mb-4 text-text-primary">
             Notifications
           </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                <h4 className="font-medium text-text-primary">
                   Unread Notifications
                 </h4>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-secondary-600'}`}>
+                <p className="text-sm text-text-secondary">
                   You have {notifications} notifications
                 </p>
               </div>
@@ -1083,11 +1416,7 @@ const App: React.FC = () => {
 
   return (
     <DevErrorBoundary>
-      <div
-        className={`min-h-screen transition-colors duration-300 ${
-          isDarkMode ? 'bg-gray-900' : 'bg-secondary-50'
-        }`}
-      >
+      <div className="min-h-screen transition-colors duration-300 bg-background">
         {/* Mobile sidebar backdrop */}
         {isSidebarOpen && (
           <div
