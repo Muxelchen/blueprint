@@ -77,6 +77,7 @@ class AIProtectionSystem {
   private static readonly PROTECTION_FILE = '.blueprint-ai-protection';
   private static readonly CONFIG_FILE = '.blueprint-protection.json';
   private static readonly BACKUP_DIR = '.blueprint-backup';
+  private static readonly DAEMON_FILE = '.blueprint-daemon.pid';
   private static protectionEnabled = true;
   private static protectedPaths = [
     'src/',
@@ -98,6 +99,8 @@ class AIProtectionSystem {
   private fileHashes: Map<string, string> = new Map();
   private originalFileContents: Map<string, string> = new Map();
   private blockedAttempts: number = 0;
+  private daemonInterval: NodeJS.Timeout | null = null;
+  private lastProcessedTime: Map<string, number> = new Map();
   private protectionStatus: {
     enabled: boolean;
     level: string;
@@ -121,6 +124,7 @@ class AIProtectionSystem {
     fileProtection: true,
     realTimeBlocking: true, // NEU: Echte Blockierung aktiviert
     instantRestore: true,   // NEU: Sofortige Wiederherstellung
+    persistentDaemon: true, // NEU: Persistenter Daemon
     protectedPaths: [
       'src/',
       'cli/',
@@ -187,6 +191,55 @@ class AIProtectionSystem {
     // Log to file or monitoring system
   }
 
+  // NEU: Persistent Daemon Management
+  private async startProtectionDaemon(): Promise<void> {
+    console.log('🤖 Starting persistent protection daemon...');
+    
+    // Create daemon PID file
+    const pidPath = path.join(process.cwd(), AIProtectionSystem.DAEMON_FILE);
+    await fs.promises.writeFile(pidPath, process.pid.toString());
+    
+    // Start daemon heartbeat
+    this.daemonInterval = setInterval(() => {
+      this.daemonHeartbeat();
+    }, 30000); // Every 30 seconds
+    
+    console.log('✅ Protection daemon started with PID:', process.pid);
+  }
+
+  private daemonHeartbeat(): void {
+    // Update protection status timestamp
+    this.protectionStatus.lastUpdated = new Date().toISOString();
+    this.saveProtectionStatus();
+    
+    // Verify all watchers are still active
+    if (this.fileWatchers.size === 0 && this.monitoringActive) {
+      console.log('🔄 Restarting file watchers...');
+      this.startAggressiveFileWatching();
+    }
+  }
+
+  private async stopProtectionDaemon(): Promise<void> {
+    console.log('🛑 Stopping protection daemon...');
+    
+    if (this.daemonInterval) {
+      clearInterval(this.daemonInterval);
+      this.daemonInterval = null;
+    }
+    
+    // Remove PID file
+    const pidPath = path.join(process.cwd(), AIProtectionSystem.DAEMON_FILE);
+    try {
+      if (fs.existsSync(pidPath)) {
+        await fs.promises.unlink(pidPath);
+      }
+    } catch (error) {
+      console.warn('Could not remove daemon PID file:', error);
+    }
+    
+    console.log('✅ Protection daemon stopped');
+  }
+
   // NEUE METHODE: Echte File System Überwachung mit sofortiger Blockierung
   private startFileSystemMonitoring(): void {
     console.log('👁️ Starting ENHANCED file system monitoring with real-time blocking...');
@@ -204,6 +257,9 @@ class AIProtectionSystem {
     
     // 4. Starte Permission-Überwachung
     this.startPermissionMonitoring();
+    
+    // 5. Starte persistenten Daemon
+    this.startProtectionDaemon();
     
     console.log('✅ Enhanced file system monitoring active');
   }
@@ -270,40 +326,42 @@ class AIProtectionSystem {
       
       if (fs.existsSync(fullPath)) {
         try {
-          // Verwende aggressive Überwachungsoptionen
-          const watcher = fs.watch(fullPath, {
-            recursive: true,
-            persistent: true
-          }, (eventType, filename) => {
-            if (filename) {
-              const changedFile = path.join(fullPath, filename);
-              this.handleFileChangeWithInstantBlock(eventType, changedFile);
-            }
-          });
+          const stat = fs.statSync(fullPath);
           
-          this.fileWatchers.set(protectedPath, watcher);
-          console.log(`🔒 AGGRESSIVE monitoring: ${protectedPath}`);
+          if (stat.isDirectory()) {
+            // Watch directory recursively
+            const watcher = fs.watch(fullPath, {
+              recursive: true,
+              persistent: true
+            }, (eventType, filename) => {
+              if (filename) {
+                const changedFile = path.join(fullPath, filename);
+                this.handleFileChangeWithInstantBlock(eventType, changedFile);
+              }
+            });
+            
+            this.fileWatchers.set(protectedPath, watcher);
+            console.log(`🔒 MONITORING directory: ${protectedPath}`);
+            
+          } else {
+            // Watch individual file
+            const watcher = fs.watch(fullPath, (eventType, filename) => {
+              this.handleFileChangeWithInstantBlock(eventType, fullPath);
+            });
+            
+            this.fileWatchers.set(protectedPath, watcher);
+            console.log(`🔒 MONITORING file: ${protectedPath}`);
+          }
           
         } catch (error) {
           console.warn(`⚠️ Could not monitor ${protectedPath}:`, error);
         }
+      } else {
+        console.warn(`⚠️ Protected path does not exist: ${protectedPath}`);
       }
     }
     
-    // Zusätzlich: Überwache kritische Einzeldateien mit separaten Watchern
-    const criticalFiles = ['package.json', 'tsconfig.json', 'vite.config.ts', 'tailwind.config.js'];
-    for (const file of criticalFiles) {
-      if (fs.existsSync(file)) {
-        try {
-          const watcher = fs.watch(file, (eventType) => {
-            this.handleFileChangeWithInstantBlock(eventType, file);
-          });
-          this.fileWatchers.set(`critical-${file}`, watcher);
-        } catch (error) {
-          console.warn(`⚠️ Could not monitor critical file ${file}:`, error);
-        }
-      }
-    }
+    console.log(`✅ Started ${this.fileWatchers.size} file watchers`);
   }
 
   // NEUE METHODE: Sofortige Datei-Änderungs-Blockierung
@@ -319,13 +377,27 @@ class AIProtectionSystem {
       return;
     }
     
-    console.log(`🚨 INSTANT BLOCK: ${eventType} detected on ${filePath}`);
+    // Skip security log file to prevent infinite loops
+    if (filePath.includes('.blueprint-security.log') || 
+        filePath.includes('.blueprint-protection.json') ||
+        filePath.includes('.blueprint-daemon.pid')) {
+      return;
+    }
     
     // Prüfe ob Änderung erlaubt ist
     if (this.isChangeAllowed(filePath)) {
-      console.log(`✅ Change allowed: ${filePath}`);
       return;
     }
+    
+    // Rate limit: Only process one event per file per second
+    const now = Date.now();
+    const lastProcessed = this.lastProcessedTime.get(filePath) || 0;
+    if (now - lastProcessed < 1000) {
+      return;
+    }
+    this.lastProcessedTime.set(filePath, now);
+    
+    console.log(`🚨 BLOCKING: ${eventType} on ${filePath}`);
     
     // SOFORTIGE BLOCKIERUNG und WIEDERHERSTELLUNG
     this.executeInstantBlock(filePath, eventType);
@@ -353,8 +425,6 @@ class AIProtectionSystem {
 
   // NEUE METHODE: Sofortige Blockierung ausführen
   private executeInstantBlock(filePath: string, eventType: string): void {
-    console.log(`🛡️ EXECUTING INSTANT BLOCK for: ${filePath}`);
-    
     this.blockedAttempts++;
     
     // 1. Versuche sofortige Wiederherstellung aus Original-Inhalt
@@ -364,26 +434,21 @@ class AIProtectionSystem {
         if (originalContent) {
           // Schreibe Original-Inhalt zurück (BLOCKING)
           fs.writeFileSync(filePath, originalContent, { flag: 'w' });
-          console.log(`🔄 INSTANT RESTORE: ${filePath} restored from memory`);
+          console.log(`🔄 RESTORED: ${path.basename(filePath)}`);
           
           // Aktualisiere Hash
           const newHash = crypto.createHash('sha256').update(originalContent).digest('hex');
           this.fileHashes.set(filePath, newHash);
         }
       } catch (error) {
-        console.error(`❌ INSTANT RESTORE FAILED for ${filePath}:`, error);
-        // Fallback auf Backup
-        this.attemptFileRestore(filePath);
+        console.error(`❌ RESTORE FAILED for ${filePath}:`, error);
       }
     }
     
-    // 2. Log Violation mit Details
+    // 2. Log Violation (simplified)
     this.logEnhancedViolation(filePath, eventType);
     
-    // 3. Zeige Security Alert
-    this.showEnhancedSecurityAlert(filePath, eventType);
-    
-    // 4. Update Protection Status
+    // 3. Update Protection Status
     this.updateProtectionStatus();
   }
 
@@ -464,7 +529,6 @@ class AIProtectionSystem {
           // Smart Backup: Prüfe, ob sich die Datei tatsächlich geändert hat
           if (config.backupSettings.smartBackup) {
             const currentContent = fs.readFileSync(filePath, 'utf-8');
-            const crypto = require('crypto');
             const currentHash = crypto.createHash('md5').update(currentContent).digest('hex');
             const originalHash = crypto.createHash('md5').update(originalContent).digest('hex');
             
@@ -796,6 +860,25 @@ class AIProtectionSystem {
     console.log('   ⚡ Instant restore capability: ACTIVE');
     console.log('   🔐 Aggressive file watching: ACTIVE');
     console.log('   💾 Continuous backup: ACTIVE');
+    console.log('   🤖 Protection daemon: RUNNING');
+    
+    // Keep the process alive for protection
+    if (process.argv.includes('set-protection') && process.argv.includes('--enable')) {
+      console.log('\n🔒 Protection system is now running continuously...');
+      console.log('   Press Ctrl+C to stop (will disable protection)');
+      
+      // Handle graceful shutdown
+      process.on('SIGINT', async () => {
+        console.log('\n\n🛑 Shutting down protection system...');
+        await this.disableProtection();
+        process.exit(0);
+      });
+      
+      // Keep alive
+      setInterval(() => {
+        // Daemon heartbeat is handled internally
+      }, 60000);
+    }
   }
 
   static async disableProtection(): Promise<void> {
@@ -805,7 +888,10 @@ class AIProtectionSystem {
     
     AIProtectionSystem.protectionEnabled = false;
     
-    // Clean up file watchers first
+    // Stop daemon first
+    await instance.stopProtectionDaemon();
+    
+    // Clean up file watchers
     await this.cleanupFileWatchers();
     
     // Update protection status
@@ -823,6 +909,7 @@ class AIProtectionSystem {
     
     console.log('✅ AI Protection System disabled successfully');
     console.log('   📁 File monitoring stopped');
+    console.log('   🤖 Protection daemon stopped');
     console.log('   🔓 All files are now editable');
   }
 
@@ -1150,6 +1237,73 @@ program
   });
 
 program
+  .command('start-daemon')
+  .description('🤖 Schutz-Daemon im Hintergrund starten')
+  .action(async () => {
+    console.log('🤖 Starting Blueprint Protection Daemon...\n');
+    
+    // Check if already running
+    const pidPath = path.join(process.cwd(), '.blueprint-daemon.pid');
+    if (fs.existsSync(pidPath)) {
+      console.log('⚠️  Protection daemon may already be running.');
+      console.log('   Use "npm run cli stop-daemon" to stop it first.');
+      return;
+    }
+    
+    // Enable protection and start daemon
+    await AIProtectionSystem.enableProtection();
+    
+    console.log('\n🔒 Protection daemon is now running in the background...');
+    console.log('   Use "npm run cli stop-daemon" to stop');
+    console.log('   Use "npm run cli protection-status" to check status');
+    
+    // Keep the process alive
+    process.on('SIGINT', async () => {
+      console.log('\n\n🛑 Shutting down protection daemon...');
+      await AIProtectionSystem.disableProtection();
+      process.exit(0);
+    });
+    
+    // Keep alive indefinitely
+    setInterval(() => {
+      // Daemon heartbeat is handled internally
+    }, 60000);
+  });
+
+program
+  .command('stop-daemon')
+  .description('🛑 Schutz-Daemon stoppen')
+  .action(async () => {
+    console.log('🛑 Stopping Blueprint Protection Daemon...\n');
+    
+    const pidPath = path.join(process.cwd(), '.blueprint-daemon.pid');
+    if (!fs.existsSync(pidPath)) {
+      console.log('ℹ️  No protection daemon running.');
+      return;
+    }
+    
+    try {
+      const pid = fs.readFileSync(pidPath, 'utf-8');
+      console.log(`🔍 Found daemon with PID: ${pid}`);
+      
+      // Try to kill the process
+      try {
+        process.kill(parseInt(pid), 'SIGTERM');
+        console.log('✅ Protection daemon stopped successfully');
+      } catch (error) {
+        console.log('⚠️  Process may have already stopped');
+      }
+      
+      // Clean up
+      fs.unlinkSync(pidPath);
+      await AIProtectionSystem.disableProtection();
+      
+    } catch (error) {
+      console.error('❌ Error stopping daemon:', error);
+    }
+  });
+
+program
   .command('ai-safe-paths')
   .description('🛡️ Sichere Pfade für AI-Operationen anzeigen')
   .action(() => {
@@ -1355,6 +1509,8 @@ program
     console.log('🛡️  SCHUTZ-BEFEHLE:');
     console.log('   set-protection --enable    AI-Schutz aktivieren');
     console.log('   set-protection --disable   AI-Schutz deaktivieren');
+    console.log('   start-daemon              Schutz-Daemon im Hintergrund starten');
+    console.log('   stop-daemon               Schutz-Daemon stoppen');
     console.log('   protection-status          Schutz-Status anzeigen');
     console.log('   ai-safe-paths             Sichere AI-Pfade anzeigen');
     console.log('   security-audit            Sicherheitsaudit durchführen');
