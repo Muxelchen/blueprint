@@ -183,7 +183,7 @@ const KPICard: React.FC<KPICardProps> = ({
   // Generate STABLE trend data (no random) for the mini chart
   const trendData = useMemo(() => {
     const days = config.chartBars;
-    const data = [];
+    const data: number[] = []; // Explicitly type the array
     const currentValue = kpi.value;
     const previousValue = kpi.previousValue;
 
@@ -197,7 +197,7 @@ const KPICard: React.FC<KPICardProps> = ({
       data.push(value);
     }
     return data;
-  }, [kpi.value, kpi.previousValue, config.chartBars]); // Removed kpi.trend from deps
+  }, [kpi.value, kpi.previousValue, config.chartBars]);
 
   // Move formatValue function BEFORE it's used in useMemo
   const formatValue = useCallback((value: number, format: string, unit: string) => {
@@ -288,7 +288,7 @@ const KPICard: React.FC<KPICardProps> = ({
 
   return (
     <div
-      className={`bg-surface border border-border rounded-lg shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${config.padding} flex flex-col w-full relative overflow-hidden`}
+      className={`bg-white border-2 border-gray-100 hover:border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer ${config.padding} flex flex-col w-full relative overflow-hidden group`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{ height: config.height, minHeight: config.height }}
@@ -304,12 +304,12 @@ const KPICard: React.FC<KPICardProps> = ({
           </div>
           <div className="min-w-0 flex-1">
             <h3
-              className={`font-semibold text-text-primary ${config.titleSize} truncate leading-tight`}
+              className={`font-bold text-gray-900 ${config.titleSize} truncate leading-tight tracking-tight`}
             >
               {kpi.title}
             </h3>
             {config.showDescription && kpi.description && (
-              <p className="text-xs text-text-secondary mt-0.5 line-clamp-1">{kpi.description}</p>
+              <p className="text-xs text-gray-600 mt-1 line-clamp-1 font-medium">{kpi.description}</p>
             )}
           </div>
         </div>
@@ -328,21 +328,20 @@ const KPICard: React.FC<KPICardProps> = ({
       </div>
 
       {/* Main Value */}
-      <div className="mb-3 flex-grow flex flex-col justify-center">
+      <div className="mb-4 flex-grow flex flex-col justify-center">
         <div
-          className={`font-bold text-text-primary transition-all duration-500 ${config.valueSize} leading-none`}
+          className={`font-black text-gray-900 transition-all duration-500 ${config.valueSize} leading-none tracking-tight group-hover:scale-105`}
           style={{
-            color: isHovered ? kpi.color : undefined,
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+            color: isHovered ? kpi.color : '#111827',
           }}
         >
           {formattedValue}
         </div>
 
         {showTrend && size !== 'small' && (
-          <div className="flex items-center space-x-2 mt-2 opacity-70 transition-opacity duration-200">
-            <span className="text-xs text-text-secondary">vs last:</span>
-            <span className="text-xs font-medium text-text-primary">{formattedPreviousValue}</span>
+          <div className="flex items-center space-x-2 mt-3 opacity-80 group-hover:opacity-100 transition-all duration-200">
+            <span className="text-xs text-gray-500 font-medium">vs last:</span>
+            <span className="text-xs font-bold text-gray-700">{formattedPreviousValue}</span>
           </div>
         )}
       </div>

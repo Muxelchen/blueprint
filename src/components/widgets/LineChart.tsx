@@ -79,14 +79,22 @@ const LineChart: React.FC<LineChartProps> = ({
     setZoomDomain(null);
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: {
+    active?: boolean;
+    payload?: Array<{
+      dataKey: string;
+      color: string;
+      value: number;
+    }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold mb-2">{`Period: ${label}`}</p>
           {payload
-            .filter((pld: any) => activeLines[pld.dataKey as keyof typeof activeLines])
-            .map((pld: any, index: number) => (
+            .filter((pld) => activeLines[pld.dataKey as keyof typeof activeLines])
+            .map((pld, index: number) => (
               <div key={index} className="flex items-center justify-between mb-1">
                 <span style={{ color: pld.color }} className="flex items-center">
                   <span
@@ -108,9 +116,13 @@ const LineChart: React.FC<LineChartProps> = ({
     return null;
   };
 
-  const CustomDot = (props: any) => {
+  const CustomDot = (props: {
+    cx?: number;
+    cy?: number;
+    payload?: { name: string };
+  }) => {
     const { cx, cy, payload } = props;
-    if (!hoveredPoint || payload.name !== hoveredPoint) return null;
+    if (!hoveredPoint || !payload || payload.name !== hoveredPoint) return null;
 
     return (
       <circle
@@ -125,7 +137,7 @@ const LineChart: React.FC<LineChartProps> = ({
     );
   };
 
-  const onBrushChange = (domain: any) => {
+  const onBrushChange = (domain: { startIndex?: number; endIndex?: number } | null) => {
     if (domain && domain.startIndex !== undefined && domain.endIndex !== undefined) {
       setZoomDomain({ startIndex: domain.startIndex, endIndex: domain.endIndex });
     }
@@ -308,7 +320,7 @@ const LineChart: React.FC<LineChartProps> = ({
               left: compact ? 5 : 10,
               bottom: showBrush ? 40 : 20,
             }}
-            onMouseMove={(e: any) => {
+            onMouseMove={(e: { activeLabel?: string }) => {
               if (e && e.activeLabel) {
                 setHoveredPoint(e.activeLabel);
               }
@@ -327,8 +339,10 @@ const LineChart: React.FC<LineChartProps> = ({
               stroke="#666"
               fontSize={compact ? 8 : 10}
               width={compact ? 30 : 40}
+              domain={['dataMin - 500', 'dataMax + 500']}
+              tickCount={compact ? 4 : 6}
               tickFormatter={value =>
-                value >= 1000 ? `$${(value / 1000).toFixed(0)}k` : `$${value}`
+                value >= 1000 ? `$${(value / 1000).toFixed(1)}k` : `$${Math.round(value)}`
               }
             />
             {/* Add separate Y-axis for visitors when it's active */}
@@ -339,8 +353,10 @@ const LineChart: React.FC<LineChartProps> = ({
                 stroke="#8B5CF6"
                 fontSize={compact ? 8 : 10}
                 width={compact ? 30 : 40}
+                domain={['dataMin - 1000', 'dataMax + 1000']}
+                tickCount={compact ? 4 : 6}
                 tickFormatter={value =>
-                  value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value.toString()
+                  value >= 1000 ? `${(value / 1000).toFixed(1)}k` : Math.round(value).toString()
                 }
               />
             )}
@@ -440,7 +456,7 @@ const LineChart: React.FC<LineChartProps> = ({
       {showStatistics && (
         <div className={`mt-3 grid ${dimensions.gridColumns} gap-2 flex-shrink-0`}>
           {Object.entries(activeLines)
-            .filter(([_, isActive]) => isActive)
+            .filter(([, isActive]) => isActive)
             .map(([key]) => {
               const stats = getStatistics(key as keyof LineData);
               const isVisitors = key === 'visitors';

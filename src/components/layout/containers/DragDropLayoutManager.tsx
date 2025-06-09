@@ -1,10 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { arrayMove } from '@dnd-kit/sortable';
 import {
   DndContext,
   DragEndEvent,
   DragStartEvent,
-  DragOverEvent,
   useSensor,
   useSensors,
   PointerSensor,
@@ -13,7 +11,6 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
-  horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -21,8 +18,8 @@ import { CSS } from '@dnd-kit/utilities';
 export interface DraggableWidget {
   id: string;
   title: string;
-  component: React.ComponentType<any>;
-  props?: any;
+  component: React.ComponentType<Record<string, unknown>>;
+  props?: Record<string, unknown>;
   position: { x: number; y: number; z?: number };
   size: { width: number; height: number };
   constraints?: {
@@ -448,6 +445,13 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
 }) => {
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [draggedWidget, setDraggedWidget] = useState<string | null>(null);
+  const [selectionRect, setSelectionRect] = useState<{
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    isSelecting: boolean;
+  } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
@@ -489,6 +493,65 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
     },
     [onWidgetSelect]
   );
+
+  // Handle selection rectangle start
+  const handleSelectionStart = useCallback((e: React.MouseEvent) => {
+    if (e.target === e.currentTarget && enableMultiSelect) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        const startX = e.clientX - rect.left;
+        const startY = e.clientY - rect.top;
+        setSelectionRect({
+          startX,
+          startY,
+          endX: startX,
+          endY: startY,
+          isSelecting: true,
+        });
+      }
+    }
+  }, [enableMultiSelect]);
+
+  // Handle selection rectangle drag
+  const handleSelectionDrag = useCallback((e: React.MouseEvent) => {
+    if (selectionRect?.isSelecting) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        const endX = e.clientX - rect.left;
+        const endY = e.clientY - rect.top;
+        setSelectionRect(prev => prev ? { ...prev, endX, endY } : null);
+      }
+    }
+  }, [selectionRect]);
+
+  // Handle selection rectangle end
+  const handleSelectionEnd = useCallback(() => {
+    if (selectionRect?.isSelecting) {
+      // Calculate which widgets are within the selection rectangle
+      const minX = Math.min(selectionRect.startX, selectionRect.endX);
+      const maxX = Math.max(selectionRect.startX, selectionRect.endX);
+      const minY = Math.min(selectionRect.startY, selectionRect.endY);
+      const maxY = Math.max(selectionRect.startY, selectionRect.endY);
+
+      const selectedIds = widgets.filter(widget => {
+        const widgetX = widget.position.x;
+        const widgetY = widget.position.y;
+        const widgetRight = widgetX + widget.size.width;
+        const widgetBottom = widgetY + widget.size.height;
+
+        return (
+          widgetX < maxX &&
+          widgetRight > minX &&
+          widgetY < maxY &&
+          widgetBottom > minY
+        );
+      }).map(w => w.id);
+
+      setSelectedWidgets(selectedIds);
+      onWidgetSelect?.(selectedIds);
+      setSelectionRect(null);
+    }
+  }, [selectionRect, widgets, onWidgetSelect]);
 
   // Handle drag start
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -544,6 +607,9 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
         className={`relative overflow-hidden select-none ${className}`}
         style={{ width: containerWidth, height: containerHeight }}
         onClick={handleContainerClick}
+        onMouseDown={handleSelectionStart}
+        onMouseMove={handleSelectionDrag}
+        onMouseUp={handleSelectionEnd}
       >
         {/* Grid Background */}
         {showGrid && (
@@ -579,7 +645,17 @@ const DragDropLayoutManager: React.FC<DragDropLayoutManagerProps> = ({
         </SortableContext>
 
         {/* Selection Rectangle (for multi-select) */}
-        {/* TODO: Implement selection rectangle for drag-to-select */}
+        {selectionRect?.isSelecting && (
+          <div
+            className="absolute border-2 border-blue-500 bg-blue-100 bg-opacity-20 pointer-events-none z-50"
+            style={{
+              left: Math.min(selectionRect.startX, selectionRect.endX),
+              top: Math.min(selectionRect.startY, selectionRect.endY),
+              width: Math.abs(selectionRect.endX - selectionRect.startX),
+              height: Math.abs(selectionRect.endY - selectionRect.startY),
+            }}
+          />
+        )}
 
         {/* Status Bar */}
         <div className="absolute bottom-4 left-4 bg-black bg-opacity-75 text-white text-xs px-3 py-1 rounded">

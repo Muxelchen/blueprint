@@ -18,9 +18,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   value = 61.9,
   max = 100,
   title = 'Progress Animations Showcase',
-  variant = 'default',
   size = 'md',
-  color = 'blue',
   showPercentage = true,
   animate = true,
 }) => {
@@ -323,10 +321,13 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {/* Main Progress Bar */}
       <div className="mb-6">
-        <div className="w-full bg-surface-secondary rounded-full h-8 relative overflow-hidden">
+        <div className="w-full bg-gray-200 rounded-full h-8 relative overflow-hidden shadow-inner">
           <div
-            className="h-8 bg-gradient-to-r from-accent via-accent to-accent-hover rounded-full transition-all duration-2000 ease-out relative overflow-hidden"
-            style={{ width: `${mainAnimatedValue}%` }}
+            className="h-8 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 rounded-full transition-all duration-2000 ease-out relative overflow-hidden shadow-lg"
+            style={{ 
+              width: `${mainAnimatedValue}%`,
+              boxShadow: '0 0 20px rgba(59, 130, 246, 0.4)'
+            }}
           >
             {/* Main bar wave effect */}
             <div
