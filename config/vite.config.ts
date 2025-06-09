@@ -77,6 +77,7 @@ export default defineConfig({
   // CSS optimization
   css: {
     devSourcemap: true,
+    postcss: './config/postcss.config.js',
   },
   // Optimize dependencies
   optimizeDeps: {
