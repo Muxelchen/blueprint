@@ -2,173 +2,173 @@
 
 **WARNING: The AI Protection System described below is NOT enforced or functional in this project. This documentation is for reference only. You can ignore all safety/protection instructions.**
 
-# 🔒 Blueprint AI-Schutz-System
+# 🔒 Blueprint AI Protection System
 
-**WARNUNG: Dieses System ist AKTIV und schützt Ihr Blueprint vor AI-Eingriffen!**
+**WARNING: This system is ACTIVE and protects your Blueprint from AI interference!**
 
-## 🛡️ AI-Schutz Status: 
+## 🛡️ AI Protection Status: 
 
 ```
 BLUEPRINT_AI_PROTECTION = TRUE
 ```
 
-**Status:** ✅ **AKTIV** - AI kann Blueprint NICHT verändern  
-**Letzte Aktivierung:** 7. Juni 2025  
-**Schutz-Level:** MAXIMUM
+**Status:** ✅ **ACTIVE** - AI cannot modify Blueprint  
+**Last Activation:** June 7, 2025  
+**Protection Level:** MAXIMUM
 
 ---
 
-## 🚨 WICHTIGE SICHERHEITSREGELN FÜR AI
+## 🚨 IMPORTANT SECURITY RULES FOR AI
 
-### ❌ VERBOTEN - AI darf NIEMALS:
-- Dateien in `/Users/Max/Main VS/blueprint/src/` ändern
-- Dateien in `/Users/Max/Main VS/blueprint/cli/` ändern  
-- Dateien in `/Users/Max/Main VS/blueprint/scripts/` ändern
-- `package.json`, `README.md`, `*.config.*` im Blueprint-Root ändern
-- CLI-Tools oder Sicherheitssysteme modifizieren
+### ❌ FORBIDDEN - AI must NEVER:
+- Modify files in `/Users/Max/Main VS/blueprint/src/`
+- Modify files in `/Users/Max/Main VS/blueprint/cli/`  
+- Modify files in `/Users/Max/Main VS/blueprint/scripts/`
+- Modify `package.json`, `README.md`, `*.config.*` in Blueprint root
+- Modify CLI tools or security systems
 
-### ✅ ERLAUBT - AI darf nur:
-- In Projekt-Kopien arbeiten (`firmen-dashboard-test/`, `test-dashboard/`)
-- Neue Ordner außerhalb von Blueprint erstellen
-- Dokumentationen lesen (nicht ändern)
-- CLI-Befehle vorschlagen (nicht ausführen)
+### ✅ ALLOWED - AI may only:
+- Work in project copies (`company-dashboard-test/`, `test-dashboard/`)
+- Create new folders outside of Blueprint
+- Read documentation (not modify)
+- Suggest CLI commands (not execute)
 
 ---
 
-## 🔧 Schutz-Schalter Kontrolle
+## 🔧 Protection Switch Control
 
-### Schutz AKTIVIEREN (Standard):
+### ACTIVATE Protection (Default):
 ```bash
-# Schutz einschalten
+# Enable protection
 npm run cli set-protection --enable
 
-# Status prüfen
+# Check status
 npm run cli protection-status
 ```
 
-### Schutz DEAKTIVIEREN (Nur für Blueprint-Entwicklung):
+### DEACTIVATE Protection (Only for Blueprint development):
 ```bash
-# VORSICHT: Nur für eigene Blueprint-Entwicklung!
+# CAUTION: Only for Blueprint development!
 npm run cli set-protection --disable
 
-# WICHTIG: Nach Änderungen wieder aktivieren!
+# IMPORTANT: Re-activate after changes!
 npm run cli set-protection --enable
 ```
 
 ---
 
-## 🛡️ Automatische Schutz-Features
+## 🛡️ Automatic Protection Features
 
-### 1. Pfad-Überwachung
-- Alle Blueprint-Pfade sind gesperrt
-- Automatische Erkennung von geschützten Bereichen
-- Sofortige Blockierung bei Zugriff
+### 1. Path Monitoring
+- All Blueprint paths are locked
+- Automatic detection of protected areas
+- Immediate blocking on access attempts
 
-### 2. AI-Prompt-Validation
-- Eingehende AI-Befehle werden gescannt
-- Gefährliche Operationen werden blockiert
-- Umleitung auf sichere Projekt-Ordner
+### 2. AI Prompt Validation
+- Incoming AI commands are scanned
+- Dangerous operations are blocked
+- Redirection to safe project folders
 
 ### 3. Real-time Monitoring
-- Kontinuierliche Überwachung aller Dateisystem-Zugriffe
-- Automatische Warnungen bei Schutz-Verletzungen
-- Backup-System bei kritischen Operationen
+- Continuous monitoring of all filesystem access
+- Automatic warnings on protection violations
+- Backup system for critical operations
 
 ---
 
-## 📋 Sichere AI-Arbeitsweise
+## 📋 Safe AI Working Methods
 
-### Für Kundenprojekte:
+### For Client Projects:
 ```
-ERLAUBT:
-✅ "Ändere das KPICard in firmen-dashboard-test/"
-✅ "Erstelle neue Komponenten in test-dashboard/src/"
-✅ "Modifiziere die App.tsx in kunde-projekt/"
+ALLOWED:
+✅ "Modify the KPICard in company-dashboard-test/"
+✅ "Create new components in test-dashboard/src/"
+✅ "Modify the App.tsx in client-project/"
 
-VERBOTEN:
-❌ "Ändere das KPICard im Blueprint"
-❌ "Modifiziere src/components/widgets/"
-❌ "Update die CLI-Tools"
+FORBIDDEN:
+❌ "Modify the KPICard in Blueprint"
+❌ "Modify src/components/widgets/"
+❌ "Update the CLI tools"
 ```
 
-### AI-Prompt-Templates (SICHER):
+### AI Prompt Templates (SAFE):
 ```
-Arbeite NUR in: /Users/Max/Main VS/blueprint/[PROJEKT-NAME]/
-NIEMALS in: /Users/Max/Main VS/blueprint/src/
+Work ONLY in: /Users/Max/Main VS/blueprint/[PROJECT-NAME]/
+NEVER in: /Users/Max/Main VS/blueprint/src/
 
-Modifiziere die Kopie in [PROJEKT-NAME]/src/components/
-Verwende die Blueprint-Vorlage aus dem Original, aber ändere sie nur in der Kopie.
+Modify the copy in [PROJECT-NAME]/src/components/
+Use the Blueprint template from the original, but only modify it in the copy.
 ```
 
 ---
 
-## 🚨 Notfall-Protokoll
+## 🚨 Emergency Protocol
 
-### Bei versehentlichen Änderungen:
+### For Accidental Changes:
 ```bash
-# 1. Sofort Blueprint-Status prüfen
+# 1. Immediately check Blueprint status
 git status
 
-# 2. Änderungen rückgängig machen
+# 2. Undo changes
 git checkout -- .
 
-# 3. Schutz-System neu aktivieren  
+# 3. Re-activate protection system  
 npm run cli set-protection --enable
 
-# 4. Backup wiederherstellen (falls nötig)
+# 4. Restore backup (if necessary)
 npm run cli restore-blueprint-backup
 ```
 
-### Bei Schutz-Verletzungen:
-1. **STOPP** - Alle AI-Operationen beenden
-2. **PRÜFEN** - Blueprint-Integrität checken
-3. **WIEDERHERSTELLEN** - Aus Git oder Backup
-4. **AKTIVIEREN** - Schutz wieder einschalten
+### For Protection Violations:
+1. **STOP** - End all AI operations
+2. **CHECK** - Verify Blueprint integrity
+3. **RESTORE** - From Git or backup
+4. **ACTIVATE** - Re-enable protection
 
 ---
 
-## 📊 Schutz-Level Konfiguration
+## 📊 Protection Level Configuration
 
-### Level 1: BASIS-SCHUTZ
-- Geschützte Pfade: `/src/`, `/cli/`, `/scripts/`
-- Automatische Warnungen
-- Manuelle Override möglich
+### Level 1: BASIC PROTECTION
+- Protected paths: `/src/`, `/cli/`, `/scripts/`
+- Automatic warnings
+- Manual override possible
 
-### Level 2: ERWEITERT (Standard)
-- Zusätzlich: Konfigurationsdateien geschützt
-- AI-Prompt-Scanning
-- Automatische Blockierung
+### Level 2: EXTENDED (Default)
+- Additional: Configuration files protected
+- AI prompt scanning
+- Automatic blocking
 
-### Level 3: MAXIMUM (Empfohlen)
-- Alles aus Level 2
-- Real-time Monitoring
-- Automatische Backups
-- Zero-Tolerance Policy
+### Level 3: MAXIMUM (Recommended)
+- Everything from Level 2
+- Real-time monitoring
+- Automatic backups
+- Zero-tolerance policy
 
 ---
 
 ## 🔍 Monitoring & Logging
 
-### Schutz-Log anzeigen:
+### View Protection Log:
 ```bash
 npm run cli protection-log
 ```
 
-### Letzte AI-Aktivitäten:
+### Recent AI Activities:
 ```bash
 npm run cli ai-activity-log
 ```
 
-### Sicherheits-Report:
+### Security Report:
 ```bash
 npm run cli security-report
 ```
 
 ---
 
-## ⚙️ Erweiterte Konfiguration
+## ⚙️ Advanced Configuration
 
-### Custom Schutz-Regeln:
+### Custom Protection Rules:
 ```javascript
 // .blueprint-protection.json
 {
@@ -181,10 +181,10 @@ npm run cli security-report
     "*.config.*"
   ],
   "allowedAIPaths": [
-    "/firmen-dashboard-test/",
+    "/company-dashboard-test/",
     "/test-dashboard/",
     "/demo-*/",
-    "/kunde-*/"
+    "/client-*/"
   ],
   "aiScanningEnabled": true,
   "autoBackupEnabled": true,
@@ -194,63 +194,63 @@ npm run cli security-report
 
 ---
 
-## 🎯 Best Practices für AI-Schutz
+## 🎯 Best Practices for AI Protection
 
-### 1. Immer Projekt-spezifisch arbeiten
+### 1. Always Work Project-Specifically
 ```
-RICHTIG: "Ändere firmen-dashboard-test/src/App.tsx"
-FALSCH:  "Ändere src/App.tsx"
-```
-
-### 2. Explizite Pfad-Angaben
-```
-RICHTIG: "Modifiziere /Users/Max/Main VS/blueprint/kunde-projekt/src/components/"
-FALSCH:  "Modifiziere die Komponenten"
+CORRECT: "Modify company-dashboard-test/src/App.tsx"
+WRONG:   "Modify src/App.tsx"
 ```
 
-### 3. Schutz-Status regelmäßig prüfen
+### 2. Explicit Path Specifications
+```
+CORRECT: "Modify /Users/Max/Main VS/blueprint/client-project/src/components/"
+WRONG:   "Modify the components"
+```
+
+### 3. Regularly Check Protection Status
 ```bash
 npm run cli protection-status
 ```
 
 ---
 
-## 🔐 Passwort-Schutz (Optional)
+## 🔐 Password Protection (Optional)
 
-### Schutz-Passwort setzen:
+### Set Protection Password:
 ```bash
 npm run cli set-protection-password
 ```
 
-### Mit Passwort deaktivieren:
+### Disable with Password:
 ```bash
 npm run cli disable-protection --password
 ```
 
 ---
 
-## 📱 Mobile App für Schutz-Status
+## 📱 Mobile App for Protection Status
 
-### Quick-Check:
-- **Grün**: Schutz aktiv, alles sicher
-- **Gelb**: Warnung, AI-Aktivität erkannt  
-- **Rot**: Schutz verletzt, sofort handeln
-
----
-
-## 🛡️ AKTUELLER SCHUTZ-STATUS
-
-```
-🔒 AI-SCHUTZ: AKTIV
-📁 GESCHÜTZTE PFADE: 15
-🤖 AI-ZUGRIFFE BLOCKIERT: 0
-📊 SICHERHEITS-LEVEL: MAXIMUM
-⏰ LETZTE PRÜFUNG: 7. Juni 2025, 20:45 Uhr
-✅ BLUEPRINT-INTEGRITÄT: 100%
-```
+### Quick Check:
+- **Green**: Protection active, everything safe
+- **Yellow**: Warning, AI activity detected  
+- **Red**: Protection violated, act immediately
 
 ---
 
-**🚨 WICHTIG: Lassen Sie diesen Schutz IMMER aktiviert, außer Sie entwickeln aktiv am Blueprint-System selbst!**
+## 🛡️ CURRENT PROTECTION STATUS
 
-*Der AI-Schutz ist Ihre Versicherung gegen versehentliche Änderungen am wertvollen Blueprint-System.*
+```
+🔒 AI PROTECTION: ACTIVE
+📁 PROTECTED PATHS: 15
+🤖 AI ACCESS BLOCKED: 0
+📊 SECURITY LEVEL: MAXIMUM
+⏰ LAST CHECK: June 7, 2025, 8:45 PM
+✅ BLUEPRINT INTEGRITY: 100%
+```
+
+---
+
+**🚨 IMPORTANT: Keep this protection ALWAYS activated, unless you are actively developing the Blueprint system itself!**
+
+*AI Protection is your insurance against accidental changes to the valuable Blueprint system.*

@@ -1,414 +1,413 @@
-# 🛡️ Blueprint Master Documentation & Sicherheitssystem
+# 🛡️ Blueprint Master Documentation & Security System
 
-**Datum:** 7. Juni 2025  
-**System:** Vollständige Blueprint-Verwaltung mit AI-Schutz  
+**Date:** June 7, 2025  
+**System:** Complete Blueprint management with AI protection  
 **Status:** Production Ready
 
-## 🎯 System-Überblick
+## 🎯 System Overview
 
-Ihr Blueprint-System ist eine professionelle Entwicklungsumgebung mit über 80 Komponenten, die es ermöglicht, schnell kundenspezifische Dashboards zu erstellen, ohne das Original-System zu gefährden.
+Your Blueprint system is a professional development environment with over 80 components that enables quick creation of customer-specific dashboards without endangering the original system.
 
 ---
 
-## 📁 Aktuelle Workspace-Struktur
+## 📁 Current Workspace Structure
 
-### 🏗️ Blueprint-Kern (GESCHÜTZT)
+### 🏗️ Blueprint Core (PROTECTED)
 ```
 /Users/Max/Main VS/blueprint/
-├── src/                          # 🔒 HAUPT-BLUEPRINT-SYSTEM
-│   ├── components/               # 80+ React-Komponenten
-│   │   ├── common/              # Basis-Komponenten (Button, Input, etc.)
+├── src/                          # 🔒 MAIN BLUEPRINT SYSTEM
+│   ├── components/               # 80+ React components
+│   │   ├── common/              # Base components (Button, Input, etc.)
 │   │   ├── data-visualization/  # Charts & Analytics
-│   │   ├── forms/               # Formulare & Validierung
-│   │   ├── layout/              # Layout-Komponenten
+│   │   ├── forms/               # Forms & Validation
+│   │   ├── layout/              # Layout components
 │   │   ├── navigation/          # Navigation & Routing
-│   │   └── widgets/             # Spezialisierte Widgets
-│   ├── templates/               # 4 Template-Varianten
+│   │   └── widgets/             # Specialized widgets
+│   ├── templates/               # 4 template variants
 │   │   ├── DashboardTemplate.tsx
 │   │   ├── AnalyticsTemplate.tsx
 │   │   ├── DataTableTemplate.tsx
 │   │   └── MapDashboardTemplate.tsx
-│   ├── hooks/                   # React-Hooks (10+ Custom Hooks)
-│   ├── store/                   # State-Management (Zustand)
-│   ├── utils/                   # Utility-Funktionen
-│   ├── types/                   # TypeScript-Definitionen
-│   └── constants/               # Konstanten & Mock-Daten
-├── cli/                         # 🔒 CLI-TOOLS
-│   ├── blueprint-cli.ts         # Haupt-CLI mit allen Befehlen
-│   └── dev-check.ts            # Development-Utilities
-└── scripts/                     # 🔒 BUILD-SKRIPTE
+│   ├── hooks/                   # React hooks (10+ custom hooks)
+│   ├── store/                   # State management (Zustand)
+│   ├── utils/                   # Utility functions
+│   ├── types/                   # TypeScript definitions
+│   └── constants/               # Constants & mock data
+├── cli/                         # 🔒 CLI TOOLS
+│   ├── blueprint-cli.ts         # Main CLI with all commands
+│   └── dev-check.ts            # Development utilities
+└── scripts/                     # 🔒 BUILD SCRIPTS
 ```
 
-### 📋 Kundenprojekte (SICHER BEARBEITBAR)
+### 📋 Client Projects (SAFE TO EDIT)
 ```
-├── firmen-dashboard-test/       # ✅ Vollständige Blueprint-Kopie
-│   └── src/                     # Komplettes Blueprint-System kopiert
-└── test-dashboard/              # ✅ Template-basiertes Projekt
-    └── src/                     # Minimale Struktur
+├── company-dashboard-test/      # ✅ Complete Blueprint copy
+│   └── src/                     # Complete Blueprint system copied
+└── test-dashboard/              # ✅ Template-based project
+    └── src/                     # Minimal structure
 ```
 
 ---
 
-## 🔧 Verfügbare CLI-Befehle
+## 🔧 Available CLI Commands
 
-### 1. **Template-Erstellung** (Schnell & Leichtgewichtig)
+### 1. **Template Creation** (Quick & Lightweight)
 ```bash
-# Neue Template-basierte Projekte
-npm run cli create <projekt-name> --template <typ>
+# New template-based projects
+npm run cli create <project-name> --template <type>
 
-# Verfügbare Templates anzeigen
+# Show available templates
 npm run cli list
 
-# Beispiele:
+# Examples:
 npm run cli create demo-dashboard --template dashboard
 npm run cli create sales-analytics --template analytics
 npm run cli create data-manager --template data-table
 npm run cli create location-app --template map
 ```
 
-### 2. **Blueprint-Kopie** (Vollständig & Professionell)
+### 2. **Blueprint Copy** (Complete & Professional)
 ```bash
-# Komplette Blueprint-Kopie für große Projekte
-npm run cli copy-blueprint <projekt-name>
+# Complete Blueprint copy for large projects
+npm run cli copy-blueprint <project-name>
 
-# Beispiel:
-npm run cli copy-blueprint firmen-projekt-2025
+# Example:
+npm run cli copy-blueprint company-project-2025
 ```
 
-### 3. **Update-Management**
+### 3. **Update Management**
 ```bash
-# Updates prüfen
-npm run cli update --check <projekt-name>
+# Check updates
+npm run cli update --check <project-name>
 
-# Einzelne Komponente aktualisieren
-npm run cli update --sync <projekt-name> --component KPICard
+# Update single component
+npm run cli update --sync <project-name> --component KPICard
 
-# Alle Komponenten synchronisieren
-npm run cli update --sync <projekt-name>
+# Synchronize all components
+npm run cli update --sync <project-name>
 
-# Vollständige Migration
-npm run cli update --migrate <projekt-name>
+# Complete migration
+npm run cli update --migrate <project-name>
 ```
 
-### 4. **Reset & Update** (Ihre neue Funktion!)
+### 4. **Reset & Update** (Your new function!)
 ```bash
-# Smart Reset - behält custom Files
-npm run cli reset-update <projekt-name>
+# Smart reset - keeps custom files
+npm run cli reset-update <project-name>
 
-# Nur Komponenten resetten
-npm run cli reset-update <projekt-name> --components-only
+# Only reset components
+npm run cli reset-update <project-name> --components-only
 
-# Komplettes Reset
-npm run cli reset-update <projekt-name> --full-reset
+# Complete reset
+npm run cli reset-update <project-name> --full-reset
 
-# Mit automatischem Backup
-npm run cli reset-update <projekt-name> --backup
+# With automatic backup
+npm run cli reset-update <project-name> --backup
 ```
 
-### 5. **Cleanup & Sicherheit**
+### 5. **Cleanup & Security**
 ```bash
-# Alle löschbaren Projekte anzeigen
+# Show all deletable projects
 npm run cli cleanup --list
 
-# Spezifisches Projekt löschen
-npm run cli cleanup --delete <projekt-name>
+# Delete specific project
+npm run cli cleanup --delete <project-name>
 
-# Alle Test-Projekte löschen
+# Delete all test projects
 npm run cli cleanup --delete-all
 ```
 
 ---
 
-## 🛡️ Sicherheitssystem
+## 🛡️ Security System
 
-### Geschützte Blueprint-Bereiche
-**Diese Bereiche sind UNANTASTBAR:**
-- ✅ `/src/` - Ihr komplettes Blueprint-System
-- ✅ `/cli/` - CLI-Tools und Skripte
-- ✅ `/scripts/` - Build-Skripte
-- ✅ `package.json` - Blueprint-Konfiguration
-- ✅ `README.md`, `*.md` - Dokumentationen
-- ✅ `vite.config.ts`, `tailwind.config.js` - Konfigurationen
+### Protected Blueprint Areas
+**These areas are UNTOUCHABLE:**
+- ✅ `/src/` - Your complete Blueprint system
+- ✅ `/cli/` - CLI tools and scripts
+- ✅ `/scripts/` - Build scripts
+- ✅ `package.json` - Blueprint configuration
+- ✅ `README.md`, `*.md` - Documentation
+- ✅ `vite.config.ts`, `tailwind.config.js` - Configurations
 
-### Sicherheitsprüfungen
-1. **Pfad-Validierung** - Nur Unterordner bearbeitbar
-2. **Name-Prüfung** - Blueprint-System wird erkannt und geschützt
-3. **Struktur-Analyse** - Automatische Erkennung von Blueprint-Dateien
-4. **Mehrfach-Validierung** - Verschiedene Sicherheitsebenen
+### Security Checks
+1. **Path Validation** - Only subfolders editable
+2. **Name Verification** - Blueprint system recognized and protected
+3. **Structure Analysis** - Automatic detection of Blueprint files
+4. **Multi-layer Validation** - Various security levels
 
 ---
 
 ## 🚀 Workflows & Best Practices
 
-### Workflow 1: Schnelle Prototypen
+### Workflow 1: Quick Prototypes
 ```bash
-# 1. Template erstellen
+# 1. Create template
 npm run cli create prototype-v1 --template dashboard
 
-# 2. Mit AI anpassen (siehe AI-Prompts unten)
+# 2. Customize with AI (see AI prompts below)
 
-# 3. Testen und iterieren
+# 3. Test and iterate
 
-# 4. Aufräumen
+# 4. Clean up
 npm run cli cleanup --delete prototype-v1
 ```
 
-### Workflow 2: Kundenprojekte
+### Workflow 2: Client Projects
 ```bash
-# 1. Vollständige Blueprint-Kopie
-npm run cli copy-blueprint kunde-dashboard-2025
+# 1. Complete Blueprint copy
+npm run cli copy-blueprint client-dashboard-2025
 
-# 2. Mit AI und Prompts anpassen
+# 2. Customize with AI and prompts
 
-# 3. Updates aus Blueprint übernehmen
-npm run cli reset-update kunde-dashboard-2025 --backup
+# 3. Adopt updates from Blueprint
+npm run cli reset-update client-dashboard-2025 --backup
 ```
 
-### Workflow 3: Blueprint-Entwicklung
+### Workflow 3: Blueprint Development
 ```bash
-# 1. Im Blueprint arbeiten (/src/)
-# - Komponenten verbessern
-# - Neue Features hinzufügen
+# 1. Work in Blueprint (/src/)
+# - Improve components
+# - Add new features
 
-# 2. Updates an Kundenprojekte verteilen
-npm run cli reset-update firmen-dashboard-test
+# 2. Distribute updates to client projects
+npm run cli reset-update company-dashboard-test
 
-# 3. Alle Projekte auf Stand bringen
-npm run cli update --sync alle-projekte
+# 3. Bring all projects up to date
+npm run cli update --sync all-projects
 ```
 
 ---
 
-## 🤖 AI-Prompt Integration
+## 🤖 AI Prompt Integration
 
-### Sichere AI-Prompts für Kundenprojekte
+### Safe AI Prompts for Client Projects
 
-**Template für Blueprint-Transformation:**
+**Template for Blueprint Transformation:**
 ```
-I need to transform the existing Blueprint framework copy in /Users/Max/Main VS/blueprint/[PROJEKT-NAME]/ into a web application for [FIRMA].
+I need to transform the existing Blueprint framework copy in /Users/Max/Main VS/blueprint/[PROJECT-NAME]/ into a web application for [COMPANY].
 
-IMPORTANT: Only modify files in the [PROJEKT-NAME] folder, NEVER touch the original Blueprint system in /Users/Max/Main VS/blueprint/src/
+IMPORTANT: Only modify files in the [PROJECT-NAME] folder, NEVER touch the original Blueprint system in /Users/Max/Main VS/blueprint/src/
 
-PURPOSE: This application will [beschreibung].
+PURPOSE: This application will [description].
 
-Show me how to modify the existing components in [PROJEKT-NAME]/src/components/ to display [spezifische daten] instead of creating new files.
+Show me how to modify the existing components in [PROJECT-NAME]/src/components/ to display [specific data] instead of creating new files.
 
-Transform the existing [PROJEKT-NAME]/src/templates/DashboardTemplate.tsx to match [business workflow].
+Transform the existing [PROJECT-NAME]/src/templates/DashboardTemplate.tsx to match [business workflow].
 ```
 
-**Sichere Komponenten-Anpassung:**
+**Safe Component Customization:**
 ```
-Modify only the components in /Users/Max/Main VS/blueprint/[PROJEKT-NAME]/src/components/widgets/ to handle [real estate data/sales metrics/customer analytics].
+Modify only the components in /Users/Max/Main VS/blueprint/[PROJECT-NAME]/src/components/widgets/ to handle [real estate data/sales metrics/customer analytics].
 
 DO NOT modify anything in /Users/Max/Main VS/blueprint/src/ - that's the protected Blueprint system.
 
-Work only in the project copy: /Users/Max/Main VS/blueprint/[PROJEKT-NAME]/
+Work only in the project copy: /Users/Max/Main VS/blueprint/[PROJECT-NAME]/
 ```
 
 ---
 
-## 📊 Template-Übersicht
+## 📊 Template Overview
 
-| Template | Beschreibung | Komponenten | Dependencies | Ideal für |
+| Template | Description | Components | Dependencies | Ideal for |
 |----------|-------------|-------------|--------------|-----------|
-| **dashboard** | Business Dashboard | KPI Cards, Charts, Data Tables, Quick Actions | recharts, zustand | Admin-Panels, Übersichten |
-| **analytics** | Analytics Dashboard | Real-time Charts, Goal Tracking, Heat Maps | recharts, chart.js, date-fns | Datenanalyse, Reporting |
-| **data-table** | Datenverwaltung | Advanced Tables, CRUD, Search, Filter | react-router-dom | Datenbankinterfaces |
-| **map** | Location Dashboard | Interactive Maps, Tracking, Geospatial | leaflet, react-leaflet | Logistik, Standortanalyse |
+| **dashboard** | Business Dashboard | KPI Cards, Charts, Data Tables, Quick Actions | recharts, zustand | Admin panels, overviews |
+| **analytics** | Analytics Dashboard | Real-time Charts, Goal Tracking, Heat Maps | recharts, chart.js, date-fns | Data analysis, reporting |
+| **data-table** | Data Management | Advanced Tables, CRUD, Search, Filter | react-router-dom | Database interfaces |
+| **map** | Location Dashboard | Interactive Maps, Tracking, Geospatial | leaflet, react-leaflet | Logistics, location analysis |
 
 ---
 
 ## ⚡ Performance & Monitoring
 
-### Verfügbare Scripts
+### Available Scripts
 ```bash
 npm run dev              # Development Server
 npm run build            # Production Build
 npm run preview          # Preview Build
 npm run lint             # Code Linting
-npm run test             # Tests ausführen
+npm run test             # Run Tests
 ```
 
-### Performance-Monitoring
-- `performance-report.json` - Automatische Performance-Berichte
-- `scripts/benchmark.ts` - Performance-Benchmarking
-- Integrierte Vitest-Tests
+### Performance Monitoring
+- `performance-report.json` - Automatic performance reports
+- `scripts/benchmark.ts` - Performance benchmarking
+- Integrated Vitest tests
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Häufige Probleme
+### Common Problems
 
-**Problem: CSS-Klassen nicht gefunden**
+**Problem: CSS classes not found**
 ```bash
-# Lösung: CSS-Datei reparieren
+# Solution: Repair CSS file
 # In src/index.css:
 # @apply border-border; → @apply border-gray-200;
 # @apply bg-background text-foreground; → @apply bg-gray-50 text-gray-900;
 ```
 
-**Problem: Port bereits belegt**
+**Problem: Port already in use**
 ```bash
-# Andere Ports verwenden
+# Use different ports
 npm run dev -- --port 5175
 npm run dev -- --port 5176
 ```
 
-**Problem: TypeScript-Fehler**
+**Problem: TypeScript errors**
 ```bash
-# Dependencies neu installieren
+# Reinstall dependencies
 rm -rf node_modules package-lock.json
 npm install
 ```
 
-**Problem: Blueprint versehentlich geändert**
+**Problem: Blueprint accidentally changed**
 ```bash
-# Git-Status prüfen
+# Check Git status
 git status
-git checkout -- .  # Änderungen zurücksetzen
+git checkout -- .  # Reset changes
 ```
 
 ---
 
 ## 🎯 Naming Conventions
 
-### Projekt-Namen
-- **Test-Projekte**: `test-*`, `demo-*`, `prototype-*`
-- **Kundenprojekte**: `kunde-*`, `firma-*`, `client-*`
-- **Experimente**: `experiment-*`, `try-*`, `variant-*`
+### Project Names
+- **Test Projects**: `test-*`, `demo-*`, `prototype-*`
+- **Client Projects**: `client-*`, `company-*`, `business-*`
+- **Experiments**: `experiment-*`, `try-*`, `variant-*`
 
-### Komponenten-Namen
+### Component Names
 - **PascalCase**: `KPICard`, `DataTable`, `AnalyticsChart`
 - **Descriptive**: `SalesAnalyticsWidget`, `CustomerDataForm`
-- **Konsistent**: `*Template`, `*Widget`, `*Form`, `*Chart`
+- **Consistent**: `*Template`, `*Widget`, `*Form`, `*Chart`
 
 ---
 
-## 📚 Dokumentations-System
+## 📚 Documentation System
 
-### Verfügbare Dokumentationen
-- `README.md` - Haupt-Dokumentation
-- `BLUEPRINT_GUIDE.md` - Blueprint-System Guide
-- `BLUEPRINT_SAFE_MANAGEMENT.md` - Dieses Dokument
-- `PROMPT_README.md` - AI-Prompt Sammlung
-- `WIDGET_GUIDE.md` - Widget-Dokumentation
-- `QUICKSTART.md` - Schnellstart-Guide
-- `TODO.md` - Entwicklungs-Roadmap
+### Available Documentation
+- `README.md` - Main documentation
+- `BLUEPRINT_GUIDE.md` - Blueprint system guide
+- `BLUEPRINT_SAFE_MANAGEMENT.md` - This document
+- `PROMPT_README.md` - AI prompt collection
+- `WIDGET_GUIDE.md` - Widget documentation
+- `QUICKSTART.md` - Quick start guide
 
-### Code-Dokumentation
-- Inline-Kommentare in allen Komponenten
-- TypeScript-Definitionen für bessere IntelliSense
-- JSDoc-Kommentare für komplexe Funktionen
-- Storybook-Integration für Komponenten-Dokumentation
+### Code Documentation
+- Inline comments in all components
+- TypeScript definitions for better IntelliSense
+- JSDoc comments for complex functions
+- Storybook integration for component documentation
 
 ---
 
-## 🔮 Erweiterte Features
+## 🔮 Advanced Features
 
-### Automatisierung
+### Automation
 ```bash
-# Batch-Operationen
+# Batch operations
 for template in dashboard analytics data-table map; do
   npm run cli create test-$template --template $template
 done
 
-# Automatisches Cleanup
+# Automatic cleanup
 npm run cli cleanup --delete-all
 ```
 
-### Git-Integration
+### Git Integration
 ```bash
-# Projekt mit Git initialisieren
-npm run cli copy-blueprint mein-projekt
-cd mein-projekt
+# Initialize project with Git
+npm run cli copy-blueprint my-project
+cd my-project
 git init
 git add .
 git commit -m "Initial Blueprint copy"
 ```
 
-### CI/CD-Ready
-- ESLint-Konfiguration
-- TypeScript-Strict-Mode
-- Vitest-Tests
-- Performance-Monitoring
-- Automatische Builds
+### CI/CD Ready
+- ESLint configuration
+- TypeScript strict mode
+- Vitest tests
+- Performance monitoring
+- Automatic builds
 
 ---
 
 ## 📞 Support & Maintenance
 
-### System-Requirements
-- **Node.js**: v18+ (empfohlen: v20+)
+### System Requirements
+- **Node.js**: v18+ (recommended: v20+)
 - **npm**: v8+
 - **TypeScript**: v5+
-- **Verfügbare Ports**: 5173-5180
-- **Speicherplatz**: ~500MB pro Projekt
+- **Available Ports**: 5173-5180
+- **Storage Space**: ~500MB per project
 
-### Backup-Strategien
+### Backup Strategies
 ```bash
-# Automatisches Backup bei Reset
-npm run cli reset-update projekt --backup
+# Automatic backup during reset
+npm run cli reset-update project --backup
 
-# Manuelles Backup
-cp -r firmen-dashboard-test firmen-dashboard-backup-$(date +%Y%m%d)
+# Manual backup
+cp -r company-dashboard-test company-dashboard-backup-$(date +%Y%m%d)
 
-# Git-basiertes Backup
+# Git-based backup
 git add .
-git commit -m "Backup vor großen Änderungen"
+git commit -m "Backup before major changes"
 ```
 
-### Notfall-Recovery
+### Emergency Recovery
 ```bash
-# Alle Test-Projekte löschen
+# Delete all test projects
 npm run cli cleanup --delete-all
 
-# Blueprint-Status prüfen
+# Check Blueprint status
 git status
 ls -la src/
 
-# Im Notfall: Blueprint zurücksetzen
+# Emergency: Reset Blueprint
 git checkout -- .
 git clean -fd
 ```
 
 ---
 
-## ⚠️ Wichtige Sicherheitshinweise
+## ⚠️ Important Security Notes
 
 ### DO's ✅
-- **Immer** in Projekt-Kopien arbeiten (`firmen-dashboard-test/`, `test-dashboard/`)
-- **Backup** erstellen vor großen Änderungen
-- **Git** verwenden für Versionskontrolle
-- **CLI-Tools** für sichere Operationen verwenden
+- **Always** work in project copies (`company-dashboard-test/`, `test-dashboard/`)
+- **Create backups** before major changes
+- **Use Git** for version control
+- **Use CLI tools** for safe operations
 
 ### DON'Ts ❌
-- **Niemals** direkt in `/src/` arbeiten (außer für Blueprint-Entwicklung)
-- **Niemals** Blueprint-Dateien ohne Backup ändern
-- **Niemals** CLI-Sicherheitsprüfungen umgehen
-- **Niemals** `node_modules` in Git committen
+- **Never** work directly in `/src/` (except for Blueprint development)
+- **Never** change Blueprint files without backup
+- **Never** bypass CLI security checks
+- **Never** commit `node_modules` to Git
 
 ---
 
-## 🎉 Erfolgsmetriken
+## 🎉 Success Metrics
 
-### Was Sie jetzt haben:
-- ✅ **80+ React-Komponenten** sofort einsatzbereit
-- ✅ **4 Template-Varianten** für verschiedene Use Cases
-- ✅ **Sichere Projekt-Verwaltung** mit Schutz vor versehentlichen Änderungen
-- ✅ **One-Click Updates** für alle Kundenprojekte
-- ✅ **AI-optimierte Prompts** für schnelle Anpassungen
-- ✅ **Professionelle CLI** für alle Operationen
-- ✅ **Vollständige Dokumentation** für alle Workflows
+### What you have now:
+- ✅ **80+ React components** ready to use
+- ✅ **4 template variants** for different use cases
+- ✅ **Safe project management** with protection against accidental changes
+- ✅ **One-click updates** for all client projects
+- ✅ **AI-optimized prompts** for quick customizations
+- ✅ **Professional CLI** for all operations
+- ✅ **Complete documentation** for all workflows
 
-### Entwicklungsgeschwindigkeit:
-- **Template-Projekt**: 5 Minuten
-- **Blueprint-Kopie**: 2 Minuten
-- **AI-Anpassungen**: 30-60 Minuten
-- **Produktionsreife App**: 1-2 Tage
+### Development Speed:
+- **Template project**: 5 minutes
+- **Blueprint copy**: 2 minutes
+- **AI customizations**: 30-60 minutes
+- **Production-ready app**: 1-2 days
 
 ---
 
-**🛡️ Ihr Blueprint-System ist jetzt bulletproof und production-ready!**
+**🛡️ Your Blueprint system is now bulletproof and production-ready!**
 
-*Letzte Aktualisierung: 7. Juni 2025*
+*Last updated: June 7, 2025*

@@ -1,147 +1,147 @@
 # 🛡️ Blueprint Safe Management Guide
 
-**Datum:** 7. Juni 2025  
-**System:** Sichere Blueprint-Verwaltung mit Schutz vor versehentlichem Löschen
+**Date:** June 7, 2025  
+**System:** Secure Blueprint management with protection against accidental deletion
 
-## 🎯 Überblick
+## 🎯 Overview
 
-Dieses System ermöglicht es Ihnen, sicher mit dem Blueprint-Framework zu experimentieren, ohne jemals das Original-System zu gefährden. Sie können jederzeit Test-Projekte erstellen, anpassen und löschen - das Blueprint-System bleibt dabei vollständig geschützt.
+This system allows you to safely experiment with the Blueprint framework without ever endangering the original system. You can create, customize, and delete test projects at any time - the Blueprint system remains fully protected.
 
 ---
 
-## 🔧 Verfügbare Befehle
+## 🔧 Available Commands
 
-### 1. 📋 Template-basierte Projekte erstellen
+### 1. 📋 Create Template-based Projects
 
 ```bash
-# Schnelle Dashboard-Erstellung (für Tests/Demos)
-npm run cli create <projekt-name> --template <template-typ>
+# Quick dashboard creation (for tests/demos)
+npm run cli create <project-name> --template <template-type>
 
-# Verfügbare Templates:
+# Available templates:
 npm run cli list
 ```
 
-**Beispiele:**
+**Examples:**
 ```bash
-# Verschiedene Template-Typen testen
+# Test different template types
 npm run cli create test-dashboard --template dashboard
 npm run cli create sales-analytics --template analytics  
 npm run cli create data-manager --template data-table
 npm run cli create location-tracker --template map
 ```
 
-### 2. 🔄 Blueprint komplett kopieren
+### 2. 🔄 Copy Complete Blueprint
 
 ```bash
-# Vollständige Blueprint-Kopie für größere Projekte
-npm run cli copy-blueprint <projekt-name>
+# Complete Blueprint copy for larger projects
+npm run cli copy-blueprint <project-name>
 ```
 
-**Beispiel:**
+**Example:**
 ```bash
-# Komplettes Blueprint als Basis kopieren
-npm run cli copy-blueprint mein-firmen-projekt
-cd mein-firmen-projekt
+# Copy complete Blueprint as base
+npm run cli copy-blueprint my-company-project
+cd my-company-project
 npm install
 npm run dev
 ```
 
-### 3. 🗑️ Sichere Projekt-Verwaltung
+### 3. 🗑️ Safe Project Management
 
 ```bash
-# Alle löschbaren Projekte anzeigen
+# Show all deletable projects
 npm run cli cleanup --list
 
-# Ein spezifisches Projekt löschen  
-npm run cli cleanup --delete <projekt-name>
+# Delete a specific project  
+npm run cli cleanup --delete <project-name>
 
-# Alle Beispiel-Projekte löschen (Blueprint bleibt geschützt)
+# Delete all example projects (Blueprint remains protected)
 npm run cli cleanup --delete-all
 ```
 
 ---
 
-## 🛡️ Sicherheitsfeatures
+## 🛡️ Security Features
 
-### Geschützte Blueprint-Bereiche
+### Protected Blueprint Areas
 
-**Das System kann NIEMALS folgende Bereiche löschen:**
-- ✅ `src/` - Blueprint-Quellcode
-- ✅ `cli/` - CLI-Tools  
-- ✅ `scripts/` - Build-Skripte
-- ✅ `public/` - Statische Assets
-- ✅ `docs/` - Dokumentation
-- ✅ `package.json` - Blueprint-Konfiguration
-- ✅ `README.md` - Blueprint-Dokumentation
-- ✅ `vite.config.ts` - Vite-Konfiguration
-- ✅ `tailwind.config.js` - Styling-Konfiguration
-- ✅ `tsconfig.json` - TypeScript-Konfiguration
+**The system can NEVER delete the following areas:**
+- ✅ `src/` - Blueprint source code
+- ✅ `cli/` - CLI tools  
+- ✅ `scripts/` - Build scripts
+- ✅ `public/` - Static assets
+- ✅ `docs/` - Documentation
+- ✅ `package.json` - Blueprint configuration
+- ✅ `README.md` - Blueprint documentation
+- ✅ `vite.config.ts` - Vite configuration
+- ✅ `tailwind.config.js` - Styling configuration
+- ✅ `tsconfig.json` - TypeScript configuration
 
-### Mehrfache Sicherheitsprüfungen
+### Multiple Security Checks
 
-1. **Pfad-Validierung**: Nur Unterordner von Blueprint können gelöscht werden
-2. **Name-Prüfung**: Projekte mit Blueprint-Namen werden blockiert
-3. **Struktur-Analyse**: Nur erkannte Projekt-Strukturen werden verwaltet
-4. **Bestätigungs-System**: Wichtige Operationen werden protokolliert
+1. **Path Validation**: Only Blueprint subdirectories can be deleted
+2. **Name Verification**: Projects with Blueprint names are blocked
+3. **Structure Analysis**: Only recognized project structures are managed
+4. **Confirmation System**: Important operations are logged
 
 ---
 
-## 🚀 Empfohlene Workflows
+## 🚀 Recommended Workflows
 
-### Workflow 1: Schnelle Tests & Demos
+### Workflow 1: Quick Tests & Demos
 
 ```bash
-# 1. Test-Dashboard erstellen
+# 1. Create test dashboard
 npm run cli create demo-dashboard --template dashboard
 
-# 2. Anpassen und testen
+# 2. Customize and test
 cd demo-dashboard
 npm install
 npm run dev
 
-# 3. Nach dem Test aufräumen
+# 3. Clean up after testing
 cd ..
 npm run cli cleanup --delete demo-dashboard
 ```
 
-### Workflow 2: Echte Firmen-Projekte
+### Workflow 2: Real Company Projects
 
 ```bash
-# 1. Blueprint als Basis kopieren
-npm run cli copy-blueprint firmen-dashboard-2025
+# 1. Copy Blueprint as base
+npm run cli copy-blueprint company-dashboard-2025
 
-# 2. Vollständige Entwicklungsumgebung
-cd firmen-dashboard-2025
+# 2. Complete development environment
+cd company-dashboard-2025
 npm install
 npm run dev
 
-# 3. Mit AI-Prompts anpassen (siehe unten)
+# 3. Customize with AI prompts (see below)
 ```
 
-### Workflow 3: Experimente & Iterationen
+### Workflow 3: Experiments & Iterations
 
 ```bash
-# 1. Mehrere Varianten erstellen
+# 1. Create multiple variants
 npm run cli create variant-a --template dashboard
 npm run cli create variant-b --template analytics
 
-# 2. Beste Variante auswählen und andere löschen
+# 2. Select best variant and delete others
 npm run cli cleanup --list
 npm run cli cleanup --delete variant-a
 
-# 3. Gewählte Variante zu vollständigem Projekt entwickeln
+# 3. Develop chosen variant into complete project
 ```
 
 ---
 
-## 🤖 AI-Prompt Integration
+## 🤖 AI Prompt Integration
 
 ### Blueprint Transformation Prompts
 
-Nach der Projekterstellung können Sie diese optimierten AI-Prompts verwenden:
+After project creation, you can use these optimized AI prompts:
 
 ```
-I need to transform the existing Blueprint framework into a web application for [FIRMENNAME]. 
+I need to transform the existing Blueprint framework into a web application for [COMPANY NAME]. 
 
 PURPOSE: This application will [track sales data/manage projects/monitor KPIs].
 
@@ -150,7 +150,7 @@ Show me how to modify the existing components (DataTable.tsx, KPICard.tsx, Chart
 Transform the existing DashboardTemplate.tsx to match [your business workflow].
 ```
 
-### Fokussierte Anpassungen
+### Focused Customizations
 
 ```
 Modify the existing Blueprint store (appStore.ts) and data management to handle [real estate listings/customer data/inventory] instead of the current structure.
@@ -160,120 +160,120 @@ Adapt the existing Blueprint layout components (Header.tsx, Sidebar.tsx, MainCon
 
 ---
 
-## 📁 Projekt-Struktur nach Erstellung
+## 📁 Project Structure After Creation
 
-### Template-basierte Projekte
+### Template-based Projects
 ```
 test-dashboard/
-├── package.json          # Angepasste Dependencies
-├── vite.config.ts        # Vite-Konfiguration  
+├── package.json          # Adapted dependencies
+├── vite.config.ts        # Vite configuration  
 ├── tailwind.config.js    # Styling
 ├── src/
-│   ├── App.tsx           # Template-spezifische App
-│   ├── components/ui/    # Basis-Komponenten
-│   └── main.tsx          # React-Entry-Point
+│   ├── App.tsx           # Template-specific app
+│   ├── components/ui/    # Base components
+│   └── main.tsx          # React entry point
 ```
 
-### Blueprint-Kopie Projekte
+### Blueprint Copy Projects
 ```
-mein-firmen-projekt/
-├── src/                  # Vollständige Blueprint-Struktur
-│   ├── components/       # Alle 80+ Komponenten
-│   ├── templates/        # 4 Template-Varianten
-│   ├── widgets/          # Chart-Widgets
-│   ├── hooks/            # React-Hooks
-│   ├── store/            # State-Management
-│   └── utils/            # Utility-Funktionen
-├── cli/                  # CLI-Tools (optional)
-└── docs/                 # Dokumentation
+my-company-project/
+├── src/                  # Complete Blueprint structure
+│   ├── components/       # All 80+ components
+│   ├── templates/        # 4 template variants
+│   ├── widgets/          # Chart widgets
+│   ├── hooks/            # React hooks
+│   ├── store/            # State management
+│   └── utils/            # Utility functions
+├── cli/                  # CLI tools (optional)
+└── docs/                 # Documentation
 ```
 
 ---
 
-## 🔧 Fehlerbehebung
+## 🔧 Troubleshooting
 
-### Problem: CLI-Befehl funktioniert nicht
+### Problem: CLI command doesn't work
 ```bash
-# Direkte Ausführung testen
+# Test direct execution
 node --loader tsx/esm cli/blueprint-cli.ts cleanup --list
 
-# Oder TypeScript kompilieren
+# Or compile TypeScript
 npm run build
 node dist/cli/blueprint-cli.js cleanup --list
 ```
 
-### Problem: Projekt lässt sich nicht starten
+### Problem: Project won't start
 ```bash
-# Dependencies neu installieren
-cd <projekt-name>
+# Reinstall dependencies
+cd <project-name>
 rm -rf node_modules package-lock.json
 npm install
 
-# CSS-Probleme beheben (bekanntes Problem)
-# Ersetze in src/index.css:
+# Fix CSS issues (known problem)
+# Replace in src/index.css:
 # @apply border-border; → @apply border-gray-200;
 # @apply bg-background text-foreground; → @apply bg-gray-50 text-gray-900;
 ```
 
-### Problem: Port bereits in Verwendung
+### Problem: Port already in use
 ```bash
-# Andere Ports verwenden
+# Use different ports
 npm run dev -- --port 5175
 npm run dev -- --port 5176
 ```
 
 ---
 
-## 📊 Verfügbare Templates & Features
+## 📊 Available Templates & Features
 
-| Template | Beschreibung | Key Features | Ideal für |
+| Template | Description | Key Features | Ideal for |
 |----------|-------------|--------------|-----------|
-| `dashboard` | Business Dashboard | KPI Cards, Charts, Data Tables, Quick Actions | Admin-Panels, Übersichten |
-| `analytics` | Analytics Dashboard | Real-time Charts, Goal Tracking, Heat Maps | Datenanalyse, Reporting |
-| `data-table` | Datenverwaltung | CRUD Operations, Search, Filter, Bulk Actions | Datenbankinterfaces |
-| `map` | Location Dashboard | Interactive Maps, Tracking, Geospatial Analytics | Logistik, Standort-basierte Apps |
+| `dashboard` | Business Dashboard | KPI Cards, Charts, Data Tables, Quick Actions | Admin panels, overviews |
+| `analytics` | Analytics Dashboard | Real-time Charts, Goal Tracking, Heat Maps | Data analysis, reporting |
+| `data-table` | Data Management | CRUD Operations, Search, Filter, Bulk Actions | Database interfaces |
+| `map` | Location Dashboard | Interactive Maps, Tracking, Geospatial Analytics | Logistics, location-based apps |
 
 ---
 
 ## 🎯 Best Practices
 
 ### 1. Naming Convention
-- **Test-Projekte**: `test-`, `demo-`, `experiment-`
-- **Firmen-Projekte**: `firmen-`, `company-`, `prod-`
-- **Varianten**: `variant-a`, `version-2`, `prototype-x`
+- **Test Projects**: `test-`, `demo-`, `experiment-`
+- **Company Projects**: `company-`, `business-`, `prod-`
+- **Variants**: `variant-a`, `version-2`, `prototype-x`
 
-### 2. Entwicklungszyklus
-1. **Template erstellen** → Schneller Start
-2. **AI-Prompts anwenden** → Anpassung an Firmenanforderungen  
-3. **Iterativ verfeinern** → Schrittweise Verbesserung
-4. **Aufräumen** → Alte Versionen löschen
+### 2. Development Cycle
+1. **Create Template** → Quick start
+2. **Apply AI Prompts** → Adapt to company requirements  
+3. **Iterative Refinement** → Gradual improvement
+4. **Clean Up** → Delete old versions
 
-### 3. Sicherheit
-- ✅ Niemals direkt im Blueprint-Ordner arbeiten
-- ✅ Regelmäßig aufräumen mit `cleanup --list`
-- ✅ Wichtige Projekte außerhalb von Blueprint sichern
-- ✅ Git verwenden für Versionskontrolle
+### 3. Security
+- ✅ Never work directly in Blueprint folder
+- ✅ Regularly clean up with `cleanup --list`
+- ✅ Backup important projects outside Blueprint
+- ✅ Use Git for version control
 
 ---
 
-## 🔮 Erweiterte Funktionen
+## 🔮 Advanced Features
 
-### Batch-Operationen
+### Batch Operations
 ```bash
-# Mehrere Test-Projekte gleichzeitig erstellen
+# Create multiple test projects simultaneously
 for template in dashboard analytics data-table map; do
   npm run cli create test-$template --template $template
 done
 
-# Alle auf einmal löschen
+# Delete all at once
 npm run cli cleanup --delete-all
 ```
 
-### Integration mit Git
+### Git Integration
 ```bash
-# Projekt-Kopie mit Git-Integration
-npm run cli copy-blueprint mein-projekt
-cd mein-projekt
+# Project copy with Git integration
+npm run cli copy-blueprint my-project
+cd my-project
 git init
 git add .
 git commit -m "Initial Blueprint copy"
@@ -283,19 +283,19 @@ git commit -m "Initial Blueprint copy"
 
 ## 📞 Support & Troubleshooting
 
-Bei Problemen prüfen Sie:
-1. **Node.js Version**: Mindestens v18 erforderlich
-2. **Berechtigungen**: Schreibrechte im Blueprint-Ordner
-3. **Speicherplatz**: Ausreichend Platz für node_modules
-4. **Ports**: 5173-5180 verfügbar für Development-Server
+For issues, check:
+1. **Node.js Version**: Minimum v18 required
+2. **Permissions**: Write permissions in Blueprint folder
+3. **Storage Space**: Sufficient space for node_modules
+4. **Ports**: 5173-5180 available for development server
 
-**Notfall-Reset:**
+**Emergency Reset:**
 ```bash
-# Alle Projekte löschen und Blueprint zurücksetzen
+# Delete all projects and reset Blueprint
 npm run cli cleanup --delete-all
-git status  # Prüfen ob Blueprint unverändert ist
+git status  # Check if Blueprint is unchanged
 ```
 
 ---
 
-**🛡️ Ihr Blueprint-System bleibt dabei immer sicher und unverändert!**
+**🛡️ Your Blueprint system always remains safe and unchanged!**
