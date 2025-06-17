@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Treemap as RechartsTreemap, ResponsiveContainer, Tooltip } from 'recharts';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 interface TreemapData {
   name: string;
@@ -70,6 +71,7 @@ const TreemapComponent: React.FC<TreemapProps> = ({
 }) => {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const { isDarkMode } = useDarkMode();
 
   const colors = [
     '#3B82F6',
@@ -82,17 +84,71 @@ const TreemapComponent: React.FC<TreemapProps> = ({
     '#84CC16',
   ];
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  // Flatten the hierarchical data for the treemap
+  const flattenedData = React.useMemo(() => {
+    const flattened = data.flatMap(category => 
+      category.children || [{ ...category, children: undefined }]
+    ).filter(item => item.size > 0);
+    
+    // Add better color mapping to each item
+    const enhancedData = flattened.map((item, index) => ({
+      ...item,
+      fill: item.color || colors[index % colors.length],
+      stroke: isDarkMode ? '#374151' : '#fff',
+    }));
+    
+    console.log('Treemap: Original data:', data);
+    console.log('Treemap: Enhanced flattened data:', enhancedData);
+    
+    return enhancedData;
+  }, [data, colors, isDarkMode]);
+
+  // Add error handling for empty data
+  if (!flattenedData || flattenedData.length === 0) {
+    console.log('Treemap: No data available, showing empty state');
+    return (
+      <div 
+        className={`
+          p-4 rounded-lg shadow-lg flex items-center justify-center
+          ${isDarkMode 
+            ? 'bg-gray-800 text-white' 
+            : 'bg-white text-gray-900'
+          }
+          ${className}
+        `}
+        style={{ height: typeof height === 'number' ? `${height}px` : height, minHeight: '400px' }}
+      >
+        <div className="text-center">
+          <div className={`text-6xl mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>
+            📊
+          </div>
+          <h3 className="text-lg font-semibold mb-2">{title}</h3>
+          <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            No data available to display
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  console.log('Treemap: Rendering with data:', flattenedData);
+
+    const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const allData = mockData.flatMap(category => category.children || []);
-      const totalSize = allData.reduce((sum, item) => sum + item.size, 0);
+      const totalSize = flattenedData.reduce((sum, item) => sum + item.size, 0);
       const percentage = ((data.size / totalSize) * 100).toFixed(1);
 
       return (
-        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-800 mb-2">{data.name}</p>
-          <div className="space-y-1 text-sm">
+        <div className={`
+          p-4 border rounded-lg shadow-lg font-sans
+          ${isDarkMode 
+            ? 'bg-gray-800 border-gray-600 text-white' 
+            : 'bg-white border-gray-200 text-gray-800'
+          }
+        `}>
+          <p className="font-semibold mb-2 text-sm">{data.name}</p>
+          <div className="space-y-1 text-xs">
             {data.category && (
               <div className="flex justify-between">
                 <span>Department:</span>
@@ -111,119 +167,55 @@ const TreemapComponent: React.FC<TreemapProps> = ({
         </div>
       );
     }
-    return null;
+        return null;
   };
 
-  const CustomContent = ({ x, y, width, height, payload }: any) => {
-    if (width < 10 || height < 10 || !payload) return null;
 
-    const isSelected = selectedNode === payload.name;
-    const isHovered = hoveredNode === payload.name;
-    const colorIndex = mockData.findIndex(item => item.name === payload.name);
-    const color = payload.color || colors[colorIndex % colors.length];
-
-    // Calculate font size based on area
-    let fontSize = Math.min(width / 8, height / 3, 16);
-    fontSize = Math.max(fontSize, 8);
-
-    // Only show text if there's enough space
-    const showText = width > 40 && height > 20;
-    const showValue = width > 60 && height > 30;
-
-    return (
-      <g>
-        <rect
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          fill={color}
-          stroke={isSelected || isHovered ? '#ffffff' : color}
-          strokeWidth={isSelected || isHovered ? 3 : 1}
-          opacity={isSelected ? 1 : isHovered ? 0.9 : 0.8}
-          style={{
-            filter: isSelected || isHovered ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' : 'none',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease-in-out',
-          }}
-          onClick={() => setSelectedNode(selectedNode === payload.name ? null : payload.name)}
-          onMouseEnter={() => setHoveredNode(payload.name)}
-          onMouseLeave={() => setHoveredNode(null)}
-        />
-
-        {showText && payload.name && (
-          <text
-            x={x + width / 2}
-            y={y + height / 2}
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontSize={fontSize}
-            fill="white"
-            fontWeight="bold"
-            style={{ pointerEvents: 'none' }}
-          >
-            <tspan x={x + width / 2} dy="0">
-              {payload.name.length > 10 ? payload.name.substring(0, 10) + '...' : payload.name}
-            </tspan>
-            {showValue && payload.size && (
-              <tspan x={x + width / 2} dy={fontSize + 2} fontSize={fontSize * 0.8}>
-                {payload.size.toLocaleString()}
-              </tspan>
-            )}
-          </text>
-        )}
-      </g>
-    );
-  };
-
-  const containerHeight = typeof height === 'number' ? `${height}px` : height;
 
   return (
     <div 
-      className={`bg-white p-4 rounded-lg shadow-lg flex flex-col ${className}`}
-      style={{ height: containerHeight, minHeight: '500px' }}
+      className={`
+        p-4 rounded-lg shadow-lg flex flex-col font-sans
+        ${isDarkMode 
+          ? 'bg-gray-800 text-white' 
+          : 'bg-white text-gray-900'
+        }
+        ${className}
+      `}
+      style={{ height: typeof height === 'number' ? `${height}px` : height, minHeight: '500px' }}
     >
       <div className="flex justify-between items-center mb-3 flex-shrink-0">
         <h3 className="text-lg font-semibold">{title}</h3>
         <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setSelectedNode('departments')}
-            className={`px-3 py-1 text-xs rounded transition-colors ${
-              selectedNode === 'departments'
-                ? 'bg-blue-100 text-blue-800'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            Departments
-          </button>
-          <button
-            onClick={() => setSelectedNode('all')}
-            className={`px-3 py-1 text-xs rounded transition-colors ${
-              selectedNode === 'all'
-                ? 'bg-blue-100 text-blue-800'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            All Items
-          </button>
+          {selectedNode && (
+            <span className={`px-2 py-1 text-xs rounded-full ${
+              isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-700'
+            }`}>
+              Selected: {selectedNode}
+            </span>
+          )}
           <button
             onClick={() => setSelectedNode(null)}
-            className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+            className={`px-3 py-1 text-xs rounded transition-colors ${
+              isDarkMode
+                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
           >
             Clear Selection
           </button>
         </div>
       </div>
 
-      {/* Treemap - Takes remaining space */}
+      {/* Treemap Chart */}
       <div className="flex-1 mb-3 min-h-[250px]">
         <ResponsiveContainer width="100%" height="100%">
           <RechartsTreemap
-            data={data}
+            data={flattenedData}
             dataKey="size"
-            stroke="#fff"
-            content={<CustomContent />}
-            animationDuration={1000}
+            aspectRatio={4/3}
+            stroke={isDarkMode ? "#374151" : "#fff"}
+            animationDuration={500}
           >
             <Tooltip content={<CustomTooltip />} />
           </RechartsTreemap>
@@ -232,15 +224,15 @@ const TreemapComponent: React.FC<TreemapProps> = ({
 
       {/* Department breakdown */}
       <div className="flex-shrink-0">
-        <h4 className="text-sm font-medium text-gray-700 mb-2">Department Breakdown</h4>
+        <h4 className={`text-sm font-medium mb-2 ${
+          isDarkMode ? 'text-gray-300' : 'text-gray-700'
+        }`}>Department Breakdown</h4>
         <div className="grid grid-cols-2 gap-2">
-          {mockData.map(category => {
+          {data.map(category => {
             const total = category.children
               ? category.children.reduce((sum: number, child: TreemapData) => sum + child.size, 0)
               : category.size;
-            const allDataTotal = mockData
-              .flatMap(cat => cat.children || [])
-              .reduce((sum, item) => sum + item.size, 0);
+            const allDataTotal = flattenedData.reduce((sum, item) => sum + item.size, 0);
             const percentage = ((total / allDataTotal) * 100).toFixed(1);
             const isSelected = selectedNode === category.name;
 
@@ -249,20 +241,30 @@ const TreemapComponent: React.FC<TreemapProps> = ({
                 key={category.name}
                 className={`p-2 rounded-lg cursor-pointer transition-all ${
                   isSelected
-                    ? 'bg-blue-50 border-2 border-blue-200'
-                    : 'bg-gray-50 hover:bg-gray-100'
+                    ? (isDarkMode 
+                      ? 'bg-blue-900 border-2 border-blue-400' 
+                      : 'bg-blue-50 border-2 border-blue-200')
+                    : (isDarkMode
+                      ? 'bg-gray-700 hover:bg-gray-600'
+                      : 'bg-gray-50 hover:bg-gray-100')
                 }`}
                 onClick={() => setSelectedNode(isSelected ? null : category.name)}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-medium text-xs">{category.name}</span>
-                  <span className="text-xs text-gray-500">{percentage}%</span>
+                  <span className={`text-xs ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`}>{percentage}%</span>
                 </div>
-                <div className="flex justify-between text-xs text-gray-600">
+                <div className={`flex justify-between text-xs ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>
                   <span>Size: {total.toLocaleString()}</span>
                   <span>Items: {category.children ? category.children.length : 1}</span>
                 </div>
-                <div className="mt-1 w-full bg-gray-200 rounded-full h-1">
+                <div className={`mt-1 w-full rounded-full h-1 ${
+                  isDarkMode ? 'bg-gray-600' : 'bg-gray-200'
+                }`}>
                   <div
                     className="h-1 rounded-full transition-all duration-500"
                     style={{
@@ -278,20 +280,21 @@ const TreemapComponent: React.FC<TreemapProps> = ({
       </div>
 
       {/* Statistics */}
-      <div className="mt-3 p-3 bg-gray-50 rounded-lg flex-shrink-0">
+      <div className={`mt-3 p-3 rounded-lg flex-shrink-0 ${
+        isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+      }`}>
         <div className="grid grid-cols-3 gap-4 text-center text-sm">
           <div>
             <p className="font-bold text-base">
-              {mockData
-                .flatMap(cat => cat.children || [])
-                .reduce((sum, item) => sum + item.size, 0)
-                .toLocaleString()}
+              {flattenedData.reduce((sum, item) => sum + item.size, 0).toLocaleString()}
             </p>
-            <p className="text-gray-600 text-xs">Total Size</p>
+            <p className={`text-xs ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            }`}>Total Size</p>
           </div>
           <div>
             {(() => {
-              const categoryTotals = mockData.map(cat => ({
+              const categoryTotals = data.map(cat => ({
                 name: cat.name,
                 total: cat.children
                   ? cat.children.reduce((sum, child) => sum + child.size, 0)
@@ -303,15 +306,19 @@ const TreemapComponent: React.FC<TreemapProps> = ({
               return (
                 <>
                   <p className="font-bold text-base">{largest.name}</p>
-                  <p className="text-gray-600 text-xs">Largest Dept</p>
-                  <p className="text-xs text-gray-500">({largest.total.toLocaleString()})</p>
+                  <p className={`text-xs ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Largest Dept</p>
+                  <p className={`text-xs ${
+                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                  }`}>({largest.total.toLocaleString()})</p>
                 </>
               );
             })()}
           </div>
           <div>
             {(() => {
-              const categoryTotals = mockData.map(cat => ({
+              const categoryTotals = data.map(cat => ({
                 name: cat.name,
                 total: cat.children
                   ? cat.children.reduce((sum, child) => sum + child.size, 0)
@@ -323,8 +330,12 @@ const TreemapComponent: React.FC<TreemapProps> = ({
               return (
                 <>
                   <p className="font-bold text-base">{smallest.name}</p>
-                  <p className="text-gray-600 text-xs">Smallest Dept</p>
-                  <p className="text-xs text-gray-500">({smallest.total.toLocaleString()})</p>
+                  <p className={`text-xs ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Smallest Dept</p>
+                  <p className={`text-xs ${
+                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                  }`}>({smallest.total.toLocaleString()})</p>
                 </>
               );
             })()}
@@ -333,9 +344,10 @@ const TreemapComponent: React.FC<TreemapProps> = ({
       </div>
 
       {/* Instructions */}
-      <div className="text-xs text-gray-500 text-center flex-shrink-0">
-        Click on rectangles to select • Switch between department and detailed view • Hover for
-        details
+      <div className={`text-xs text-center mt-2 flex-shrink-0 ${
+        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+      }`}>
+        Click on rectangles to select • Click department cards to highlight • Hover for details
       </div>
     </div>
   );
