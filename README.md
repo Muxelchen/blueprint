@@ -197,13 +197,13 @@ import { AccessibilitySupport, KeyboardNav } from '@/components/common/inputs';
 - [x] **AudioWidget** - ✅ COMPLETE: Audio player with playlist, waveform, spectrum, favorites, shuffle/repeat, themes
 - [x] **DocumentViewer** - ✅ COMPLETE: PDF/DOC viewer with zoom, navigation, search, thumbnails, fullscreen, download/print
 - [x] **CodeBlock** - ✅ COMPLETE: Code display with syntax highlighting, themes, copy/download, search, line numbers, fullscreen
-- [ ] **MarkdownViewer** - Markdown renderer with live preview
+- [x] **MarkdownViewer** - ✅ COMPLETE: Markdown renderer with live preview, editor toolbar, split view, export
 
 ### 📝 **Text & Content Widgets** (Priority: MEDIUM)
-- [ ] **TextWidget** - Simple text display with formatting
+- [x] **TextWidget** - ✅ COMPLETE: Simple text display with formatting, editing, character count, export
 - [ ] **QuoteWidget** - Quote block with author and styling
-- [ ] **CounterWidget** - Animated number display
-- [ ] **ClockWidget** - Current time with different time zones
+- [x] **CounterWidget** - ✅ COMPLETE: Animated number display with trends, targets, multiple formats
+- [x] **ClockWidget** - ✅ COMPLETE: Current time with different time zones, digital/analog styles
 - [ ] **QRCodeWidget** - QR code generator and display
 - [ ] **EmbedWidget** - Iframe for external content (YouTube, Maps, etc.)
 
@@ -216,7 +216,7 @@ import { AccessibilitySupport, KeyboardNav } from '@/components/common/inputs';
 
 ### 🛠️ **Utility Widgets** (Priority: MEDIUM)
 - [ ] **ShortcutWidget** - Quick access buttons for actions
-- [ ] **SearchWidget** - Global search functionality
+- [x] **SearchWidget** - ✅ COMPLETE: Global search functionality with filters, highlighting, recent searches
 - [ ] **FilterWidget** - Filter panel for data
 - [ ] **ExportWidget** - Export functions (PDF, Excel, CSV)
 - [ ] **PrintWidget** - Print-optimized views

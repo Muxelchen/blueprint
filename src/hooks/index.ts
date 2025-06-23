@@ -12,6 +12,8 @@ export * from './useDebounce';
 
 // Theme management hooks
 export * from './useTheme';
+export * from './useDarkMode';
+export * from './useDarkModeShortcut';
 
 // Notification management hooks
 export * from './useNotifications';

@@ -28,6 +28,9 @@ export { default as Timeline } from './Timeline';
 export { default as Calendar } from './Calendar';
 export { default as ProgressBar } from './ProgressBar';
 export { default as WeatherWidget } from './WeatherWidget';
+export { default as ClockWidget } from './ClockWidget';
+export { default as SearchWidget } from './SearchWidget';
+export { default as ShortcutWidget } from './ShortcutWidget';
 
 // =============================================================================
 // 🖼️ MEDIA & CONTENT WIDGETS
@@ -37,6 +40,13 @@ export { default as VideoWidget } from './VideoWidget';
 export { default as AudioWidget } from './AudioWidget';
 export { default as DocumentViewer } from './DocumentViewer';
 export { default as CodeBlock } from './CodeBlock';
+export { default as MarkdownViewer } from './MarkdownViewer';
+
+// =============================================================================
+// 📝 TEXT & CONTENT WIDGETS
+// =============================================================================
+export { default as TextWidget } from './TextWidget';
+export { default as CounterWidget } from './CounterWidget';
 
 // =============================================================================
 // 📦 WIDGET COLLECTIONS & UTILITIES
@@ -49,13 +59,14 @@ export { default as CodeBlock } from './CodeBlock';
 export const WIDGET_CATEGORIES = {
   CHARTS: ['AreaChart', 'BarChart', 'DonutChart', 'GaugeChart', 'Heatmap', 'LineChart', 'PieChart', 'RealtimeChart', 'ScatterPlot', 'Treemap'],
   DATA_DISPLAY: ['DataTable', 'KPICard', 'Timeline'],
-  INTERACTIVE: ['Calendar', 'ProgressBar', 'WeatherWidget'],
-  MEDIA_CONTENT: ['ImageWidget', 'VideoWidget', 'AudioWidget', 'DocumentViewer', 'CodeBlock'],
+  INTERACTIVE: ['Calendar', 'ProgressBar', 'WeatherWidget', 'ClockWidget', 'SearchWidget', 'ShortcutWidget'],
+  MEDIA_CONTENT: ['ImageWidget', 'VideoWidget', 'AudioWidget', 'DocumentViewer', 'CodeBlock', 'MarkdownViewer'],
+  TEXT_CONTENT: ['TextWidget', 'CounterWidget'],
 } as const;
 
 // Widget metadata for development tools
 export const WIDGET_METADATA = {
-  totalCount: 22,
+  totalCount: 28,
   categories: Object.keys(WIDGET_CATEGORIES).length,
   lastUpdated: '2025-01-15', // Update when adding new widgets
 } as const;

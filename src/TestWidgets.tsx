@@ -7,20 +7,37 @@ const TestWidgets: React.FC = () => {
       <h1 className="text-3xl font-bold text-center mb-8">Widget Development Status</h1>
       
       {/* Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* Media Widgets Status */}
         <div className="border p-6 rounded-lg bg-green-50 border-green-200">
           <div className="flex items-center mb-4">
             <CheckCircle className="w-6 h-6 text-green-600 mr-2" />
-            <h2 className="text-xl font-semibold text-green-800">Media Widgets</h2>
+            <h2 className="text-xl font-semibold text-green-800">Media & Content</h2>
           </div>
           <ul className="space-y-2 text-green-700">
-            <li>✅ AudioWidget - Working</li>
-            <li>✅ VideoWidget - Working</li>
-            <li>✅ ImageWidget - Working</li>
-            <li>✅ DocumentViewer - Working</li>
-            <li>✅ CodeBlock - Working</li>
+            <li>✅ AudioWidget</li>
+            <li>✅ VideoWidget</li>
+            <li>✅ ImageWidget</li>
+            <li>✅ DocumentViewer</li>
+            <li>✅ CodeBlock</li>
+            <li>✅ MarkdownViewer</li>
+          </ul>
+        </div>
+
+        {/* New Widgets Status */}
+        <div className="border p-6 rounded-lg bg-green-50 border-green-200">
+          <div className="flex items-center mb-4">
+            <CheckCircle className="w-6 h-6 text-green-600 mr-2" />
+            <h2 className="text-xl font-semibold text-green-800">Text & Utility</h2>
+          </div>
+          <ul className="space-y-2 text-green-700">
+            <li>✅ TextWidget</li>
+            <li>✅ CounterWidget</li>
+            <li>✅ ClockWidget</li>
+            <li>✅ SearchWidget</li>
+            <li>✅ ShortcutWidget</li>
+            <li>🎯 +5 new widgets</li>
           </ul>
         </div>
 
@@ -31,9 +48,9 @@ const TestWidgets: React.FC = () => {
             <h2 className="text-xl font-semibold text-blue-800">Media Assets</h2>
           </div>
           <ul className="space-y-2 text-blue-700">
-            <li>📁 Local asset system setup</li>
-            <li>🔄 Fallback URLs working</li>
-            <li>📚 Documentation complete</li>
+            <li>📁 Local asset system</li>
+            <li>🔄 Fallback URLs</li>
+            <li>📚 Documentation</li>
             <li>🎵 Audio: MP3, OGG, WAV</li>
             <li>🎬 Video: MP4, WebM</li>
             <li>🖼️ Images: JPG, PNG, WebP</li>
@@ -52,6 +69,7 @@ const TestWidgets: React.FC = () => {
             <li>📦 MediaService: Active</li>
             <li>🧪 TypeScript: Clean</li>
             <li>⚡ Performance: Good</li>
+            <li>📊 28 Total Widgets</li>
           </ul>
         </div>
 

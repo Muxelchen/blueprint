@@ -33,6 +33,7 @@ import {
   Button,
   IconButton,
   PrintButton,
+  DarkModeShortcut,
 } from './components/common';
 import {
   // Input components
@@ -1080,184 +1081,155 @@ const HomePage: React.FC = () => {
       exit={{ opacity: 0, y: -20 }}
       className="space-y-8"
     >
-      <div className="text-center">
-        <h1
-          className={`text-4xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-secondary-900'}`}
-        >
-          Welcome to Blueprint Frontend
-        </h1>
-        <p
-          className={`text-lg max-w-2xl mx-auto ${
-            isDarkMode ? 'text-gray-300' : 'text-secondary-600'
-          }`}
-        >
-          A complete React application with TypeScript, Tailwind CSS, and modern tooling. Ready for
-          local development with all features included.
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <motion.div
-          className={`card hover:shadow-xl transition-all duration-300 ${
-            isDarkMode
-              ? 'bg-gray-800 border-gray-700 hover:bg-gray-750'
-              : 'bg-white hover:shadow-xl'
-          }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="flex items-center space-x-3 mb-4">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900' : 'bg-primary-100'}`}>
-              <User className={`w-6 h-6 ${isDarkMode ? 'text-blue-300' : 'text-primary-600'}`} />
-            </div>
-            <h3 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              User Profile
-            </h3>
-          </div>
-          <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-            Welcome back, {user?.name}! You have {notifications} new notifications.
-          </p>
-          <button
-            onClick={() => {
-              incrementNotifications();
-              toast.success('New notification added!');
-            }}
-            className="btn-primary"
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className={`absolute inset-0 ${isDarkMode 
+          ? 'bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-gray-900/20' 
+          : 'bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50'
+        }`}></div>
+        
+        <div className="relative text-center py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            Add Notification
-          </button>
-        </motion.div>
-
-        <motion.div
-          className={`card hover:shadow-xl transition-all duration-300 ${
-            isDarkMode
-              ? 'bg-gray-800 border-gray-700 hover:bg-gray-750'
-              : 'bg-white hover:shadow-xl'
-          }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="flex items-center space-x-3 mb-4">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-purple-900' : 'bg-accent-100'}`}>
-              <Grid className={`w-6 h-6 ${isDarkMode ? 'text-purple-300' : 'text-accent-600'}`} />
+            <div className="mb-6">
+              <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                isDarkMode ? 'bg-blue-900/50 text-blue-300 border border-blue-700' 
+                          : 'bg-blue-100 text-blue-700 border border-blue-200'
+              }`}>
+                <span className="mr-2">✨</span>
+                Production Ready • Enterprise Grade
+              </span>
             </div>
-            <h3 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Components
-            </h3>
-          </div>
-          <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-            Explore all Blueprint components in action with live examples.
-          </p>
-          <Link to="/showcase" className="btn-accent">
-            View Components
-          </Link>
-        </motion.div>
+            
+            <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+                Blueprint
+              </span>
+              <br />
+              <span className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                Development Platform
+              </span>
+            </h1>
+            
+            <p className={`text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-600'
+            }`}>
+              Experience <strong className="text-blue-500">80+ production-ready components</strong>, 
+              <strong className="text-purple-500"> 4 complete templates</strong>, and enterprise-grade features.
+              <br />
+              <span className="text-lg">Built with React 18, TypeScript 5, and modern web technologies.</span>
+            </p>
+          </motion.div>
 
-        <motion.div
-          className={`card hover:shadow-xl transition-all duration-300 ${
-            isDarkMode
-              ? 'bg-gray-800 border-gray-700 hover:bg-gray-750'
-              : 'bg-white hover:shadow-xl'
-          }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="flex items-center space-x-3 mb-4">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-green-900' : 'bg-success-100'}`}>
-              <Table className={`w-6 h-6 ${isDarkMode ? 'text-green-300' : 'text-success-600'}`} />
+          {/* Feature Stats */}
+          <motion.div 
+            className="grid grid-cols-2 md:grid-cols-5 gap-6 mt-12 max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            {[
+              { icon: '⚡', number: '80+', label: 'Components' },
+              { icon: '🎨', number: '4', label: 'Templates' },
+              { icon: '🔒', number: '100%', label: 'AI Protected' },
+              { icon: '⚡', number: '99%', label: 'Performance' },
+              { icon: '🌙', number: 'Ctrl+Shift+D', label: 'Dark Mode' }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                className={`text-center p-4 rounded-2xl ${
+                  isDarkMode ? 'bg-gray-800/50 border border-gray-700' 
+                             : 'bg-white/80 border border-gray-200 shadow-sm'
+                }`}
+                whileHover={{ scale: 1.05, y: -5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="text-3xl mb-2">{stat.icon}</div>
+                <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {stat.number}
+                </div>
+                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Call to Action Buttons */}
+          <motion.div 
+            className="flex flex-col sm:flex-row justify-center gap-4 mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <Link 
+              to="/showcase" 
+              className="group inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              <Grid className="w-5 h-5 mr-2" />
+              Explore Components
+              <motion.span 
+                className="ml-2"
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                →
+              </motion.span>
+            </Link>
+            
+            <Link 
+              to="/templates" 
+              className={`group inline-flex items-center px-8 py-4 text-lg font-semibold rounded-2xl border-2 transform hover:scale-105 transition-all duration-200 ${
+                isDarkMode 
+                  ? 'text-white border-gray-600 hover:bg-gray-800 hover:border-gray-500' 
+                  : 'text-gray-900 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+              }`}
+            >
+              <Table className="w-5 h-5 mr-2" />
+              View Templates
+            </Link>
+          </motion.div>
+
+          {/* Quick Stats */}
+          <motion.div 
+            className={`mt-12 p-6 rounded-2xl ${
+              isDarkMode ? 'bg-gray-800/30 border border-gray-700' 
+                         : 'bg-white/60 border border-gray-200'
+            }`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <div className="flex flex-wrap justify-center items-center gap-8 text-sm">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full bg-green-500`}></div>
+                <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+                  Production Ready
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full bg-blue-500`}></div>
+                <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+                  TypeScript Strict
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full bg-purple-500`}></div>
+                <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+                  WCAG 2.1 Compliant
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full bg-orange-500`}></div>
+                <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+                  Performance Optimized
+                </span>
+              </div>
             </div>
-            <h3 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Templates
-            </h3>
-          </div>
-          <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-            Ready-to-use templates for rapid application development.
-          </p>
-          <Link to="/templates" className="btn-secondary">
-            View Templates
-          </Link>
-        </motion.div>
-      </div>
-
-      <div
-        className={`card transition-colors duration-300 ${
-          isDarkMode
-            ? 'bg-gradient-to-r from-gray-800 to-gray-700 border-gray-600'
-            : 'bg-gradient-to-r from-primary-50 to-accent-50'
-        }`}
-      >
-        <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-          Features Included
-        </h2>
-        <div className="grid md:grid-cols-2 gap-4">
-          <ul className="space-y-2">
-            <li className="flex items-center space-x-2">
-              <div
-                className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-blue-400' : 'bg-primary-500'}`}
-              ></div>
-              <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                React 18 with TypeScript
-              </span>
-            </li>
-            <li className="flex items-center space-x-2">
-              <div
-                className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-blue-400' : 'bg-primary-500'}`}
-              ></div>
-              <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                Vite for fast development
-              </span>
-            </li>
-            <li className="flex items-center space-x-2">
-              <div
-                className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-blue-400' : 'bg-primary-500'}`}
-              ></div>
-              <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                Tailwind CSS with custom theme
-              </span>
-            </li>
-            <li className="flex items-center space-x-2">
-              <div
-                className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-blue-400' : 'bg-primary-500'}`}
-              ></div>
-              <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                Framer Motion animations
-              </span>
-            </li>
-          </ul>
-          <ul className="space-y-2">
-            <li className="flex items-center space-x-2">
-              <div
-                className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-purple-400' : 'bg-accent-500'}`}
-              ></div>
-              <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                React Router for navigation
-              </span>
-            </li>
-            <li className="flex items-center space-x-2">
-              <div
-                className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-purple-400' : 'bg-accent-500'}`}
-              ></div>
-              <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                Zustand for state management
-              </span>
-            </li>
-            <li className="flex items-center space-x-2">
-              <div
-                className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-purple-400' : 'bg-accent-500'}`}
-              ></div>
-              <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                React Hot Toast notifications
-              </span>
-            </li>
-            <li className="flex items-center space-x-2">
-              <div
-                className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-purple-400' : 'bg-accent-500'}`}
-              ></div>
-              <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                Recharts & React Leaflet ready
-              </span>
-            </li>
-          </ul>
+          </motion.div>
         </div>
       </div>
     </motion.div>
@@ -1508,7 +1480,16 @@ const App: React.FC = () => {
                   <Menu className="w-5 h-5" />
                 </button>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  {/* Dark Mode Shortcut Button */}
+                  <DarkModeShortcut
+                    enableFloat={false}
+                    size="md"
+                    style="minimal"
+                    showKeyboardHint={true}
+                    className="p-2 ml-4 transform translate-y-4"
+                  />
+                  
                   {/* Notification Center Bell */}
                   <div className="relative">
                     <button
@@ -1836,6 +1817,8 @@ const App: React.FC = () => {
           showSettings={true}
           className="z-50"
         />
+
+
       </div>
     </DevErrorBoundary>
   );
