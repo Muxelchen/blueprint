@@ -108,6 +108,12 @@ import {
   Treemap,
   GaugeChart,
   RealtimeChart,
+  // New Media Widgets
+  ImageWidget,
+  VideoWidget,
+  AudioWidget,
+  DocumentViewer,
+  CodeBlock,
 } from './components/widgets';
 import {
   DashboardTemplate,
@@ -119,6 +125,48 @@ import { useAppStore } from './store/appStore';
 import { useDarkMode } from './hooks/useDarkMode';
 import { useNotificationCenter } from './hooks/useNotificationCenter';
 import NotificationCenterExample from './components/common/feedback/NotificationCenterExample';
+import TestWidgets from './TestWidgets';
+import CalendarPage from './pages/CalendarPage';
+import ProjectsPage from './pages/ProjectsPage';
+import MessagesPage from './pages/MessagesPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import ReportsPage from './pages/ReportsPage';
+import MapPage from './pages/MapPage';
+import ActivityPage from './pages/ActivityPage';
+import DocumentsPage from './pages/DocumentsPage';
+import DatabasePage from './pages/DatabasePage';
+import SecurityPage from './pages/SecurityPage';
+import BookmarksPage from './pages/BookmarksPage';
+import ArchivePage from './pages/ArchivePage';
+import HelpPage from './pages/HelpPage';
+import ProfilePage from './pages/ProfilePage';
+import UserSettingsPage from './pages/SettingsPage';
+
+// Analytics subpages
+import AnalyticsTrafficPage from './pages/analytics/AnalyticsTrafficPage';
+import AnalyticsConversionsPage from './pages/analytics/AnalyticsConversionsPage';
+import AnalyticsRevenuePage from './pages/analytics/AnalyticsRevenuePage';
+
+// Maps subpages
+import MapHeatPage from './pages/maps/MapHeatPage';
+import MapLocationsPage from './pages/maps/MapLocationsPage';
+
+// Projects subpages
+import ProjectsActivePage from './pages/projects/ProjectsActivePage';
+import ProjectsArchivedPage from './pages/projects/ProjectsArchivedPage';
+
+// Activity subpages
+import ActivityUsersPage from './pages/activity/ActivityUsersPage';
+import ActivityLogsPage from './pages/activity/ActivityLogsPage';
+
+// Messages subpages
+import MessagesSentPage from './pages/messages/MessagesSentPage';
+import MessagesDraftsPage from './pages/messages/MessagesDraftsPage';
+
+// Templates subpages
+import TemplatesAnalyticsPage from './pages/templates/TemplatesAnalyticsPage';
+import TemplatesDataTablePage from './pages/templates/TemplatesDataTablePage';
+
 import './index.css';
 
 // Add a simple widget wrapper with error boundary
@@ -252,6 +300,28 @@ const ComponentShowcase: React.FC = () => {
                 { title: 'Weather Widget', component: <WeatherWidget /> },
                 { title: 'Data Table', component: <DataTable /> },
                 { title: 'KPI Card', component: <KPICard data={mockKPIData[0]} /> },
+              ].map(({ title, component }, idx) => (
+                <WidgetWrapper key={idx} title={title}>
+                  {component}
+                </WidgetWrapper>
+              ))}
+            </div>
+          </div>
+
+          {/* New Media & Content Widgets Section */}
+          <div>
+            <h2
+              className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+            >
+              🖼️ Media & Content Widgets
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-full">
+              {[
+                { title: 'Image Widget', component: <ImageWidget mode="gallery" size="medium" enableZoom={true} enableLightbox={true} /> },
+                { title: 'Video Widget', component: <VideoWidget mode="single" size="medium" controls={true} enableFullscreen={true} /> },
+                { title: 'Audio Widget', component: <AudioWidget mode="playlist" size="medium" showWaveform={true} showSpectrum={true} /> },
+                { title: 'Document Viewer', component: <DocumentViewer height="400px" enableDownload={true} showToolbar={true} /> },
+                { title: 'Code Block', component: <CodeBlock language="typescript" theme="dark" showLineNumbers={true} /> },
               ].map(({ title, component }, idx) => (
                 <WidgetWrapper key={idx} title={title}>
                   {component}
@@ -1401,91 +1471,22 @@ const SettingsPage: React.FC = () => {
 
 // Main App Component with Error Boundary
 const App: React.FC = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
-  const { notifications } = useAppStore();
+  const { notifications, sidebarCollapsed, isMobileSidebarOpen, toggleMobileSidebar } = useAppStore();
   const { isDarkMode } = useDarkMode();
   const notificationCenter = useNotificationCenter();
 
-  const navigation = [
-    { name: 'Home', href: '/', icon: Home },
-    { name: 'Components', href: '/showcase', icon: Grid },
-    { name: 'Templates', href: '/templates', icon: Table },
-    { name: 'Settings', href: '/settings', icon: Settings },
-  ];
+  // Navigation is now handled by the Sidebar component
 
   return (
     <DevErrorBoundary>
       <div className="min-h-screen transition-colors duration-300 bg-background">
-        {/* Mobile sidebar backdrop */}
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
         <div className="flex min-h-screen">
-          {/* Sidebar */}
-          <div
-            className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 shadow-xl transform transition-all duration-300 ease-in-out md:translate-x-0 md:static md:inset-0 ${
-              isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-secondary-200'
-            }`}
-          >
-            <div
-              className={`flex items-center justify-between h-16 px-6 border-b ${
-                isDarkMode ? 'border-gray-700' : 'border-secondary-200'
-              }`}
-            >
-              <h1
-                className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-secondary-900'}`}
-              >
-                Blueprint
-              </h1>
-              <button
-                onClick={() => setIsSidebarOpen(false)}
-                className={`md:hidden p-2 rounded-lg transition-colors ${
-                  isDarkMode
-                    ? 'hover:bg-gray-700 text-gray-300'
-                    : 'hover:bg-secondary-100 text-secondary-600'
-                }`}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <nav className="mt-6 px-3">
-              <div className="space-y-1">
-                {navigation.map(item => {
-                  const isActive = location.pathname === item.href;
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      onClick={() => setIsSidebarOpen(false)}
-                      className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        isActive
-                          ? isDarkMode
-                            ? 'bg-blue-900 text-blue-200'
-                            : 'bg-primary-100 text-primary-700'
-                          : isDarkMode
-                            ? 'text-gray-300 hover:text-white hover:bg-gray-700'
-                            : 'text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100'
-                      }`}
-                    >
-                      <item.icon className="mr-3 h-5 w-5" />
-                      {item.name}
-                      {item.name === 'Settings' && notifications > 0 && (
-                        <span className="ml-auto bg-error-500 text-white text-xs px-2 py-1 rounded-full">
-                          {notifications}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-            </nav>
-          </div>
+          {/* Use the new enhanced Sidebar component */}
+          <Sidebar 
+            isOpen={isMobileSidebarOpen} 
+            onToggle={toggleMobileSidebar}
+          />
 
           {/* Main content area */}
           <div className="flex-1 flex flex-col min-h-screen">
@@ -1497,8 +1498,8 @@ const App: React.FC = () => {
             >
               <div className="flex items-center justify-between h-full px-6">
                 <button
-                  onClick={() => setIsSidebarOpen(true)}
-                  className={`md:hidden p-2 rounded-lg transition-colors ${
+                  onClick={toggleMobileSidebar}
+                  className={`lg:hidden p-2 rounded-lg transition-colors ${
                     isDarkMode
                       ? 'hover:bg-gray-700 text-gray-300'
                       : 'hover:bg-secondary-100 text-secondary-600'
@@ -1570,6 +1571,250 @@ const App: React.FC = () => {
                     element={
                       <DevErrorBoundary>
                         <SettingsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/test-widgets"
+                    element={
+                      <DevErrorBoundary>
+                        <TestWidgets />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/calendar"
+                    element={
+                      <DevErrorBoundary>
+                        <CalendarPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/projects"
+                    element={
+                      <DevErrorBoundary>
+                        <ProjectsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/messages"
+                    element={
+                      <DevErrorBoundary>
+                        <MessagesPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/analytics"
+                    element={
+                      <DevErrorBoundary>
+                        <AnalyticsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/reports"
+                    element={
+                      <DevErrorBoundary>
+                        <ReportsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/map"
+                    element={
+                      <DevErrorBoundary>
+                        <MapPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/activity"
+                    element={
+                      <DevErrorBoundary>
+                        <ActivityPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/documents"
+                    element={
+                      <DevErrorBoundary>
+                        <DocumentsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/database"
+                    element={
+                      <DevErrorBoundary>
+                        <DatabasePage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/security"
+                    element={
+                      <DevErrorBoundary>
+                        <SecurityPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/bookmarks"
+                    element={
+                      <DevErrorBoundary>
+                        <BookmarksPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/archive"
+                    element={
+                      <DevErrorBoundary>
+                        <ArchivePage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/help"
+                    element={
+                      <DevErrorBoundary>
+                        <HelpPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <DevErrorBoundary>
+                        <ProfilePage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/user-settings"
+                    element={
+                      <DevErrorBoundary>
+                        <UserSettingsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+
+                  {/* Analytics subpages */}
+                  <Route
+                    path="/analytics/traffic"
+                    element={
+                      <DevErrorBoundary>
+                        <AnalyticsTrafficPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/analytics/conversions"
+                    element={
+                      <DevErrorBoundary>
+                        <AnalyticsConversionsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/analytics/revenue"
+                    element={
+                      <DevErrorBoundary>
+                        <AnalyticsRevenuePage />
+                      </DevErrorBoundary>
+                    }
+                  />
+
+                  {/* Maps subpages */}
+                  <Route
+                    path="/map/heat"
+                    element={
+                      <DevErrorBoundary>
+                        <MapHeatPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/map/locations"
+                    element={
+                      <DevErrorBoundary>
+                        <MapLocationsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+
+                  {/* Projects subpages */}
+                  <Route
+                    path="/projects/active"
+                    element={
+                      <DevErrorBoundary>
+                        <ProjectsActivePage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/projects/archived"
+                    element={
+                      <DevErrorBoundary>
+                        <ProjectsArchivedPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+
+                  {/* Activity subpages */}
+                  <Route
+                    path="/activity/users"
+                    element={
+                      <DevErrorBoundary>
+                        <ActivityUsersPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/activity/logs"
+                    element={
+                      <DevErrorBoundary>
+                        <ActivityLogsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+
+                  {/* Messages subpages */}
+                  <Route
+                    path="/messages/sent"
+                    element={
+                      <DevErrorBoundary>
+                        <MessagesSentPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/messages/drafts"
+                    element={
+                      <DevErrorBoundary>
+                        <MessagesDraftsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+
+                  {/* Templates subpages */}
+                  <Route
+                    path="/templates/analytics"
+                    element={
+                      <DevErrorBoundary>
+                        <TemplatesAnalyticsPage />
+                      </DevErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/templates/datatable"
+                    element={
+                      <DevErrorBoundary>
+                        <TemplatesDataTablePage />
                       </DevErrorBoundary>
                     }
                   />

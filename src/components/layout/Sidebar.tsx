@@ -20,17 +20,33 @@ import {
   ChevronDown,
   ChevronRight,
   Star,
+  Grid,
+  Table,
 } from 'lucide-react';
+import { useAppStore } from '../../store/appStore';
 
 interface SidebarProps {
-  isOpen: boolean;
-  onToggle: () => void;
+  // Mobile props kept for backwards compatibility
+  isOpen?: boolean;
+  onToggle?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { 
+    sidebarCollapsed, 
+    isMobileSidebarOpen, 
+    toggleSidebarCollapsed, 
+    toggleMobileSidebar,
+    setMobileSidebarOpen 
+  } = useAppStore();
+  
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
   const location = useLocation();
+
+  // Use global state for mobile sidebar, fallback to props for compatibility
+  const mobileIsOpen = isOpen !== undefined ? isOpen : isMobileSidebarOpen;
+  const mobileToggle = onToggle || toggleMobileSidebar;
 
   // Main navigation items
   const mainNavigation = [
@@ -43,6 +59,27 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         { name: 'Overview', href: '/' },
         { name: 'Analytics', href: '/analytics' },
         { name: 'Reports', href: '/reports' },
+      ],
+    },
+    {
+      name: 'Components',
+      href: '/showcase',
+      icon: Grid,
+      badge: null,
+      submenu: [
+        { name: 'Component Showcase', href: '/showcase' },
+        { name: 'Widgets', href: '/test-widgets' },
+      ],
+    },
+    {
+      name: 'Templates',
+      href: '/templates',
+      icon: Table,
+      badge: null,
+      submenu: [
+        { name: 'Dashboard Templates', href: '/templates' },
+        { name: 'Analytics Template', href: '/templates/analytics' },
+        { name: 'Data Table Template', href: '/templates/datatable' },
       ],
     },
     {
@@ -120,7 +157,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
 
   // Bottom navigation items
   const bottomNavigation = [
-    { name: 'Settings', href: '/settings', icon: Settings, badge: null },
+    { name: 'Settings', href: '/user-settings', icon: Settings, badge: null },
     { name: 'Help & Support', href: '/help', icon: HelpCircle, badge: null },
     { name: 'Profile', href: '/profile', icon: User, badge: null },
   ];
@@ -128,22 +165,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
   // Handle responsive behavior
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setIsCollapsed(false);
-      }
+      const isDesktopView = window.innerWidth >= 1024;
+      setIsDesktop(isDesktopView);
     };
+
+    // Initial check
+    handleResize();
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
+  const handleToggleCollapse = () => {
+    toggleSidebarCollapsed();
     setActiveSubmenu(null);
   };
 
   const toggleSubmenu = (itemName: string) => {
-    if (isCollapsed) return;
+    if (sidebarCollapsed) return;
     setActiveSubmenu(activeSubmenu === itemName ? null : itemName);
   };
 
@@ -167,8 +206,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   : 'text-secondary-600 dark:text-gray-300 hover:text-secondary-900 dark:hover:text-white hover:bg-secondary-100 dark:hover:bg-gray-700'
               }`}
             >
-              <item.icon className={`${isCollapsed ? 'w-6 h-6' : 'w-5 h-5 mr-3'} flex-shrink-0`} />
-              {!isCollapsed && (
+              <item.icon className={`${sidebarCollapsed ? 'w-6 h-6' : 'w-5 h-5 mr-3'} flex-shrink-0`} />
+              {!sidebarCollapsed && (
                 <>
                   <span className="flex-1 text-left">{item.name}</span>
                   {item.badge && (
@@ -195,14 +234,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
           ) : (
             <Link
               to={item.href}
+              onClick={() => !isDesktop && mobileToggle()}
               className={`w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 itemIsActive
                   ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
                   : 'text-secondary-600 dark:text-gray-300 hover:text-secondary-900 dark:hover:text-white hover:bg-secondary-100 dark:hover:bg-gray-700'
               }`}
             >
-              <item.icon className={`${isCollapsed ? 'w-6 h-6' : 'w-5 h-5 mr-3'} flex-shrink-0`} />
-              {!isCollapsed && (
+              <item.icon className={`${sidebarCollapsed ? 'w-6 h-6' : 'w-5 h-5 mr-3'} flex-shrink-0`} />
+              {!sidebarCollapsed && (
                 <>
                   <span className="flex-1">{item.name}</span>
                   {item.badge && (
@@ -224,7 +264,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
           )}
 
           {/* Tooltip for collapsed state */}
-          {isCollapsed && (
+          {sidebarCollapsed && (
             <div className="absolute left-full ml-2 px-2 py-1 bg-secondary-900 dark:bg-gray-700 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
               {item.name}
             </div>
@@ -233,7 +273,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
 
         {/* Submenu */}
         <AnimatePresence>
-          {hasSubmenu && isSubmenuOpen && !isCollapsed && (
+          {hasSubmenu && isSubmenuOpen && !sidebarCollapsed && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
@@ -246,6 +286,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                   <Link
                     key={subItem.name}
                     to={subItem.href}
+                    onClick={() => !isDesktop && mobileToggle()}
                     className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
                       isActive(subItem.href)
                         ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 font-medium'
@@ -267,13 +308,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     <>
       {/* Mobile overlay */}
       <AnimatePresence>
-        {isOpen && (
+        {mobileIsOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-            onClick={onToggle}
+            onClick={mobileToggle}
           />
         )}
       </AnimatePresence>
@@ -282,17 +323,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
       <motion.aside
         initial={false}
         animate={{
-          x: isOpen ? 0 : -280,
-          width: isCollapsed ? 80 : 280,
+          x: isDesktop ? 0 : (mobileIsOpen ? 0 : -280),
+          width: sidebarCollapsed ? 80 : 280,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className={`fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-800 border-r border-secondary-200 dark:border-gray-700 shadow-lg lg:relative lg:translate-x-0 ${
-          isCollapsed ? 'lg:w-20' : 'lg:w-64'
+        className={`fixed inset-y-0 left-0 z-50 lg:sticky lg:top-0 lg:h-screen bg-white dark:bg-gray-800 border-r border-secondary-200 dark:border-gray-700 shadow-lg lg:translate-x-0 ${
+          sidebarCollapsed ? 'lg:w-20' : 'lg:w-64'
         } w-64 flex flex-col`}
       >
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-secondary-200 dark:border-gray-700">
-          {!isCollapsed && (
+          {!sidebarCollapsed && (
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
                 <Star className="w-5 h-5 text-white" />
@@ -303,11 +344,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
 
           {/* Desktop collapse button */}
           <button
-            onClick={toggleCollapse}
+            onClick={handleToggleCollapse}
             className="hidden lg:flex p-1.5 rounded-lg hover:bg-secondary-100 dark:hover:bg-gray-700 transition-colors"
             aria-label="Toggle sidebar"
           >
-            {isCollapsed ? (
+            {sidebarCollapsed ? (
               <ChevronRight className="w-4 h-4 text-secondary-600 dark:text-gray-300" />
             ) : (
               <ChevronDown className="w-4 h-4 text-secondary-600 dark:text-gray-300" />
@@ -316,11 +357,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         </div>
 
         {/* Navigation */}
-        <div className="flex-1 overflow-y-auto py-4">
-          <div className="px-3 space-y-2">
+        <div className="flex-1 overflow-y-auto py-4 min-h-0">
+          <div className="px-3 space-y-2 pb-4">
             {/* Main navigation */}
             <div className="space-y-1">
-              {!isCollapsed && (
+              {!sidebarCollapsed && (
                 <h3 className="px-3 text-xs font-semibold text-secondary-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                   Main
                 </h3>
@@ -333,7 +374,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
 
             {/* Secondary navigation */}
             <div className="space-y-1">
-              {!isCollapsed && (
+              {!sidebarCollapsed && (
                 <h3 className="px-3 text-xs font-semibold text-secondary-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                   Tools
                 </h3>
@@ -349,7 +390,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         </div>
 
         {/* Status indicator */}
-        {!isCollapsed && (
+        {!sidebarCollapsed && (
           <div className="px-3 py-2 border-t border-secondary-200 dark:border-gray-700">
             <div className="flex items-center space-x-2 text-xs text-secondary-500 dark:text-gray-400">
               <div className="w-2 h-2 bg-success-500 rounded-full"></div>

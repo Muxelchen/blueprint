@@ -188,6 +188,45 @@ import { AccessibilitySupport, KeyboardNav } from '@/components/common/inputs';
 </AccessibilitySupport>
 ```
 
+## 📋 TODO - Additional Base Components
+
+### 🖼️ **Media & Content Widgets** (Priority: HIGH)
+- [x] **ImageWidget** - ✅ COMPLETE: Image display with zoom, gallery mode, lazy loading, lightbox, download/share
+- [ ] **ImageGallery** - Image gallery with thumbnails and lightbox (partially covered by ImageWidget)
+- [x] **VideoWidget** - ✅ COMPLETE: Video player with controls, subtitles, playlist, PiP, fullscreen, keyboard shortcuts
+- [x] **AudioWidget** - ✅ COMPLETE: Audio player with playlist, waveform, spectrum, favorites, shuffle/repeat, themes
+- [x] **DocumentViewer** - ✅ COMPLETE: PDF/DOC viewer with zoom, navigation, search, thumbnails, fullscreen, download/print
+- [x] **CodeBlock** - ✅ COMPLETE: Code display with syntax highlighting, themes, copy/download, search, line numbers, fullscreen
+- [ ] **MarkdownViewer** - Markdown renderer with live preview
+
+### 📝 **Text & Content Widgets** (Priority: MEDIUM)
+- [ ] **TextWidget** - Simple text display with formatting
+- [ ] **QuoteWidget** - Quote block with author and styling
+- [ ] **CounterWidget** - Animated number display
+- [ ] **ClockWidget** - Current time with different time zones
+- [ ] **QRCodeWidget** - QR code generator and display
+- [ ] **EmbedWidget** - Iframe for external content (YouTube, Maps, etc.)
+
+### 🔗 **Social & Interaction** (Priority: LOW)
+- [ ] **SocialFeedWidget** - Social media integration
+- [ ] **CommentWidget** - Comment system with replies
+- [ ] **RatingWidget** - Rating system with stars/points
+- [ ] **ShareWidget** - Social sharing buttons
+- [ ] **ContactWidget** - Contact form with validation
+
+### 🛠️ **Utility Widgets** (Priority: MEDIUM)
+- [ ] **ShortcutWidget** - Quick access buttons for actions
+- [ ] **SearchWidget** - Global search functionality
+- [ ] **FilterWidget** - Filter panel for data
+- [ ] **ExportWidget** - Export functions (PDF, Excel, CSV)
+- [ ] **PrintWidget** - Print-optimized views
+
+### 🎨 **Design & Layout** (Priority: LOW)
+- [ ] **SpacerWidget** - Flexible spacing between widgets
+- [ ] **DividerWidget** - Visual separators and dividers
+- [ ] **BackgroundWidget** - Background container with images/colors
+- [ ] **BorderWidget** - Decorative frames and borders
+
 ## 🔧 Technology Stack
 
 ### Core Technologies

@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useAppStore } from '../../store/appStore';
 
 interface MainContentProps {
   children: React.ReactNode;
@@ -213,11 +214,15 @@ const ChartPlaceholder: React.FC<ChartPlaceholderProps> = ({ title, height = 'h-
 
 // Main Content Component
 const MainContent: React.FC<MainContentProps> = ({ children, className = '' }) => {
+  const { sidebarCollapsed } = useAppStore();
+  
   return (
     <main className={`flex-1 p-6 bg-background min-h-screen ${className}`}>
       <div className="max-w-7xl mx-auto">
-        {/* Default Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {/* Default Grid Layout - adapts to sidebar state */}
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300 ${
+          sidebarCollapsed ? 'lg:grid-cols-4 xl:grid-cols-5' : 'lg:grid-cols-3 xl:grid-cols-4'
+        }`}>
           {children}
         </div>
       </div>

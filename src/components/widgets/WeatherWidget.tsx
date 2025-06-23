@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 interface WeatherData {
   location: string;
@@ -38,6 +39,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
   const [forecast, setForecast] = useState<ForecastDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUnit, setSelectedUnit] = useState(units);
+  const { isDarkMode } = useDarkMode();
 
   // Mock weather data
   const generateMockWeather = (): WeatherData => {
@@ -160,14 +162,26 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
   if (!currentWeather) return null;
 
   return (
-    <div className="bg-gradient-to-br from-accent to-accent-hover text-white p-6 rounded-lg shadow-lg">
+    <div className={`
+      ${isDarkMode 
+        ? 'bg-gradient-to-br from-gray-800 to-gray-900 text-white' 
+        : 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
+      } 
+      p-6 rounded-lg shadow-lg
+    `}>
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold">Weather</h3>
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setSelectedUnit(selectedUnit === 'celsius' ? 'fahrenheit' : 'celsius')}
-            className="px-2 py-1 text-xs bg-white bg-opacity-20 hover:bg-opacity-30 rounded transition-colors"
+            className={`
+              px-2 py-1 text-xs rounded transition-colors
+              ${isDarkMode
+                ? 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+                : 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white'
+              }
+            `}
           >
             °{selectedUnit === 'celsius' ? 'C' : 'F'}
           </button>
@@ -189,28 +203,58 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
 
       {/* Weather Details */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+        <div className={`
+          p-3 rounded-lg
+          ${isDarkMode
+            ? 'bg-gray-700 bg-opacity-50'
+            : 'bg-white bg-opacity-20'
+          }
+        `}>
           <div className="text-xs opacity-75 mb-1">Humidity</div>
           <div className="text-lg font-semibold">{currentWeather.humidity}%</div>
         </div>
-        <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+        <div className={`
+          p-3 rounded-lg
+          ${isDarkMode
+            ? 'bg-gray-700 bg-opacity-50'
+            : 'bg-white bg-opacity-20'
+          }
+        `}>
           <div className="text-xs opacity-75 mb-1">Wind</div>
           <div className="text-lg font-semibold">
             {currentWeather.windSpeed} km/h {currentWeather.windDirection}
           </div>
         </div>
-        <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+        <div className={`
+          p-3 rounded-lg
+          ${isDarkMode
+            ? 'bg-gray-700 bg-opacity-50'
+            : 'bg-white bg-opacity-20'
+          }
+        `}>
           <div className="text-xs opacity-75 mb-1">Pressure</div>
           <div className="text-lg font-semibold">{currentWeather.pressure} hPa</div>
         </div>
-        <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+        <div className={`
+          p-3 rounded-lg
+          ${isDarkMode
+            ? 'bg-gray-700 bg-opacity-50'
+            : 'bg-white bg-opacity-20'
+          }
+        `}>
           <div className="text-xs opacity-75 mb-1">Visibility</div>
           <div className="text-lg font-semibold">{currentWeather.visibility} km</div>
         </div>
       </div>
 
       {/* UV Index */}
-      <div className="bg-white bg-opacity-20 p-3 rounded-lg mb-6">
+      <div className={`
+        p-3 rounded-lg mb-6
+        ${isDarkMode
+          ? 'bg-gray-700 bg-opacity-50'
+          : 'bg-white bg-opacity-20'
+        }
+      `}>
         <div className="flex justify-between items-center">
           <div>
             <div className="text-xs opacity-75 mb-1">UV Index</div>
@@ -233,7 +277,13 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
             {forecast.map((day, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between bg-white bg-opacity-20 p-3 rounded-lg"
+                className={`
+                  flex items-center justify-between p-3 rounded-lg
+                  ${isDarkMode
+                    ? 'bg-gray-700 bg-opacity-50'
+                    : 'bg-white bg-opacity-20'
+                  }
+                `}
               >
                 <div className="flex items-center space-x-3">
                   <span className="text-xl">{day.icon}</span>

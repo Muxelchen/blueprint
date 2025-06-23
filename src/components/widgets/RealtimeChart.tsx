@@ -133,10 +133,12 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
   height = 480,
   className = '',
 }) => {
-  // 🎯 Performance Optimizations
+  // 🎯 Performance Optimizations - Properly use React hooks at top level
   const { useVisibilityOptimization, useRenderOptimization, useMemoryOptimization } =
     usePerformanceOptimization();
-  const [chartRef, isVisible] = useVisibilityOptimization(0.1);
+  
+  // Initialize with a more permissive visibility check
+  const [chartRef, isVisible] = useVisibilityOptimization(0.01);
   const { startMeasure, endMeasure, metrics } = useRenderOptimization('RealtimeChart');
   const { checkMemoryUsage, clearCache } = useMemoryOptimization();
 
@@ -144,6 +146,7 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
   const [useWebsocketData, setUseWebsocketData] = useState(false);
   const [speed, setSpeed] = useState(updateInterval);
   const [isRunning, setIsRunning] = useState(true);
+  const [forceVisible, setForceVisible] = useState(true); // Force visibility initially
 
   // Refs for cleanup
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -189,13 +192,14 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
     };
   }, []);
 
-  // 🚀 Debounced data updates for better performance
+  // 🚀 Debounced data updates for better performance - Reduce delay for realtime updates
   const debouncedAddData = useDebounceCallback((newData: RealtimeData) => {
     setData(prevData => {
       const updatedData = [...prevData, newData];
-      return updatedData.slice(-maxDataPoints);
+      const result = updatedData.slice(-maxDataPoints);
+      return result;
     });
-  }, 50);
+  }, 10); // Reduced from 50ms to 10ms for more responsive updates
 
   // 🌐 WebSocket integration
   const { connected: isConnected, send: sendMessage } = useWebSocket({
@@ -213,22 +217,35 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
     },
   });
 
-  // 🔄 Mock data generation with performance monitoring
+  // 🔄 Mock data generation with performance monitoring - Enhanced with fallback logic
   useEffect(() => {
-    if (!useWebsocketData && isRunning && isVisible && dataGenerationRef.current) {
+    const shouldGenerate = !useWebsocketData && isRunning && (isVisible || forceVisible) && dataGenerationRef.current;
+    
+    if (shouldGenerate) {
       startMeasure();
 
-      intervalRef.current = setInterval(() => {
-        // Check memory usage periodically
-        const memoryUsage = checkMemoryUsage();
-        if (memoryUsage > 90) {
-          console.warn('🧠 High memory usage in RealtimeChart, clearing old data');
-          setData(prev => prev.slice(-Math.floor(maxDataPoints / 2)));
-          clearCache();
-        }
+      // Generate initial data if none exists
+      if (data.length === 0) {
+        const initialData = Array.from({ length: 5 }, () => generateMockData());
+        setData(initialData);
+      }
 
-        const newData = generateMockData();
-        debouncedAddData(newData);
+      intervalRef.current = setInterval(() => {
+        try {
+          // Check memory usage periodically
+          const memoryUsage = checkMemoryUsage();
+          if (memoryUsage > 90) {
+            console.warn('🧠 High memory usage in RealtimeChart, clearing old data');
+            setData(prev => prev.slice(-Math.floor(maxDataPoints / 2)));
+            clearCache();
+          }
+
+          const newData = generateMockData();
+          debouncedAddData(newData);
+        } catch (error) {
+          console.error('Error generating mock data:', error);
+          // Continue generation even if there's an error
+        }
       }, speed);
 
       endMeasure();
@@ -244,6 +261,7 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
     isRunning,
     speed,
     isVisible,
+    forceVisible,
     generateMockData,
     debouncedAddData,
     maxDataPoints,
@@ -251,7 +269,17 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
     endMeasure,
     checkMemoryUsage,
     clearCache,
+    data.length, // Add data.length as dependency for initial generation
   ]);
+
+  // Force visibility after initial mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setForceVisible(false); // Allow normal visibility optimization after 2 seconds
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // 🧹 Cleanup on unmount
   useEffect(() => {
@@ -282,13 +310,28 @@ const RealtimeChart: React.FC<RealtimeChartProps> = ({
     clearCache();
   }, [clearCache]);
 
-  // 🎨 Don't render if not visible (performance optimization)
-  if (!isVisible) {
-    return <div ref={chartRef} style={{ height: typeof height === 'number' ? `${height}px` : height }} className={className} />;
+  // Check if we should render the chart (more permissive logic)
+  const shouldRender = isVisible || forceVisible || data.length > 0;
+
+  // 🎨 Render placeholder if not visible and no data
+  if (!shouldRender) {
+    return (
+      <div 
+        ref={chartRef} 
+        style={{ height: typeof height === 'number' ? `${height}px` : height }} 
+        className={`${className} flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300`}
+      >
+        <div className="text-center p-8">
+          <div className="text-gray-400 mb-2">📊</div>
+          <p className="text-sm text-gray-500">Realtime Chart Loading...</p>
+          <p className="text-xs text-gray-400 mt-1">Chart will appear when visible</p>
+        </div>
+      </div>
+    );
   }
 
   const containerHeight = typeof height === 'number' ? `${height}px` : height;
-  const chartHeight = typeof height === 'number' ? Math.max(200, height - 280) : '200px'; // Reserve space for controls and stats
+  const chartHeight = typeof height === 'number' ? Math.max(200, height - 280) : '200px';
 
   return (
     <div 
