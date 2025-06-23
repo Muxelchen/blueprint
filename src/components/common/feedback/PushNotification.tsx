@@ -516,7 +516,7 @@ const NotificationHistory: React.FC<{
               <div className="text-sm text-gray-600 mt-1">{item.notification.body}</div>
               <div className="text-xs text-gray-500 mt-2">
                 {new Date(item.timestamp).toLocaleTimeString()}
-                {item.active && <span className="ml-20 text-blue-600">• Active</span>}
+                {item.active && <span className="ml-2 text-blue-600">• Active</span>}
               </div>
             </div>
 
